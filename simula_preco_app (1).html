@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simula Preço App · Andorinha Med</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0E0F0D;--bg2:#161714;--bg3:#1E201C;--bg4:#252722;
+  --border:#2E302A;--border2:#3A3D35;
+  --text:#E8E6DF;--text2:#9A9890;--text3:#5A5C54;
+  --green:#7BC47A;--green-dim:#2D4A2C;--green-bg:#1A2E19;
+  --red:#E07070;--red-dim:#4A2424;--red-bg:#2E1818;
+  --amber:#D4A44C;--amber-bg:#2A2010;
+  --blue:#6BA4D4;--blue-light:#A8CCEE;--blue-bg:#0E1E2E;--blue-dim:#1A3050;
+  --accent:#C8E87A;--accent2:#8BAF3A;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --display:'Syne',sans-serif;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ── Layout ── */
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+
+/* ── Sidebar ── */
+.sidebar{
+  background:var(--bg2);border-right:1px solid var(--border);
+  padding:0;position:sticky;top:0;height:100vh;
+  display:flex;flex-direction:column;overflow-y:auto;z-index:10;
+}
+.logo{padding:20px 20px 16px}
+.logo-name{font-family:var(--display);font-size:17px;font-weight:700;color:var(--blue-light);letter-spacing:0.3px;line-height:1.1}
+.logo-sub{font-size:9px;color:var(--text2);margin-top:3px;text-transform:uppercase;letter-spacing:1.2px}
+.client-tag{
+  margin:0 12px 14px;padding:7px 10px;
+  background:var(--green-bg);border:1px solid var(--green-dim);
+  border-radius:5px;display:flex;align-items:center;gap:6px;
+}
+.client-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.client-name{font-size:12px;font-weight:500;color:var(--green);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav{padding:4px 0;flex:1}
+.nav-section{padding:10px 20px 4px;font-size:9px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:1.2px}
+.nav-item{
+  display:flex;align-items:center;gap:9px;padding:9px 20px;
+  font-size:13px;font-weight:400;color:var(--text2);cursor:pointer;
+  transition:.15s;border-left:2px solid transparent;
+}
+.nav-item:hover{color:var(--text);background:var(--bg3)}
+.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(200,232,122,0.04)}
+.nav-icon{width:15px;height:15px;opacity:0.5;flex-shrink:0}
+.nav-item.active .nav-icon{opacity:1}
+.sidebar-footer{padding:14px 16px;border-top:1px solid var(--border)}
+.sf-row{font-size:11px;color:var(--text);font-family:var(--mono);line-height:1.8}
+
+/* ── Top bar (mobile) ── */
+.topbar{
+  display:none;background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:12px 16px;position:sticky;top:0;z-index:20;
+  justify-content:space-between;align-items:center;
+}
+.topbar-title{font-family:var(--display);font-size:15px;font-weight:700;color:var(--blue-light)}
+.hamburger{background:none;border:1px solid var(--border2);border-radius:4px;padding:5px 7px;cursor:pointer;color:var(--text2)}
+.mobile-nav{
+  display:none;position:fixed;inset:0;background:rgba(14,15,13,0.95);
+  z-index:100;padding:20px;flex-direction:column;gap:4px;
+}
+.mobile-nav.open{display:flex}
+.mobile-nav-close{align-self:flex-end;background:none;border:1px solid var(--border2);border-radius:4px;padding:6px 10px;color:var(--text2);cursor:pointer;font-size:12px;margin-bottom:12px}
+
+/* ── Main ── */
+.main{overflow-y:auto;min-height:100vh}
+.page{display:none;padding:28px 32px;max-width:1100px}
+.page.active{display:block}
+.page-header{margin-bottom:24px}
+.page-title{font-family:var(--display);font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.3px;margin-bottom:3px}
+.page-subtitle{font-size:12px;color:var(--text2);font-weight:300}
+
+/* ── Cards ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px}
+.card-title{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:var(--text2);margin-bottom:12px}
+.card+.card{margin-top:12px}
+
+/* ── Grids ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+/* ── Inputs ── */
+.input-section{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.input-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.input-section-title{
+  font-family:var(--display);font-size:12px;font-weight:600;color:var(--text);
+  margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);
+  text-transform:uppercase;letter-spacing:0.5px;
+}
+.input-group{margin-bottom:12px}
+.input-label{font-size:11px;font-weight:500;color:var(--text);margin-bottom:4px;display:flex;justify-content:space-between}
+.input-hint{font-weight:300;color:var(--text2)}
+.input-row{display:flex;align-items:center;gap:8px}
+.input-row-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.input-row-2 .input-group{margin-bottom:0}
+input[type=number],input[type=text]{
+  flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;
+  padding:7px 10px;font-family:var(--mono);font-size:13px;color:var(--accent);
+  outline:none;transition:.15s;width:100%;
+}
+input[type=text]{color:var(--green)}
+input[type=number]:focus,input[type=text]:focus{border-color:var(--accent2);background:var(--bg4)}
+input[type=number]::-webkit-inner-spin-button{opacity:0.3}
+.input-suffix{font-size:11px;color:var(--text3);min-width:30px;flex-shrink:0}
+.input-mini{width:80px!important;flex:none}
+
+/* ── KPIs ── */
+.kpi{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:11px 13px}
+.kpi-lbl{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;font-weight:500}
+.kpi-val{font-family:var(--mono);font-size:15px;font-weight:500}
+.kpi-sub{font-size:10px;color:var(--text3);margin-top:2px;font-family:var(--mono)}
+.pos{color:var(--green)}.neg{color:var(--red)}.neu{color:var(--text2)}.amb{color:var(--amber)}
+
+/* ── Tables ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:600px}
+th{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:0.8px;color:var(--text2);padding:8px 8px;text-align:right;border-bottom:1px solid var(--border2);background:var(--bg3);white-space:nowrap}
+th:first-child{text-align:left}
+td{padding:7px 8px;text-align:right;font-family:var(--mono);font-size:11px;border-bottom:1px solid var(--border);color:var(--text2);white-space:nowrap}
+td:first-child{text-align:left;font-family:var(--sans);color:var(--text);font-size:11px;white-space:normal}
+tr:hover td{background:rgba(255,255,255,0.015)}
+tr.total td{font-weight:500;color:var(--text);background:rgba(200,232,122,0.03);border-top:1px solid var(--border2)}
+tr.section td{background:var(--bg3);font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text2);padding:6px 8px}
+tr.section td:first-child{font-family:var(--sans)}
+.val-pos{color:var(--green)}.val-neg{color:var(--red)}.val-na{color:var(--text2);font-family:var(--sans);font-size:11px}
+
+/* ── Derived ── */
+.derived-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.derived-item{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:9px 11px}
+.derived-item .dl{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:2px}
+.derived-item .dv{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text)}
+
+/* ── Segments ── */
+.seg{display:flex;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;overflow:hidden}
+.seg button{padding:5px 13px;font-size:12px;font-family:var(--sans);font-weight:400;cursor:pointer;color:var(--text2);background:transparent;border:none;transition:.15s}
+.seg button.on{background:var(--bg4);color:var(--accent);font-weight:500}
+
+/* ── Diagram ── */
+.diagram-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:18px}
+svg.diagram{width:100%;display:block;overflow:visible}
+.diagram-legend{display:flex;gap:16px;flex-wrap:wrap;padding:12px 0 0;font-size:11px;color:var(--text3);border-top:1px solid var(--border)}
+.dl-item{display:flex;align-items:center;gap:5px}
+.dl-dot{width:8px;height:8px;border-radius:2px}
+.dl-dash{width:18px;height:0;border-top:1.5px dashed var(--text3)}
+
+/* ── Sensitivity ── */
+.sensitivity-bar{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:4px;margin-bottom:4px;font-size:12px}
+.sensitivity-bar.viable{background:var(--green-bg)}
+.sensitivity-bar.inviable{background:var(--red-bg)}
+.sensitivity-bar.current{border:1px solid var(--amber);background:var(--amber-bg)}
+.sb-label{font-family:var(--mono);min-width:84px;font-size:11px}
+.sb-track{flex:1;height:4px;background:var(--border2);border-radius:2px;position:relative}
+.sb-fill{height:100%;border-radius:2px;transition:.3s}
+.sb-vpl{font-family:var(--mono);font-size:11px;min-width:96px;text-align:right}
+.sb-status{font-size:10px;min-width:80px;text-align:right}
+
+/* ── Executive cards ── */
+.exec-card{background:var(--bg3);border-radius:6px;padding:14px;margin-bottom:8px;border-left:3px solid}
+.exec-card.green{border-color:var(--green)}.exec-card.red{border-color:var(--red)}.exec-card.amber{border-color:var(--amber)}
+.exec-title{font-family:var(--display);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px}
+.exec-card.green .exec-title{color:var(--green)}.exec-card.red .exec-title{color:var(--red)}.exec-card.amber .exec-title{color:var(--amber)}
+.exec-body{font-size:12px;color:var(--text);line-height:1.7;font-weight:300}
+
+/* ── Alerts ── */
+.alert{padding:11px 13px;border-radius:5px;font-size:12px;line-height:1.6;margin-bottom:10px;font-weight:300;border-left:3px solid}
+.alert.ok{background:var(--green-bg);color:var(--green);border-color:var(--green)}
+.alert.err{background:var(--red-bg);color:var(--red);border-color:var(--red)}
+.alert.warn{background:var(--amber-bg);color:var(--amber);border-color:var(--amber)}
+
+/* ── Misc ── */
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .topbar{display:flex}
+  .main{padding-top:0}
+  .page{padding:16px}
+  .grid2,.grid3,.grid4{grid-template-columns:1fr 1fr}
+  .grid4{grid-template-columns:1fr 1fr}
+  .page-title{font-size:18px}
+  .derived-grid{grid-template-columns:1fr 1fr}
+  .diagram-wrap{padding:12px}
+  .card{padding:14px}
+}
+@media(max-width:480px){
+  .grid2,.grid3,.grid4{grid-template-columns:1fr}
+  .derived-grid{grid-template-columns:1fr 1fr}
+  .input-row-2{grid-template-columns:1fr}
+  .diagram-legend{gap:10px}
+}
+
+/* ── Visual hierarchy — secondary rows ── */
+tr.row-dim td {
+  color: var(--text2);
+  font-size: 10px;
+  opacity: 0.85;
+  border-bottom-color: transparent;
+}
+tr.row-dim td:first-child {
+  font-family: var(--sans);
+  color: var(--text3);
+}
+tr.row-faint td {
+  color: var(--text2);
+  font-size: 10px;
+  border-bottom-color: transparent;
+  font-family: var(--mono);
+}
+tr.row-faint td:first-child {
+  font-family: var(--sans);
+  color: var(--text2);
+}
+tr.row-event td {
+  color: var(--text);
+  font-size: 11px;
+}
+tr.row-event:hover td {
+  background: rgba(255,255,255,0.025);
+}
+tr.row-event td:first-child {
+  color: var(--text2);
+}
+</style>
+</head>
+<body>
+
+<!-- Mobile top bar -->
+<div class="topbar">
+  <div class="topbar-title">SIMULA PREÇO APP</div>
+  <button class="hamburger" onclick="toggleMobileNav()">☰ Menu</button>
+</div>
+
+<!-- Mobile nav overlay -->
+<div class="mobile-nav" id="mobile-nav">
+  <button class="mobile-nav-close" onclick="toggleMobileNav()">✕ Fechar</button>
+  <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding:0 4px">Modelo</div>
+  <div class="nav-item active" onclick="goTo('premissas');toggleMobileNav()">Premissas</div>
+  <div class="nav-item" onclick="goTo('fluxo-icms');toggleMobileNav()">Fluxo c/ ICMS</div>
+  <div class="nav-item" onclick="goTo('fluxo-no');toggleMobileNav()">Fluxo s/ ICMS</div>
+  <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:12px 0 8px;padding:0 4px">Análise</div>
+  <div class="nav-item" onclick="goTo('comparativo');toggleMobileNav()">Comparativo</div>
+  <div class="nav-item" onclick="goTo('decisao');toggleMobileNav()">Análise de Decisão</div>
+  <div class="nav-item" onclick="goTo('diagrama');toggleMobileNav()">Diagrama FC</div>
+</div>
+
+<div class="app">
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-name">SIMULA PREÇO APP</div>
+    <div class="logo-sub">Andorinha Med · Análise Financeira</div>
+  </div>
+  <div class="client-tag" id="client-tag">
+    <div class="client-dot"></div>
+    <div class="client-name" id="client-display">—</div>
+  </div>
+  <div class="nav">
+    <div class="nav-section">Modelo</div>
+    <div class="nav-item active" onclick="goTo('premissas')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Premissas
+    </div>
+    <div class="nav-item" onclick="goTo('fluxo-icms')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M9 4l5 4-5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Fluxo c/ ICMS
+    </div>
+    <div class="nav-item" onclick="goTo('fluxo-no')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M9 4l5 4-5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="2" y1="4" x2="8" y2="13" stroke="currentColor" stroke-width="1" opacity="0.35"/></svg>
+      Fluxo s/ ICMS
+    </div>
+    <div class="nav-section" style="margin-top:6px">Análise</div>
+    <div class="nav-item" onclick="goTo('comparativo')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="5" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="4" width="5" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+      Comparativo
+    </div>
+    <div class="nav-item" onclick="goTo('decisao')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.6 3.3 3.6.5-2.6 2.6.6 3.6L8 10.4l-3.2 1.6.6-3.6L2.8 5.8l3.6-.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      Análise de Decisão
+    </div>
+    <div class="nav-item" onclick="goTo('diagrama')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12l3-5 3 3 2-4 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Diagrama FC
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="sf-row" id="sb-taxa">i = 1,50% a.m.</div>
+    <div class="sf-row" id="sb-pv">PV = R$ 5,39</div>
+    <div class="sf-row" id="sb-rebate">Rebate = R$ 10,41</div>
+  </div>
+</nav>
+
+<!-- ── Pages ── -->
+<main class="main">
+
+<!-- ══ PREMISSAS ══ -->
+<div class="page active" id="page-premissas">
+  <div class="page-header">
+    <div class="page-title">Premissas</div>
+    <div class="page-subtitle">Todos os campos são inputs — qualquer alteração recalcula o modelo instantaneamente</div>
+  </div>
+  <div class="grid2">
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">Identificação</div>
+        <div class="input-group">
+          <div class="input-label">Nome do cliente</div>
+          <input type="text" id="p-cliente" value="ULTRAFARMA" oninput="recalc()" placeholder="Nome do cliente">
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Dados da operação</div>
+        <div class="input-section">
+          <div class="input-section-title">Mercadoria &amp; Fiscal</div>
+          <div class="input-group">
+            <div class="input-label">Valor Mercadoria (bruto) <span class="input-hint">com ICMS</span></div>
+            <div class="input-row"><input type="number" id="p-compra" value="15.54" step="0.01" oninput="recalc()"><span class="input-suffix">R$</span></div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">Alíquota ICMS</div>
+            <div class="input-row"><input type="number" id="p-icms" value="12" step="0.1" oninput="recalc()"><span class="input-suffix">%</span></div>
+          </div>
+        </div>
+        <div class="input-section">
+          <div class="input-section-title">Preço &amp; Custos</div>
+          <div class="input-group">
+            <div class="input-label">Preço de Venda</div>
+            <div class="input-row"><input type="number" id="p-pv" value="5.39" step="0.01" oninput="recalc()"><span class="input-suffix">R$</span></div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">Frete <span class="input-hint">% do PV · pgt. D<span id="lbl-d-frete">15</span></span></div>
+            <div class="input-row-2">
+              <div class="input-group">
+                <div class="input-label">Alíquota</div>
+                <div class="input-row"><input type="number" id="p-frete" value="2.5" step="0.1" oninput="recalc()"><span class="input-suffix">%</span></div>
+              </div>
+              <div class="input-group">
+                <div class="input-label">Prazo</div>
+                <div class="input-row"><input type="number" id="d-frete" value="15" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">Comissão <span class="input-hint">% do PV</span></div>
+            <div class="input-row-2">
+              <div class="input-group">
+                <div class="input-label">Alíquota</div>
+                <div class="input-row"><input type="number" id="p-comis" value="0" step="0.1" oninput="recalc()"><span class="input-suffix">%</span></div>
+              </div>
+              <div class="input-group">
+                <div class="input-label">Prazo</div>
+                <div class="input-row"><input type="number" id="d-comis" value="30" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">Rebate <span class="input-hint">recebimento do fornecedor</span></div>
+            <div class="input-row"><input type="number" id="p-rebate" value="10.41" step="0.01" oninput="recalc()"><span class="input-suffix">R$</span></div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">PIS/COFINS s/ Rebate <span class="input-hint">incide sobre receita do rebate</span></div>
+            <div class="input-row"><input type="number" id="p-piscofins" value="3.65" step="0.05" oninput="recalc()"><span class="input-suffix">%</span></div>
+          </div>
+        </div>
+        <div class="input-section">
+          <div class="input-section-title">Taxa de Desconto</div>
+          <div class="input-group">
+            <div class="input-label">Taxa de juros <span class="input-hint">ao mês</span></div>
+            <div class="input-row"><input type="number" id="p-taxa" value="1.5" step="0.1" oninput="recalc()"><span class="input-suffix">% a.m.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">Prazos dos eventos (dias)</div>
+        <div class="input-group">
+          <div class="input-label">ICMS Crédito (entrada)</div>
+          <div class="input-row"><input type="number" id="d-icmsc" value="0" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">ICMS Débito (apuração)</div>
+          <div class="input-row"><input type="number" id="d-icmsd" value="45" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Compra — pagamento fornecedor</div>
+          <div class="input-row"><input type="number" id="d-compra" value="60" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Venda — recebimento</div>
+          <div class="input-row"><input type="number" id="d-venda" value="75" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Rebate — recebimento</div>
+          <div class="input-row"><input type="number" id="d-rebate" value="120" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px;font-style:italic">Frete e Comissão têm prazos próprios acima ↑</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Valores derivados</div>
+        <div class="derived-grid" id="derived-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FLUXO c/ICMS ══ -->
+<div class="page" id="page-fluxo-icms">
+  <div class="page-header">
+    <div class="page-title">Fluxo Financeiro c/ ICMS</div>
+    <div class="page-subtitle">Captura o efeito temporal do crédito fiscal · fator = (1+i)^(n/30)</div>
+  </div>
+  <div class="grid4" style="margin-bottom:16px" id="kpis-icms"></div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">P&amp;L — demonstrativo de resultado</div>
+    <div class="tbl-wrap"><table id="tbl-pl"></table></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Fluxo de caixa &amp; VPL</div>
+    <div class="tbl-wrap"><table id="tbl-fc-icms"></table></div>
+  </div>
+</div>
+
+<!-- ══ FLUXO s/ICMS ══ -->
+<div class="page" id="page-fluxo-no">
+  <div class="page-header">
+    <div class="page-title">Fluxo Financeiro s/ ICMS</div>
+    <div class="page-subtitle">Apenas movimentos financeiros efetivos — ICMS como compensação fiscal sem desembolso</div>
+  </div>
+  <div class="grid4" style="margin-bottom:16px" id="kpis-no"></div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title" id="nota-no"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Fluxo de caixa &amp; VPL</div>
+    <div class="tbl-wrap"><table id="tbl-fc-no"></table></div>
+  </div>
+</div>
+
+<!-- ══ COMPARATIVO ══ -->
+<div class="page" id="page-comparativo">
+  <div class="page-header">
+    <div class="page-title">Comparativo</div>
+    <div class="page-subtitle">c/ ICMS vs. s/ ICMS — a diferença é o VPL do timing fiscal</div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">Indicadores</div>
+    <div class="tbl-wrap"><table id="tbl-comp"></table></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Interpretação gerencial</div>
+    <div id="interp-gerencial"></div>
+  </div>
+</div>
+
+<!-- ══ ANÁLISE DE DECISÃO ══ -->
+<div class="page" id="page-decisao">
+  <div class="page-header">
+    <div class="page-title">Análise de Decisão</div>
+    <div class="page-subtitle">Ponto de equilíbrio, sensibilidade ao rebate e resumo executivo</div>
+  </div>
+  <div class="grid2" style="margin-bottom:12px">
+    <div class="card"><div class="card-title">Ponto de equilíbrio — rebate mínimo (VPL caixa = 0)</div><div id="breakeven-detail"></div></div>
+    <div class="card"><div class="card-title">Decisão rápida</div><div id="decisao-rapida"></div></div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="card-title" style="margin:0">Sensibilidade VPL s/ ICMS × Rebate</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:11px;color:var(--text3)">Passo</span>
+        <input type="number" id="s-passo" value="0.25" step="0.05" style="width:66px;font-size:12px;padding:4px 8px" oninput="recalc()">
+        <span style="font-size:11px;color:var(--text3)">Linhas ±</span>
+        <input type="number" id="s-linhas" value="5" step="1" min="2" max="8" style="width:50px;font-size:12px;padding:4px 8px" oninput="recalc()">
+      </div>
+    </div>
+    <div id="sensitivity-bars"></div>
+  </div>
+  <div class="card"><div class="card-title">Resumo executivo</div><div id="exec-summary"></div></div>
+</div>
+
+<!-- ══ DIAGRAMA ══ -->
+<div class="page" id="page-diagrama">
+  <div class="page-header">
+    <div class="page-title">Diagrama de Fluxo de Caixa</div>
+    <div class="page-subtitle">↑ entrada · ↓ saída · altura proporcional ao valor · cinza = valor no outro modo</div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
+    <div class="seg" id="sg-m">
+      <button class="on" onclick="setDiagModel('icms',this)">c/ ICMS</button>
+      <button onclick="setDiagModel('no',this)">s/ ICMS</button>
+    </div>
+    <div class="seg" id="sg-t">
+      <button class="on" onclick="setDiagType('nom',this)">Nominal</button>
+      <button onclick="setDiagType('disc',this)">Descontado</button>
+    </div>
+  </div>
+  <div class="grid4" style="margin-bottom:14px" id="kpis-diag"></div>
+  <div class="diagram-wrap">
+    <svg id="diag-svg" class="diagram" viewBox="0 0 900 420" role="img" aria-label="Diagrama de fluxo de caixa"></svg>
+    <div class="diagram-legend">
+      <div class="dl-item"><div class="dl-dot" style="background:var(--green)"></div>Entrada</div>
+      <div class="dl-item"><div class="dl-dot" style="background:var(--red)"></div>Saída</div>
+      <div class="dl-item"><div class="dl-dash"></div>Saldo acumulado</div>
+      <div class="dl-item" style="margin-left:auto;font-style:italic;font-size:10px">Cinza = valor no outro modo</div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+// ── State ──
+let diagMdl='icms', diagTyp='nom';
+
+// ── Nav ──
+function goTo(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  // Update both sidebar and mobile nav
+  document.querySelectorAll('.nav-item, .mobile-nav .nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active');
+  });
+}
+function toggleMobileNav(){
+  document.getElementById('mobile-nav').classList.toggle('open');
+}
+
+// ── Format ──
+const fR=(v,dp=4)=>{
+  if(v===null||v===undefined||isNaN(v))return'—';
+  const a=Math.abs(v).toFixed(dp).replace('.',',');
+  return v<0?'(R$ '+a+')':'R$ '+a;
+};
+const fP=(v,dp=2)=>(isNaN(v)?'—':(v>=0?'+':'')+(v*100).toFixed(dp).replace('.',',')+'%');
+const fN=(v,dp=4)=>(isNaN(v)?'—':v.toFixed(dp).replace('.',','));
+const cls=v=>v>0?'val-pos':v<0?'val-neg':'';
+const clsK=v=>v>0?'pos':v<0?'neg':'neu';
+
+// ── Inputs ──
+function gi(id){return parseFloat(document.getElementById(id).value)||0;}
+function gs(id){return document.getElementById(id).value||'';}
+
+// ── Calc ──
+function calc(){
+  const compra=gi('p-compra'), icmsAliq=gi('p-icms')/100;
+  const pv=gi('p-pv'),         freteP=gi('p-frete')/100;
+  const comisP=gi('p-comis')/100, rebate=gi('p-rebate');
+  const piscoP=gi('p-piscofins')/100, taxa=gi('p-taxa')/100;
+
+  // Prazos
+  const dIC=gi('d-icmsc'), dFR=gi('d-frete'), dCOM=gi('d-comis');
+  const dID=gi('d-icmsd'), dCP=gi('d-compra'), dVD=gi('d-venda'), dRB=gi('d-rebate');
+
+  const fat=d=>Math.pow(1+taxa,d/30);
+
+  // Derived
+  const icmsC   = compra*icmsAliq;
+  const icmsD   = pv*icmsAliq;
+  const cmv     = compra-icmsC;
+  const vliq    = pv-icmsD;
+  const freteV  = pv*freteP;
+  const comisV  = pv*comisP;
+  const piscoV  = rebate*piscoP;   // PIS/COFINS on rebate
+  const saldoICMS = icmsC-icmsD;
+
+  // P&L
+  const mc1    = vliq-cmv;
+  const mc2    = mc1-comisV-freteV;
+  const mcFinal= mc2+rebate-piscoV;
+
+  // Events: 8 slots
+  // days array: [dIC, dFR, dCOM, dID, dCP, dVD, dRB, dRB]
+  const days  = [dIC, dFR, dCOM, dID, dCP, dVD, dRB, dRB];
+  const lbls  = ['ICMS Crédito','(-) Frete','(-) Comissão','(-) ICMS Débito','(-) Compra','(+) Venda','(+) Rebate bruto','(-) PIS/COFINS s/ Rebate'];
+
+  // Flows c/ICMS
+  const fcICMS= [icmsC, -freteV, -comisV, -icmsD, -compra, pv, rebate, -piscoV];
+  // Flows s/ICMS (ICMS lines = 0)
+  const fcNO  = [0,     -freteV, -comisV,       0, -compra, pv, rebate, -piscoV];
+
+  const discICMS = fcICMS.map((f,i)=>f/fat(days[i]));
+  const discNO   = fcNO.map(  (f,i)=>f/fat(days[i]));
+
+  const cumICMS  = fcICMS.reduce((a,b,i)=>[...a,(a[i-1]||0)+b],[]);
+  const cumNO    = fcNO.reduce(  (a,b,i)=>[...a,(a[i-1]||0)+b],[]);
+  const cumDICMS = discICMS.reduce((a,b,i)=>[...a,(a[i-1]||0)+b],[]);
+  const cumDNO   = discNO.reduce(  (a,b,i)=>[...a,(a[i-1]||0)+b],[]);
+
+  const fcFI=cumICMS[7], fcFN=cumNO[7];
+  const vplI=cumDICMS[7], vplN=cumDNO[7];
+
+  // Breakeven: VPL caixa s/ rebate (net)
+  // Net rebate contribution = rebate/fat(dRB) - piscoV/fat(dRB) = (rebate-piscoV)/fat(dRB)
+  // Find rebate_bruto_min such that VPL_no = 0
+  // vplN = vplNoRebate + (rebate_min*(1-piscoP))/fat(dRB) = 0
+  // => rebate_min = -vplNoRebate * fat(dRB) / (1-piscoP)
+  const vplNoReb  = discNO.slice(0,6).reduce((a,b)=>a+b,0); // without rebate and piscofins
+  const rebateMin = -vplNoReb * fat(dRB) / (1-piscoP);
+  const gap       = rebateMin - rebate;
+
+  return {
+    compra,icmsAliq,pv,freteP,comisP,rebate,piscoP,taxa,
+    dIC,dFR,dCOM,dID,dCP,dVD,dRB,
+    fat, icmsC,icmsD,cmv,vliq,freteV,comisV,piscoV,saldoICMS,
+    mc1,mc2,mcFinal,
+    days,lbls,fcICMS,fcNO,discICMS,discNO,
+    cumICMS,cumNO,cumDICMS,cumDNO,
+    fcFI,fcFN,vplI,vplN,vplNoReb,rebateMin,gap
+  };
+}
+
+// ── KPI html ──
+const kpiH=(l,v,isPct=false)=>{
+  const val=isPct?fP(v):fR(v);
+  return `<div class="kpi"><div class="kpi-lbl">${l}</div><div class="kpi-val ${clsK(v)}">${val}</div></div>`;
+};
+
+// ── Table helpers ──
+
+// Unique days preserving order
+function getUD(days){ const s=new Set(); return days.filter(d=>s.has(d)?false:s.add(d)); }
+
+// For each unique day: last cumulative value after all events on that day
+function mapCum(cums,days,ud){ return ud.map(d=>{let v=null;days.forEach((dd,i)=>{if(dd===d)v=cums[i]});return v!==null?v:0}); }
+
+// For each unique day: sum of FC values on that day
+function mapFC(fcVals,days,ud){ return ud.map(d=>days.reduce((s,dd,i)=>dd===d?s+fcVals[i]:s,0)); }
+
+// For each unique day: sum of discounted values on that day
+function mapVPL(discVals,days,ud){ return ud.map(d=>days.reduce((s,dd,i)=>dd===d?s+discVals[i]:s,0)); }
+
+function dayHdr(ud){
+  return `<tr><th>Evento</th>${ud.map(d=>`<th>D${d}</th>`).join('')}<th>Total</th></tr>`;
+}
+function eventRow(lbl,val,eventDay,ud,isNA=false){
+  const cells=ud.map(d=>{
+    if(isNA) return `<td class="val-na">N/A</td>`;
+    if(d!==eventDay||val===0) return `<td class="val-na">—</td>`;
+    return `<td class="${cls(val)}">${fR(val)}</td>`;
+  });
+  const totCell=isNA?`<td class="val-na">N/A</td>`:val===0?`<td class="val-na">—</td>`:`<td class="${cls(val)}">${fR(val)}</td>`;
+  return `<tr class="row-event"><td>${lbl}</td>${cells.join('')}${totCell}</tr>`;
+}
+function cumRow(lbl,vals,isTot=false){
+  return `<tr${isTot?' class="total"':''}><td>${lbl}</td>${vals.map(v=>`<td class="${cls(v)}">${fR(v)}</td>`).join('')}<td></td></tr>`;
+}
+function pctRow(lbl,vals,pv){
+  return `<tr class="row-dim"><td>${lbl}</td>${vals.map(v=>`<td>${fP(v/pv)}</td>`).join('')}<td></td></tr>`;
+}
+function fatRow(lbl,ud,fat){
+  return `<tr class="row-faint"><td>${lbl}</td>${ud.map(d=>`<td>${fN(fat(d))}</td>`).join('')}<td></td></tr>`;
+}
+function vplRow(lbl,vals){
+  const tot=vals.reduce((a,b)=>a+b,0);
+  return `<tr class="row-dim"><td>${lbl}</td>${vals.map(v=>`<td class="${cls(v)}">${fR(v)}</td>`).join('')}<td class="${cls(tot)}">${fR(tot)}</td></tr>`;
+}
+
+// ── Main recalc ──
+function recalc(){
+  const R=calc();
+  const{pv,taxa,rebate,icmsC,icmsD,saldoICMS,mc1,mc2,mcFinal,
+        freteV,comisV,piscoV,cmv,vliq,
+        days,lbls,fcICMS,fcNO,discICMS,discNO,
+        cumICMS,cumNO,cumDICMS,cumDNO,
+        fcFI,fcFN,vplI,vplN,vplNoReb,rebateMin,gap,fat}=R;
+
+  // Client display
+  const cname=gs('p-cliente')||'—';
+  document.getElementById('client-display').textContent=cname;
+
+  // Sidebar footer
+  document.getElementById('sb-taxa').textContent=`i = ${(taxa*100).toFixed(2).replace('.',',')}% a.m.`;
+  document.getElementById('sb-pv').textContent=`PV = ${fR(pv,2)}`;
+  document.getElementById('sb-rebate').textContent=`Rebate = ${fR(rebate,2)}`;
+
+  // ── Derived ──
+  document.getElementById('derived-grid').innerHTML=[
+    ['ICMS Crédito',fR(icmsC)],['ICMS Débito',fR(icmsD)],['Saldo ICMS',fR(saldoICMS)],
+    ['CMV líq.',fR(cmv)],['Venda Líquida',fR(vliq)],['PIS/COFINS Rebate',fR(piscoV)],
+    ['Frete (R$)',fR(freteV)],['Comissão (R$)',fR(comisV)],['MC Final',fR(mcFinal)],
+  ].map(([l,v])=>`<div class="derived-item"><div class="dl">${l}</div><div class="dv">${v}</div></div>`).join('');
+
+  // ── Fluxo c/ICMS ──
+  document.getElementById('kpis-icms').innerHTML=kpiH('FC Final',fcFI)+kpiH('FC (% PV)',fcFI/pv,'',true)+kpiH('VPL Final',vplI)+kpiH('VPL (% PV)',vplI/pv,true);
+
+  const plRows=[
+    ['Preço de Venda',pv,pv/pv,false],
+    ['(-) ICMS s/ Venda',-icmsD,-icmsD/pv,false],
+    ['Venda Líquida',vliq,vliq/pv,true],
+    ['(-) CMV',-cmv,-cmv/pv,false],
+    ['MC1',mc1,mc1/pv,true],
+    ['(-) Comissão',-comisV,-comisV/pv,false],
+    ['(-) Frete',-freteV,-freteV/pv,false],
+    ['MC2',mc2,mc2/pv,true],
+    ['(+) Rebate bruto',rebate,rebate/pv,false],
+    ['(-) PIS/COFINS s/ Rebate',-piscoV,-piscoV/pv,false],
+    ['MC Final',mcFinal,mcFinal/pv,true],
+  ];
+  document.getElementById('tbl-pl').innerHTML=
+    `<tr><th>Linha</th><th>R$</th><th style="opacity:0.6">% PV</th></tr>`+
+    plRows.map(([l,v,p,t])=>`<tr${t?' class="total"':''}><td>${l}</td><td class="${cls(v)}">${fR(v,4)}</td><td class="${cls(p)}">${fP(p)}</td></tr>`).join('');
+
+  // FC + VPL c/ICMS
+  const ud=getUD(days);
+  const nCols=ud.length+2;
+  let t=`<table>${dayHdr(ud)}`;
+  fcICMS.forEach((v,i)=>{ t+=eventRow(lbls[i],v,days[i],ud); });
+  t+=cumRow('FC do Período',mapFC(fcICMS,days,ud),false);
+  t+=cumRow('FC Acumulado',mapCum(cumICMS,days,ud),true);
+  t+=pctRow('FC Acumulado (% PV)',mapCum(cumICMS,days,ud),pv);
+  t+=`<tr class="section"><td colspan="${nCols}">VPL — (1+${(taxa*100).toFixed(2).replace('.',',')}%)^(n/30)</td></tr>`;
+  t+=fatRow('Fator de Desconto',ud,fat);
+  t+=vplRow('VPL do Período',mapVPL(discICMS,days,ud));
+  t+=cumRow('VPL Acumulado',mapCum(cumDICMS,days,ud),true);
+  t+=pctRow('VPL Acumulado (% PV)',mapCum(cumDICMS,days,ud),pv);
+  t+='</table>';
+  document.getElementById('tbl-fc-icms').outerHTML=t.replace('<table','<table id="tbl-fc-icms"');
+
+  // ── Fluxo s/ICMS ──
+  document.getElementById('kpis-no').innerHTML=kpiH('FC Final',fcFN)+kpiH('FC (% PV)',fcFN/pv,true)+kpiH('VPL Final',vplN)+kpiH('VPL (% PV)',vplN/pv,true);
+  document.getElementById('nota-no').innerHTML=
+    `Crédito ICMS ${fR(icmsC)} &gt; Débito ${fR(icmsD)} — sem desembolso ao fisco. Saldo credor de <strong style="color:var(--amber)">${fR(saldoICMS)}</strong> no livro fiscal para compensação futura.`;
+
+  const ud2=getUD(days);
+  const nCols2=ud2.length+2;
+  let t2=`<table>${dayHdr(ud2)}`;
+  fcNO.forEach((v,i)=>{
+    const isICMS=i===0||i===3;
+    t2+=isICMS?eventRow(lbls[i],0,days[i],ud2,true):eventRow(lbls[i],v,days[i],ud2);
+  });
+  t2+=cumRow('FC do Período',mapFC(fcNO,days,ud2),false);
+  t2+=cumRow('FC Acumulado',mapCum(cumNO,days,ud2),true);
+  t2+=pctRow('FC Acumulado (% PV)',mapCum(cumNO,days,ud2),pv);
+  t2+=`<tr class="section"><td colspan="${nCols2}">VPL</td></tr>`;
+  t2+=fatRow('Fator de Desconto',ud2,fat);
+  t2+=vplRow('VPL do Período',mapVPL(discNO,days,ud2));
+  t2+=cumRow('VPL Acumulado',mapCum(cumDNO,days,ud2),true);
+  t2+=pctRow('VPL Acumulado (% PV)',mapCum(cumDNO,days,ud2),pv);
+  t2+='</table>';
+  document.getElementById('tbl-fc-no').outerHTML=t2.replace('<table','<table id="tbl-fc-no"');
+
+  // ── Comparativo ──
+  const compRows=[
+    ['FC Final (R$)',       fR(fcFI),        fR(fcFN),       fR(fcFI-fcFN),     'Diferença = benefício temporal do ICMS'],
+    ['FC Final (% PV)',     fP(fcFI/pv),     fP(fcFN/pv),    fP((fcFI-fcFN)/pv),''],
+    ['VPL Final (R$)',      fR(vplI),        fR(vplN),       fR(vplI-vplN),     'VPL do timing fiscal do ICMS'],
+    ['VPL Final (% PV)',    fP(vplI/pv),     fP(vplN/pv),    fP((vplI-vplN)/pv),`${fP(vplI/pv)} c/ICMS vs ${fP(vplN/pv)} s/ICMS`],
+    ['MC P&L (R$)',         fR(mcFinal),     '—',            '—',               `Margem contábil ${fR(mcFinal)}`],
+    ['MC P&L (% PV)',       fP(mcFinal/pv),  '—',            '—',               `${fP(mcFinal/pv)} — depende 100% do rebate`],
+    ['Saldo ICMS crédito',  fR(saldoICMS),   '—',            '—',               'Livro fiscal — vale se houver débitos futuros'],
+  ];
+  document.getElementById('tbl-comp').innerHTML=
+    `<tr><th>Indicador</th><th>c/ ICMS</th><th>s/ ICMS</th><th>Diferença</th><th>Observação</th></tr>`+
+    compRows.map(([l,e,c,d,obs],i)=>`<tr class="${[1,3,5].includes(i)?'row-dim':''}"><td>${l}</td><td class="val-pos">${e}</td><td style="color:${c==='—'?'var(--text3)':'var(--blue)'}">${c}</td><td style="color:var(--amber)">${d}</td><td style="color:var(--text3);font-size:10px;font-family:var(--sans)">${obs}</td></tr>`).join('');
+
+  document.getElementById('interp-gerencial').innerHTML=[
+    {t:'Por que os modelos diferem?',b:`Crédito ICMS ${fR(icmsC)} > Débito ${fR(icmsD)}. Saldo de ${fR(saldoICMS)} não sai do caixa — compensação contábil futura. O modelo c/ICMS captura esse benefício temporal; o s/ICMS ignora por não ser movimentação financeira.`},
+    {t:'Quando usar c/ICMS?',b:`Para medir margem contábil e avaliar o retorno da estrutura fiscal. Margem P&L atual: ${fP(mcFinal/pv)}. Adequado quando a empresa tem saldo devedor de ICMS para absorver o crédito.`},
+    {t:'Quando usar s/ICMS?',b:`Para gestão de liquidez. VPL de ${fP(vplN/pv)} — operação ${vplN<0?'consome':'gera'} valor a ${fP(taxa)} a.m. ${vplN<0?'Alerta para o financeiro.':'Operação viável no caixa.'}`},
+    {t:'Risco principal',b:`MC2 sem rebate: ${fP(mc2/pv)}. Rebate de ${fR(rebate)} = ${fP(rebate/pv)} do PV — dependência estrutural. Crédito ICMS de ${fR(saldoICMS)} só tem valor se houver débitos futuros. PIS/COFINS ${fP(R.piscoP)} incide sobre o rebate bruto.`},
+  ].map(({t,b})=>`<div style="padding:11px 0;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:500;color:var(--text);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px">${t}</div><div style="font-size:12px;color:var(--text2);line-height:1.7;font-weight:300">${b}</div></div>`).join('');
+
+  // ── Decisão ──
+  document.getElementById('breakeven-detail').innerHTML=`
+    <div style="font-size:12px;color:var(--text3);margin-bottom:10px;font-weight:300">
+      VPL caixa sem rebate: <span style="font-family:var(--mono);color:var(--red)">${fR(vplNoReb)}</span><br>
+      Fator D${R.dRB}: <span style="font-family:var(--mono);color:var(--text2)">${fN(fat(R.dRB))}</span><br>
+      PIS/COFINS: <span style="font-family:var(--mono);color:var(--text2)">${fP(R.piscoP)}</span> s/ rebate
+    </div>
+    <div style="background:var(--bg3);border-radius:5px;padding:11px;margin-bottom:10px">
+      <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Rebate mínimo bruto</div>
+      <div style="font-family:var(--mono);font-size:18px;font-weight:500;color:var(--accent)">${fR(rebateMin)}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px">${fP(rebateMin/pv)} do PV</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--border)">
+      <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px">Rebate atual</div><div style="font-family:var(--mono);font-size:14px;color:var(--blue)">${fR(rebate)}</div></div>
+      <div style="color:var(--text3);font-size:18px;align-self:center">→</div>
+      <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px">Gap</div><div style="font-family:var(--mono);font-size:14px;color:${gap>0?'var(--red)':'var(--green)'}">${gap>0?'+':''}${fR(gap)}</div></div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:6px;font-weight:300">
+      ${gap>0?`Necessário <span style="font-family:var(--mono);color:var(--red)">${fR(gap)}</span> a mais de rebate para zerar VPL caixa.`:
+              `Rebate atual supera o mínimo em <span style="font-family:var(--mono);color:var(--green)">${fR(Math.abs(gap))}</span>.`}
+    </div>`;
+
+  const viable=vplN>=0;
+  document.getElementById('decisao-rapida').innerHTML=
+    `<div class="alert ${viable?'ok':'err'}"><strong>${viable?'Viável financeiramente.':'Inviável no caixa.'}</strong><br>VPL c/ICMS: ${fP(vplI/pv)} · VPL s/ICMS: ${fP(vplN/pv)}</div>
+    <div style="font-size:11px;color:var(--text3);line-height:1.7;font-weight:300">
+      ${viable?`A operação gera valor a ${fP(taxa)} a.m. mesmo desconsiderando o crédito fiscal.`:
+               `Requer rebate de ${fR(rebateMin)} para equilibrar o caixa. Gap atual: ${fR(gap)}.`}
+    </div>`;
+
+  const nL=parseInt(document.getElementById('s-linhas').value)||5;
+  const passo=parseFloat(document.getElementById('s-passo').value)||0.25;
+  let bars='';
+  for(let i=0;i<=nL*2;i++){
+    const rb=rebate+(i-nL)*passo;
+    if(rb<=0)continue;
+    const piscoLocal=rb*R.piscoP;
+    const vpl=vplNoReb+(rb-piscoLocal)/fat(R.dRB);
+    const isCur=Math.abs(rb-rebate)<0.001;
+    const viable2=vpl>=0;
+    const pct=Math.min(Math.abs(vpl)/Math.max(Math.abs(vplNoReb),0.01)*25,100);
+    bars+=`<div class="sensitivity-bar ${isCur?'current':viable2?'viable':'inviable'}">
+      <div class="sb-label" style="color:${isCur?'var(--amber)':viable2?'var(--green)':'var(--red)'}">${fR(rb,2)}</div>
+      <div class="sb-track"><div class="sb-fill" style="width:${pct}%;background:${viable2?'var(--green-dim)':'var(--red-dim)'}"></div></div>
+      <div class="sb-vpl ${clsK(vpl)}">${fR(vpl,4)}</div>
+      <div class="sb-status" style="color:${isCur?'var(--amber)':viable2?'var(--green)':'var(--red)'}">
+        ${isCur?'← atual':viable2?'viável':'inviável'}
+      </div>
+    </div>`;
+  }
+  document.getElementById('sensitivity-bars').innerHTML=bars;
+
+  document.getElementById('exec-summary').innerHTML=[
+    {c:'green',t:'ACEITAR — visão c/ ICMS',b:`VPL c/ICMS ${fP(vplI/pv)} positivo a ${fP(taxa)} a.m. Margem P&L de ${fP(mcFinal/pv)}. Crédito líquido ICMS de ${fR(saldoICMS)} permanece na empresa sem custo financeiro.`},
+    {c:'red',  t:'REJEITAR — visão s/ ICMS',b:`VPL s/ICMS ${fP(vplN/pv)} a ${fP(taxa)} a.m. Desembolso de ${fR(rebate)} no D${R.dCP} contra recebimentos tardios. PIS/COFINS de ${fR(piscoV)} reduz o rebate líquido para ${fR(rebate-piscoV)}.`},
+    {c:'amber',t:'CONDIÇÃO DE VIABILIDADE',b:`Rebate mínimo bruto: ${fR(rebateMin)} (${fP(rebateMin/pv)} PV). Rebate atual: ${fR(rebate)}. A operação ${gap>0?'AINDA NÃO É':'JÁ É'} viável no caixa com o rebate contratado.`},
+  ].map(({c,t,b})=>`<div class="exec-card ${c}"><div class="exec-title">${t}</div><div class="exec-body">${b}</div></div>`).join('');
+
+  // ── Diagram ──
+  renderDiagram(R);
+}
+
+// ── Diagram ──
+function setDiagModel(m,btn){diagMdl=m;document.querySelectorAll('#sg-m button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
+function setDiagType(t,btn){diagTyp=t;document.querySelectorAll('#sg-t button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
+
+function renderDiagram(R){
+  const{pv,days,fcICMS,fcNO,discICMS,discNO,fcFI,fcFN,vplI,vplN,fat}=R;
+  const raw  =diagMdl==='icms'?fcICMS:fcNO;
+  const disc =diagMdl==='icms'?discICMS:discNO;
+  const vals =diagTyp==='nom'?raw:disc;
+  const alt  =diagTyp==='nom'?disc:raw;
+  const fcF  =diagMdl==='icms'?fcFI:fcFN;
+  const vplF =diagMdl==='icms'?vplI:vplN;
+
+  document.getElementById('kpis-diag').innerHTML=
+    kpiH('FC Final',fcF)+kpiH('FC (% PV)',fcF/pv,true)+kpiH('VPL Final',vplF)+kpiH('VPL (% PV)',vplF/pv,true);
+
+  // X positions for 8 events — filter zeros for display
+  const allXS=[60,150,235,330,440,555,690,790];
+  const TLY=195, SC=9.5, MH=28;
+  const GRN='#7BC47A', RED='#E07070', GRAY='#5A5C54';
+  const DLBLS=['ICMS créd.','Frete','Comissão','ICMS déb.','Compra','Venda','Rebate bruto','PIS/COFINS'];
+
+  let s='';
+  s+=`<rect x="40" y="20" width="850" height="${TLY-20}" rx="0" fill="rgba(200,232,122,0.015)"/>`;
+  s+=`<line x1="40" y1="${TLY}" x2="870" y2="${TLY}" stroke="#3A3D35" stroke-width="0.75"/>`;
+  s+=`<text x="32" y="${TLY+4}" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="10" fill="#5A5C54">0</text>`;
+
+  let cumPts=[], cum=0;
+  vals.forEach((v,i)=>{
+    const x=allXS[i];
+    if(v===0){
+      s+=`<line x1="${x}" y1="${TLY-4}" x2="${x}" y2="${TLY+4}" stroke="#2E302A" stroke-width="0.75"/>`;
+      s+=`<text x="${x}" y="${TLY+17}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" fill="#3A3D35">D${days[i]}</text>`;
+      return;
+    }
+    cum+=v; cumPts.push({x,v:cum});
+    const pos=v>0;
+    const h=Math.max(Math.abs(v)*SC,MH);
+    const col=pos?GRN:RED;
+    const y2=pos?TLY-h:TLY+h;
+    s+=`<line x1="${x}" y1="${TLY}" x2="${x}" y2="${y2+(pos?3:-3)}" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>`;
+    if(pos) s+=`<polygon points="${x-4},${y2+10} ${x+4},${y2+10} ${x},${y2+1}" fill="${col}"/>`;
+    else     s+=`<polygon points="${x-4},${y2-10} ${x+4},${y2-10} ${x},${y2-1}" fill="${col}"/>`;
+    s+=`<line x1="${x}" y1="${TLY-4}" x2="${x}" y2="${TLY+4}" stroke="#4A4D43" stroke-width="0.75"/>`;
+    s+=`<text x="${x}" y="${TLY+17}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="500" fill="#9A9890">D${days[i]}</text>`;
+    const vStr=fR(v,4), altStr=fR(alt[i],4), lbl=DLBLS[i];
+    if(pos){
+      s+=`<text x="${x}" y="${y2-18}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="500" fill="${col}">${vStr}</text>`;
+      s+=`<text x="${x}" y="${y2-6}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" fill="#9A9890">${lbl}</text>`;
+      s+=`<text x="${x}" y="${y2+4}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="${GRAY}">${altStr}</text>`;
+    } else {
+      s+=`<text x="${x}" y="${y2+13}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="500" fill="${col}">${vStr}</text>`;
+      s+=`<text x="${x}" y="${y2+24}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" fill="#9A9890">${lbl}</text>`;
+      s+=`<text x="${x}" y="${y2+34}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="${GRAY}">${altStr}</text>`;
+    }
+  });
+
+  if(cumPts.length>1){
+    const csc=3.5, cy=p=>TLY-p.v*csc;
+    let dp=`M ${cumPts[0].x} ${cy(cumPts[0])}`;
+    cumPts.slice(1).forEach(p=>{dp+=` L ${p.x} ${cy(p)}`});
+    s+=`<path d="${dp}" fill="none" stroke="#3A3D35" stroke-width="1.2" stroke-dasharray="5 4"/>`;
+    const last=cumPts[cumPts.length-1];
+    const lc=last.v>=0?GRN:RED;
+    s+=`<circle cx="${last.x}" cy="${cy(last)}" r="4" fill="${lc}"/>`;
+    s+=`<circle cx="${last.x}" cy="${cy(last)}" r="1.8" fill="#0E0F0D"/>`;
+    s+=`<text x="${last.x+12}" y="${cy(last)-2}" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="500" fill="${lc}">Saldo</text>`;
+    s+=`<text x="${last.x+12}" y="${cy(last)+9}" font-family="IBM Plex Mono,monospace" font-size="9" fill="${lc}">${fR(last.v,4)}</text>`;
+  }
+
+  document.getElementById('diag-svg').innerHTML=s;
+}
+
+// ── Init ──
+recalc();
+</script>
+</body>
+</html>
