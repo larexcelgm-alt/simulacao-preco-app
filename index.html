@@ -854,8 +854,23 @@ function renderDiagram(R){
   document.getElementById('kpis-diag').innerHTML=
     kpiH('FC Final',fcF)+kpiH('FC (% PV)',fcF/pv,true)+kpiH('VPL Final',vplF)+kpiH('VPL (% PV)',vplF/pv,true);
 
-  // X positions for 8 events — filter zeros for display
-  const allXS=[60,150,235,330,440,555,690,790];
+  // X positions: unique days proportional to timeline, same-day events offset ±18px
+  const ud=getUD(days);
+  const maxDay=Math.max(...ud);
+  const X0=65, X1=830;
+  const udXS=ud.map(d=>X0+(d/maxDay)*(X1-X0));
+  const getDayX=d=>udXS[ud.indexOf(d)];
+  // count events per day for offset
+  const dayCnt={}, daySeq={};
+  days.forEach((d,i)=>{dayCnt[d]=(dayCnt[d]||0)+1;});
+  const dayPos={};
+  days.forEach((d,i)=>{dayPos[d]=(dayPos[d]||0); daySeq[i]=dayPos[d]; dayPos[d]++;});
+  const getX=i=>{
+    const d=days[i], base=getDayX(d), cnt=dayCnt[d];
+    if(cnt===1) return base;
+    return base+(daySeq[i]-(cnt-1)/2)*22;
+  };
+
   const TLY=195, SC=9.5, MH=28;
   const GRN='#7BC47A', RED='#E07070', GRAY='#5A5C54';
   const DLBLS=['ICMS créd.','Frete','Comissão','ICMS déb.','Compra','Venda','Rebate bruto','PIS/COFINS'];
@@ -865,15 +880,18 @@ function renderDiagram(R){
   s+=`<line x1="40" y1="${TLY}" x2="870" y2="${TLY}" stroke="#3A3D35" stroke-width="0.75"/>`;
   s+=`<text x="32" y="${TLY+4}" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="10" fill="#5A5C54">0</text>`;
 
+  // Draw unique-day axis ticks first
+  ud.forEach(d=>{
+    const x=getDayX(d);
+    s+=`<line x1="${x}" y1="${TLY-4}" x2="${x}" y2="${TLY+4}" stroke="#4A4D43" stroke-width="0.75"/>`;
+    s+=`<text x="${x}" y="${TLY+17}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="500" fill="#9A9890">D${d}</text>`;
+  });
+
   let cumPts=[], cum=0;
   vals.forEach((v,i)=>{
-    const x=allXS[i];
-    if(v===0){
-      s+=`<line x1="${x}" y1="${TLY-4}" x2="${x}" y2="${TLY+4}" stroke="#2E302A" stroke-width="0.75"/>`;
-      s+=`<text x="${x}" y="${TLY+17}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" fill="#3A3D35">D${days[i]}</text>`;
-      return;
-    }
-    cum+=v; cumPts.push({x,v:cum});
+    const x=getX(i);
+    if(v===0){ cum+=0; return; }
+    cum+=v; cumPts.push({x:getDayX(days[i]),v:cum});
     const pos=v>0;
     const h=Math.max(Math.abs(v)*SC,MH);
     const col=pos?GRN:RED;
@@ -881,8 +899,6 @@ function renderDiagram(R){
     s+=`<line x1="${x}" y1="${TLY}" x2="${x}" y2="${y2+(pos?3:-3)}" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>`;
     if(pos) s+=`<polygon points="${x-4},${y2+10} ${x+4},${y2+10} ${x},${y2+1}" fill="${col}"/>`;
     else     s+=`<polygon points="${x-4},${y2-10} ${x+4},${y2-10} ${x},${y2-1}" fill="${col}"/>`;
-    s+=`<line x1="${x}" y1="${TLY-4}" x2="${x}" y2="${TLY+4}" stroke="#4A4D43" stroke-width="0.75"/>`;
-    s+=`<text x="${x}" y="${TLY+17}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="500" fill="#9A9890">D${days[i]}</text>`;
     const vStr=fR(v,4), altStr=fR(alt[i],4), lbl=DLBLS[i];
     if(pos){
       s+=`<text x="${x}" y="${y2-18}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="500" fill="${col}">${vStr}</text>`;
