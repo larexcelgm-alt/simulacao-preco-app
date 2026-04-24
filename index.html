@@ -490,6 +490,46 @@ tr.row-event td:first-child {
     <div id="sensitivity-bars"></div>
   </div>
   <div class="card"><div class="card-title">Resumo executivo</div><div id="exec-summary"></div></div>
+
+  <!-- ══ CÁLCULO INVERSO ══ -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-title">Cálculo Inverso — Precificação por meta</div>
+
+    <!-- Selectors row -->
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+      <div>
+        <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Quero calcular</div>
+        <div class="seg" id="ci-what">
+          <button class="on" onclick="setCIWhat('pv',this)">Preço de Venda</button>
+          <button onclick="setCIWhat('rebate',this)">Rebate</button>
+          <button onclick="setCIWhat('compra',this)">Preço de Compra</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Meta baseada em</div>
+        <div class="seg" id="ci-base">
+          <button class="on" onclick="setCIBase('mc',this)">MC Final</button>
+          <button onclick="setCIBase('vpl',this)">VPL s/ ICMS</button>
+          <button onclick="setCIBase('fc',this)">FC Acumulado</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Margem-alvo (% PV)</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="number" id="ci-target" value="15" step="0.5" style="width:80px;font-size:13px;padding:6px 10px" oninput="recalc()">
+          <span style="font-size:12px;color:var(--text2)">%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result panels -->
+    <div class="grid3" id="ci-result-grid" style="margin-bottom:14px"></div>
+
+    <!-- Explanation -->
+    <div id="ci-explanation" style="font-size:12px;color:var(--text2);line-height:1.7;padding:10px 12px;background:var(--bg3);border-radius:5px;border-left:2px solid var(--accent2)"></div>
+  </div>
+
+
 </div>
 
 <!-- ══ DIAGRAMA ══ -->
@@ -525,7 +565,7 @@ tr.row-event td:first-child {
 
 <script>
 // ── State ──
-let diagMdl='icms', diagTyp='nom';
+let diagMdl='icms', diagTyp='nom', ciWhat='pv', ciBase='mc';
 
 // ── Nav ──
 function goTo(id){
@@ -551,6 +591,9 @@ const fP=(v,dp=2)=>(isNaN(v)?'—':(v>=0?'+':'')+(v*100).toFixed(dp).replace('.'
 const fN=(v,dp=4)=>(isNaN(v)?'—':v.toFixed(dp).replace('.',','));
 const cls=v=>v>0?'val-pos':v<0?'val-neg':'';
 const clsK=v=>v>0?'pos':v<0?'neg':'neu';
+
+// ── Precision: round to 8dp before any comparison to avoid JS float drift ──
+const r8=v=>Math.round(v*1e8)/1e8;
 
 // ── Inputs ──
 function gi(id){return parseFloat(document.getElementById(id).value)||0;}
@@ -772,7 +815,7 @@ function recalc(){
   document.getElementById('interp-gerencial').innerHTML=[
     {t:'Por que os modelos diferem?',b:`Crédito ICMS ${fR(icmsC)} > Débito ${fR(icmsD)}. Saldo de ${fR(saldoICMS)} não sai do caixa — compensação contábil futura. O modelo c/ICMS captura esse benefício temporal; o s/ICMS ignora por não ser movimentação financeira.`},
     {t:'Quando usar c/ICMS?',b:`Para medir margem contábil e avaliar o retorno da estrutura fiscal. Margem P&L atual: ${fP(mcFinal/pv)}. Adequado quando a empresa tem saldo devedor de ICMS para absorver o crédito.`},
-    {t:'Quando usar s/ICMS?',b:`Para gestão de liquidez. VPL de ${fP(vplN/pv)} — operação ${vplN<0?'consome':'gera'} valor a ${fP(taxa)} a.m. ${vplN<0?'Alerta para o financeiro.':'Operação viável no caixa.'}`},
+    {t:'Quando usar s/ICMS?',b:`Para gestão de liquidez. VPL de ${fP(vplN/pv)} — operação ${r8(vplN)<0?'consome':'gera'} valor a ${fP(taxa)} a.m. ${r8(vplN)<0?'Alerta para o financeiro.':'Operação viável no caixa.'}`},
     {t:'Risco principal',b:`MC2 sem rebate: ${fP(mc2/pv)}. Rebate de ${fR(rebate)} = ${fP(rebate/pv)} do PV — dependência estrutural. Crédito ICMS de ${fR(saldoICMS)} só tem valor se houver débitos futuros. PIS/COFINS ${fP(R.piscoP)} incide sobre o rebate bruto.`},
   ].map(({t,b})=>`<div style="padding:11px 0;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:500;color:var(--text);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px">${t}</div><div style="font-size:12px;color:var(--text2);line-height:1.7;font-weight:300">${b}</div></div>`).join('');
 
@@ -791,14 +834,14 @@ function recalc(){
     <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--border)">
       <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px">Rebate atual</div><div style="font-family:var(--mono);font-size:14px;color:var(--blue)">${fR(rebate)}</div></div>
       <div style="color:var(--text3);font-size:18px;align-self:center">→</div>
-      <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px">Gap</div><div style="font-family:var(--mono);font-size:14px;color:${gap>0?'var(--red)':'var(--green)'}">${gap>0?'+':''}${fR(gap)}</div></div>
+      <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px">Gap</div><div style="font-family:var(--mono);font-size:14px;color:${r8(gap)>0?'var(--red)':'var(--green)'}">${r8(gap)>0?'+':''}${fR(gap)}</div></div>
     </div>
     <div style="font-size:11px;color:var(--text3);margin-top:6px;font-weight:300">
-      ${gap>0?`Necessário <span style="font-family:var(--mono);color:var(--red)">${fR(gap)}</span> a mais de rebate para zerar VPL caixa.`:
+      ${r8(gap)>0?`Necessário <span style="font-family:var(--mono);color:var(--red)">${fR(gap)}</span> a mais de rebate para zerar VPL caixa.`:
               `Rebate atual supera o mínimo em <span style="font-family:var(--mono);color:var(--green)">${fR(Math.abs(gap))}</span>.`}
     </div>`;
 
-  const viable=vplN>=0;
+  const viable=r8(vplN)>=0;
   document.getElementById('decisao-rapida').innerHTML=
     `<div class="alert ${viable?'ok':'err'}"><strong>${viable?'Viável financeiramente.':'Inviável no caixa.'}</strong><br>VPL c/ICMS: ${fP(vplI/pv)} · VPL s/ICMS: ${fP(vplN/pv)}</div>
     <div style="font-size:11px;color:var(--text3);line-height:1.7;font-weight:300">
@@ -815,7 +858,7 @@ function recalc(){
     const piscoLocal=rb*R.piscoP;
     const vpl=vplNoReb+(rb-piscoLocal)/fat(R.dRB);
     const isCur=Math.abs(rb-rebate)<0.001;
-    const viable2=vpl>=0;
+    const viable2=r8(vpl)>=0;
     const pct=Math.min(Math.abs(vpl)/Math.max(Math.abs(vplNoReb),0.01)*25,100);
     bars+=`<div class="sensitivity-bar ${isCur?'current':viable2?'viable':'inviable'}">
       <div class="sb-label" style="color:${isCur?'var(--amber)':viable2?'var(--green)':'var(--red)'}">${fR(rb,2)}</div>
@@ -831,16 +874,250 @@ function recalc(){
   document.getElementById('exec-summary').innerHTML=[
     {c:'green',t:'ACEITAR — visão c/ ICMS',b:`VPL c/ICMS ${fP(vplI/pv)} positivo a ${fP(taxa)} a.m. Margem P&L de ${fP(mcFinal/pv)}. Crédito líquido ICMS de ${fR(saldoICMS)} permanece na empresa sem custo financeiro.`},
     {c:'red',  t:'REJEITAR — visão s/ ICMS',b:`VPL s/ICMS ${fP(vplN/pv)} a ${fP(taxa)} a.m. Desembolso de ${fR(rebate)} no D${R.dCP} contra recebimentos tardios. PIS/COFINS de ${fR(piscoV)} reduz o rebate líquido para ${fR(rebate-piscoV)}.`},
-    {c:'amber',t:'CONDIÇÃO DE VIABILIDADE',b:`Rebate mínimo bruto: ${fR(rebateMin)} (${fP(rebateMin/pv)} PV). Rebate atual: ${fR(rebate)}. A operação ${gap>0?'AINDA NÃO É':'JÁ É'} viável no caixa com o rebate contratado.`},
+    {c:'amber',t:'CONDIÇÃO DE VIABILIDADE',b:`Rebate mínimo bruto: ${fR(rebateMin)} (${fP(rebateMin/pv)} PV). Rebate atual: ${fR(rebate)}. A operação ${r8(gap)>0?'AINDA NÃO É':'JÁ É'} viável no caixa com o rebate contratado.`},
   ].map(({c,t,b})=>`<div class="exec-card ${c}"><div class="exec-title">${t}</div><div class="exec-body">${b}</div></div>`).join('');
+
+  // ── Cálculo Inverso ──
+  renderCI(R);
 
   // ── Diagram ──
   renderDiagram(R);
 }
 
 // ── Diagram ──
+function setCIWhat(v,btn){ciWhat=v;document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
+function setCIBase(v,btn){ciBase=v;document.querySelectorAll('#ci-base button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
 function setDiagModel(m,btn){diagMdl=m;document.querySelectorAll('#sg-m button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
 function setDiagType(t,btn){diagTyp=t;document.querySelectorAll('#sg-t button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
+
+
+// ── Cálculo Inverso ──────────────────────────────────
+function renderCI(R){
+  const{pv,taxa,rebate,piscoP,freteP,comisP,compra,icmsAliq,
+        dIC,dFR,dCOM,dID,dCP,dVD,dRB,fat,
+        icmsC,icmsD,saldoICMS,freteV,comisV,piscoV,cmv,vliq,
+        mc2,vplNoReb,fcFI,fcFN,vplI,vplN} = R;
+
+  const tgt = (parseFloat(document.getElementById('ci-target').value)||0)/100;
+
+  // ── Helper: VPL s/ICMS given arbitrary pv, rebate, compra
+  const vplNO = (pvX, rbX, cpX) => {
+    const icmsDx = pvX * icmsAliq;
+    const fretex  = pvX * freteP;
+    const comisx  = pvX * comisP;
+    const piscoVx = rbX * piscoP;
+    return (-fretex)/fat(dFR) + (-comisx)/fat(dCOM) + (-cpX)/fat(dCP)
+           + pvX/fat(dVD) + (rbX-piscoVx)/fat(dRB);
+  };
+
+  // ── Helper: FC Acumulado given pv, rebate, compra
+  const fcAcc = (pvX, rbX, cpX) => {
+    const fretex  = pvX * freteP;
+    const comisx  = pvX * comisP;
+    const piscoVx = rbX * piscoP;
+    return -fretex - comisx - cpX + pvX + rbX - piscoVx;
+  };
+
+  // ── Helper: MC Final given pv, rebate, compra
+  const mcFn = (pvX, rbX, cpX) => {
+    const icmsDx  = pvX  * icmsAliq;
+    const icmsCx  = cpX  * icmsAliq;
+    const vliqX   = pvX  - icmsDx;
+    const cmvX    = cpX  - icmsCx;
+    const fretex  = pvX  * freteP;
+    const comisx  = pvX  * comisP;
+    const piscoVx = rbX  * piscoP;
+    return vliqX - cmvX - fretex - comisx + rbX - piscoVx;
+  };
+
+  let result = null, formula = '', label = '', unit = 'R$';
+  let current = null, currentLabel = '';
+
+  // ── SOLVE ─────────────────────────────────────────────
+  if(ciWhat === 'pv') {
+    // Solve for PV such that metric(PV, rebate, compra) = tgt * PV
+    // All metrics are linear in PV → closed-form
+    if(ciBase === 'mc') {
+      // MC = PV(1-icms) - compra(1-icms) - PV*frete - PV*comis + rebate - pisco
+      // = PV*(1 - icms - frete - comis) - cmv + rebate - pisco
+      // MC/PV = tgt  =>  MC = tgt*PV
+      // PV*(1 - icms - frete - comis) - cmv + rebate - pisco = tgt*PV
+      // PV*(1 - icms - frete - comis - tgt) = cmv - rebate + pisco
+      const piscoFixed = rebate * piscoP;
+      const num = cmv - rebate + piscoFixed;
+      const den = 1 - icmsAliq - freteP - comisP - tgt;
+      result = den !== 0 ? num / den : null;
+      formula = `PV = (CMV − Rebate + PIS/COFINS) ÷ (1 − ICMS% − Frete% − Comissão% − Meta%)`;
+      current = pv; currentLabel = 'PV atual';
+    } else if(ciBase === 'vpl') {
+      // VPL_no = -frete*PV/f15 - comis*PV/f30 - compra/f60 + PV/f75 + (rb-rb*pisco)/f120
+      // = PV*(-frete/f15 - comis/f30 + 1/f75) + const
+      // VPL/PV = tgt  =>  VPL = tgt*PV
+      // PV*(-frete/f15 - comis/f30 + 1/f75 - tgt) = compra/f60 - (rb*(1-pisco))/f120
+      const A = -freteP/fat(dFR) - comisP/fat(dCOM) + 1/fat(dVD) - tgt;
+      const B = compra/fat(dCP) - rebate*(1-piscoP)/fat(dRB);
+      result = A !== 0 ? B / A : null;
+      formula = `PV resolvido da equação: VPL_s/ICMS = Meta% × PV`;
+      current = pv; currentLabel = 'PV atual';
+    } else { // fc
+      // FC = PV - PV*frete - PV*comis - compra + rebate - pisco
+      // = PV*(1 - frete - comis) + const
+      // FC/PV = tgt  =>  FC = tgt*PV
+      // PV*(1 - frete - comis - tgt) = compra - rebate + pisco
+      const piscoFixed = rebate * piscoP;
+      const num = compra - rebate + piscoFixed;
+      const den = 1 - freteP - comisP - tgt;
+      result = den !== 0 ? num / den : null;
+      formula = `PV = (Compra − Rebate + PIS/COFINS) ÷ (1 − Frete% − Comissão% − Meta%)`;
+      current = pv; currentLabel = 'PV atual';
+    }
+  }
+
+  else if(ciWhat === 'rebate') {
+    // Solve for Rebate such that metric(pv, Rebate, compra) = tgt * pv
+    if(ciBase === 'mc') {
+      // MC = vliq - cmv - frete - comis + rb - rb*pisco
+      // = vliq - cmv - frete - comis + rb*(1-pisco) = tgt*pv
+      // rb = (tgt*pv - vliq + cmv + frete + comis) / (1 - pisco)
+      const need = tgt*pv - vliq + cmv + freteV + comisV;
+      result = need / (1 - piscoP);
+      formula = `Rebate = (Meta×PV − VendaLíq + CMV + Frete + Comissão) ÷ (1 − PIS/COFINS%)`;
+      current = rebate; currentLabel = 'Rebate atual';
+    } else if(ciBase === 'vpl') {
+      // vpl_no = vplNoReb + rb*(1-pisco)/f120 = tgt*pv
+      // rb = (tgt*pv - vplNoReb) * f120 / (1-pisco)
+      result = (tgt*pv - vplNoReb) * fat(dRB) / (1 - piscoP);
+      formula = `Rebate = (Meta×PV − VPL_sem_rebate) × Fator_D${dRB} ÷ (1 − PIS/COFINS%)`;
+      current = rebate; currentLabel = 'Rebate atual';
+    } else { // fc
+      // fc = -frete - comis - compra + pv + rb*(1-pisco) = tgt*pv
+      // rb = (tgt*pv + frete + comis + compra - pv) / (1-pisco)
+      result = (tgt*pv + freteV + comisV + compra - pv) / (1 - piscoP);
+      formula = `Rebate = (Meta×PV + Frete + Comissão + Compra − PV) ÷ (1 − PIS/COFINS%)`;
+      current = rebate; currentLabel = 'Rebate atual';
+    }
+    label = 'Rebate necessário'; unit = 'R$';
+  }
+
+  else { // compra
+    // Solve for Compra such that metric(pv, rebate, Compra) = tgt * pv
+    if(ciBase === 'mc') {
+      // MC = vliq - (compra - compra*icms) - frete - comis + rb - pisco
+      // = vliq - compra*(1-icms) - frete - comis + rb - pisco = tgt*pv
+      // compra = (vliq - freteV - comisV + rb - pisco - tgt*pv) / (1-icms)
+      result = (vliq - freteV - comisV + rebate - piscoV - tgt*pv) / (1 - icmsAliq);
+      formula = `Compra = (VendaLíq − Frete − Comissão + Rebate − PIS/COFINS − Meta×PV) ÷ (1 − ICMS%)`;
+      current = compra; currentLabel = 'Compra atual';
+    } else if(ciBase === 'vpl') {
+      // vpl_no = -frete/f15 - comis/f30 - compra/f60 + pv/f75 + rb*(1-p)/f120 = tgt*pv
+      // compra = (-frete/f15 - comis/f30 + pv/f75 + rb*(1-p)/f120 - tgt*pv) * f60
+      result = (-freteV/fat(dFR) - comisV/fat(dCOM) + pv/fat(dVD) + rebate*(1-piscoP)/fat(dRB) - tgt*pv) * fat(dCP);
+      formula = `Compra = (VPL_sem_compra − Meta×PV) × Fator_D${dCP}`;
+      current = compra; currentLabel = 'Compra atual';
+    } else { // fc
+      // fc = -frete - comis - compra + pv + rb*(1-pisco) = tgt*pv
+      // compra = -frete - comis + pv + rb*(1-pisco) - tgt*pv
+      result = -freteV - comisV + pv + rebate*(1-piscoP) - tgt*pv;
+      formula = `Compra = PV − Frete − Comissão + Rebate×(1−PIS/COFINS%) − Meta×PV`;
+      current = compra; currentLabel = 'Compra atual';
+    }
+    label = 'Compra máxima'; unit = 'R$';
+  }
+
+  // ── Metrics at the calculated result ──────────────────
+  let mc_res = null, vpl_res = null, fc_res = null;
+  if(result !== null && result > 0) {
+    const pvX  = ciWhat==='pv'     ? result : pv;
+    const rbX  = ciWhat==='rebate' ? result : rebate;
+    const cpX  = ciWhat==='compra' ? result : compra;
+    mc_res  = mcFn(pvX, rbX, cpX);
+    vpl_res = vplNO(pvX, rbX, cpX);
+    fc_res  = fcAcc(pvX, rbX, cpX);
+  }
+
+  const pvRef = ciWhat==='pv' ? (result||pv) : pv;
+  const valid = result !== null && r8(result) > 0;
+  const gap   = valid ? r8(result - current) : null;
+  const gapPct= valid && current ? (result-current)/current : null;
+
+  // ── Build result grid ──────────────────────────────────
+  const whatLabels = {pv:'Preço de Venda alvo', rebate:'Rebate necessário', compra:'Compra máxima'};
+  const baseLabels = {mc:'MC Final', vpl:'VPL s/ ICMS', fc:'FC Acumulado'};
+
+  const cards = [
+    // Main result
+    {
+      label: whatLabels[ciWhat],
+      value: valid ? fR(result,4) : 'Insolúvel',
+      sub:   valid ? `Meta ${fP(tgt)} × PV` : 'Verifique os parâmetros',
+      color: valid ? 'var(--accent)' : 'var(--red)',
+      bg:    valid ? 'rgba(200,232,122,0.06)' : 'var(--red-bg)',
+    },
+    // Gap vs current
+    {
+      label: `Gap vs ${currentLabel}`,
+      value: gap !== null ? (gap>=0?'+':'')+fR(gap,4) : '—',
+      sub:   gapPct !== null ? (gapPct>=0?'+':'')+fP(gapPct)+' vs atual' : '—',
+      color: gap === null ? 'var(--text2)' : gap>=0 ? 'var(--green)' : 'var(--red)',
+      bg:    'var(--bg3)',
+    },
+    // Validation: MC at result
+    {
+      label: 'MC Final resultante',
+      value: mc_res !== null ? fR(mc_res,4) : '—',
+      sub:   mc_res !== null && pvRef>0 ? fP(mc_res/pvRef)+' do PV' : '—',
+      color: mc_res!==null ? (r8(mc_res)>=0?'var(--green)':'var(--red)') : 'var(--text2)',
+      bg:    'var(--bg3)',
+    },
+    // VPL at result
+    {
+      label: 'VPL s/ ICMS resultante',
+      value: vpl_res !== null ? fR(vpl_res,4) : '—',
+      sub:   vpl_res !== null && pvRef>0 ? fP(vpl_res/pvRef)+' do PV' : '—',
+      color: vpl_res!==null ? (r8(vpl_res)>=0?'var(--green)':'var(--red)') : 'var(--text2)',
+      bg:    'var(--bg3)',
+    },
+    // FC at result
+    {
+      label: 'FC Acumulado resultante',
+      value: fc_res !== null ? fR(fc_res,4) : '—',
+      sub:   fc_res !== null && pvRef>0 ? fP(fc_res/pvRef)+' do PV' : '—',
+      color: fc_res!==null ? (r8(fc_res)>=0?'var(--green)':'var(--red)') : 'var(--text2)',
+      bg:    'var(--bg3)',
+    },
+    // Consistency check
+    {
+      label: 'Meta atingida?',
+      value: valid && mc_res!==null ? (
+        ciBase==='mc'  ? fP(mc_res/pvRef)  :
+        ciBase==='vpl' ? fP(vpl_res/pvRef) : fP(fc_res/pvRef)
+      ) : '—',
+      sub: valid ? `Alvo: ${fP(tgt)}` : '—',
+      color: valid ? 'var(--accent)' : 'var(--text2)',
+      bg: 'var(--bg3)',
+    },
+  ];
+
+  document.getElementById('ci-result-grid').style.gridTemplateColumns='repeat(3,1fr)';
+  document.getElementById('ci-result-grid').innerHTML =
+    cards.map(({label,value,sub,color,bg})=>`
+      <div style="background:${bg};border:1px solid var(--border);border-radius:6px;padding:11px 13px">
+        <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;font-weight:500">${label}</div>
+        <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:${color}">${value}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--mono)">${sub}</div>
+      </div>`).join('');
+
+  document.getElementById('ci-explanation').innerHTML =
+    `<strong style="color:var(--text);font-size:11px;text-transform:uppercase;letter-spacing:0.5px">
+      Calculando: ${whatLabels[ciWhat]} para ${baseLabels[ciBase]} = ${fP(tgt)} do PV
+    </strong><br>
+    <span style="color:var(--text3)">${formula}</span>
+    ${valid && gap!==null ? `<br><span style="color:var(--text2);margin-top:4px;display:block">
+      ${r8(gap)>0 ? `Necessário ${fR(Math.abs(gap),4)} a mais que o valor atual.` :
+                gap<0 ? `${fR(Math.abs(gap),4)} abaixo do valor atual — meta já superada.` :
+                'Valor atual já atinge exatamente a meta.'}
+    </span>` : ''}`;
+}
 
 function renderDiagram(R){
   const{pv,days,fcICMS,fcNO,discICMS,discNO,fcFI,fcFN,vplI,vplN,fat}=R;
@@ -917,7 +1194,7 @@ function renderDiagram(R){
     cumPts.slice(1).forEach(p=>{dp+=` L ${p.x} ${cy(p)}`});
     s+=`<path d="${dp}" fill="none" stroke="#3A3D35" stroke-width="1.2" stroke-dasharray="5 4"/>`;
     const last=cumPts[cumPts.length-1];
-    const lc=last.v>=0?GRN:RED;
+    const lc=r8(last.v)>=0?GRN:RED;
     s+=`<circle cx="${last.x}" cy="${cy(last)}" r="4" fill="${lc}"/>`;
     s+=`<circle cx="${last.x}" cy="${cy(last)}" r="1.8" fill="#0E0F0D"/>`;
     s+=`<text x="${last.x+12}" y="${cy(last)-2}" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="500" fill="${lc}">Saldo</text>`;
