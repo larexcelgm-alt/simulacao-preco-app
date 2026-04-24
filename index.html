@@ -377,9 +377,9 @@ tr.row-event td:first-child {
           </div>
         </div>
         <div class="input-section">
-          <div class="input-section-title">Taxa de Desconto</div>
+          <div class="input-section-title">TMA — Taxa de Desconto</div>
           <div class="input-group">
-            <div class="input-label">Taxa de juros <span class="input-hint">ao mês</span></div>
+            <div class="input-label">TMA — Taxa Mínima de Atratividade <span class="input-hint">ao mês</span></div>
             <div class="input-row"><input type="number" id="p-taxa" value="1.5" step="0.1" oninput="syncTaxa('p-taxa')"><span class="input-suffix">% a.m.</span></div>
           </div>
         </div>
@@ -422,7 +422,7 @@ tr.row-event td:first-child {
 <div class="page" id="page-fluxo-icms">
   <div class="page-header">
     <div class="page-title">Fluxo Financeiro c/ ICMS</div>
-    <div class="page-subtitle">Captura o efeito temporal do crédito fiscal · fator = (1+i)^(n/30)</div>
+    <div class="page-subtitle">Captura o efeito temporal do crédito fiscal · fator = (1+TMA)^(n/30)</div>
   </div>
   <div class="grid4" style="margin-bottom:16px" id="kpis-icms"></div>
   <div class="card" style="margin-bottom:12px">
@@ -524,7 +524,7 @@ tr.row-event td:first-child {
       <div style="margin-left:auto">
         <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">
           TMA
-          <span style="font-size:9px;color:var(--text3);text-transform:none;letter-spacing:0;margin-left:4px;font-style:italic">sincronizada c/ Premissas</span>
+          <span style="font-size:9px;color:var(--text3);text-transform:none;letter-spacing:0;margin-left:4px;font-style:italic">= Premissas</span>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <input type="number" id="ci-taxa" value="1.5" step="0.1" min="0"
@@ -741,7 +741,7 @@ function recalc(){
   document.getElementById('client-display').textContent=cname;
 
   // Sidebar footer
-  document.getElementById('sb-taxa').textContent=`i = ${(taxa*100).toFixed(2).replace('.',',')}% a.m.`;
+  document.getElementById('sb-taxa').textContent=`TMA = ${(taxa*100).toFixed(2).replace('.',',')}% a.m.`;
   document.getElementById('sb-pv').textContent=`PV = ${fR(pv,2)}`;
   document.getElementById('sb-rebate').textContent=`Rebate = ${fR(rebate,2)}`;
 
@@ -780,7 +780,7 @@ function recalc(){
   t+=cumRow('FC do Período',mapFC(fcICMS,days,ud),false);
   t+=cumRow('FC Acumulado',mapCum(cumICMS,days,ud),true);
   t+=pctRow('FC Acumulado (% PV)',mapCum(cumICMS,days,ud),pv);
-  t+=`<tr class="section"><td colspan="${nCols}">VPL — (1+${(taxa*100).toFixed(2).replace('.',',')}%)^(n/30)</td></tr>`;
+  t+=`<tr class="section"><td colspan="${nCols}">VPL — (1+TMA)^(n/30)  |  TMA = ${(taxa*100).toFixed(2).replace('.',',')}% a.m.</td></tr>`;
   t+=fatRow('Fator de Desconto',ud,fat);
   t+=vplRow('VPL do Período',mapVPL(discICMS,days,ud));
   t+=cumRow('VPL Acumulado',mapCum(cumDICMS,days,ud),true);
@@ -803,7 +803,7 @@ function recalc(){
   t2+=cumRow('FC do Período',mapFC(fcNO,days,ud2),false);
   t2+=cumRow('FC Acumulado',mapCum(cumNO,days,ud2),true);
   t2+=pctRow('FC Acumulado (% PV)',mapCum(cumNO,days,ud2),pv);
-  t2+=`<tr class="section"><td colspan="${nCols2}">VPL</td></tr>`;
+  t2+=`<tr class="section"><td colspan="${nCols2}">VPL — (1+TMA)^(n/30)  |  TMA = ${(taxa*100).toFixed(2).replace('.',',')}% a.m.</td></tr>`;
   t2+=fatRow('Fator de Desconto',ud2,fat);
   t2+=vplRow('VPL do Período',mapVPL(discNO,days,ud2));
   t2+=cumRow('VPL Acumulado',mapCum(cumDNO,days,ud2),true);
@@ -828,7 +828,7 @@ function recalc(){
   document.getElementById('interp-gerencial').innerHTML=[
     {t:'Por que os modelos diferem?',b:`Crédito ICMS ${fR(icmsC)} > Débito ${fR(icmsD)}. Saldo de ${fR(saldoICMS)} não sai do caixa — compensação contábil futura. O modelo c/ICMS captura esse benefício temporal; o s/ICMS ignora por não ser movimentação financeira.`},
     {t:'Quando usar c/ICMS?',b:`Para medir margem contábil e avaliar o retorno da estrutura fiscal. Margem P&L atual: ${fP(mcFinal/pv)}. Adequado quando a empresa tem saldo devedor de ICMS para absorver o crédito.`},
-    {t:'Quando usar s/ICMS?',b:`Para gestão de liquidez. VPL de ${fP(vplN/pv)} — operação ${r8(vplN)<0?'consome':'gera'} valor a ${fP(taxa)} a.m. ${r8(vplN)<0?'Alerta para o financeiro.':'Operação viável no caixa.'}`},
+    {t:'Quando usar s/ICMS?',b:`Para gestão de liquidez. VPL de ${fP(vplN/pv)} — operação ${r8(vplN)<0?'consome':'gera'} valor à TMA de ${fP(taxa)} a.m. ${r8(vplN)<0?'Alerta para o financeiro.':'Operação viável no caixa.'}`},
     {t:'Risco principal',b:`MC2 sem rebate: ${fP(mc2/pv)}. Rebate de ${fR(rebate)} = ${fP(rebate/pv)} do PV — dependência estrutural. Crédito ICMS de ${fR(saldoICMS)} só tem valor se houver débitos futuros. PIS/COFINS ${fP(R.piscoP)} incide sobre o rebate bruto.`},
   ].map(({t,b})=>`<div style="padding:11px 0;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:500;color:var(--text);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px">${t}</div><div style="font-size:12px;color:var(--text2);line-height:1.7;font-weight:300">${b}</div></div>`).join('');
 
@@ -858,7 +858,7 @@ function recalc(){
   document.getElementById('decisao-rapida').innerHTML=
     `<div class="alert ${viable?'ok':'err'}"><strong>${viable?'Viável financeiramente.':'Inviável no caixa.'}</strong><br>VPL c/ICMS: ${fP(vplI/pv)} · VPL s/ICMS: ${fP(vplN/pv)}</div>
     <div style="font-size:11px;color:var(--text3);line-height:1.7;font-weight:300">
-      ${viable?`A operação gera valor a ${fP(taxa)} a.m. mesmo desconsiderando o crédito fiscal.`:
+      ${viable?`A operação gera valor à TMA de ${fP(taxa)} a.m. mesmo desconsiderando o crédito fiscal.`:
                `Requer rebate de ${fR(rebateMin)} para equilibrar o caixa. Gap atual: ${fR(gap)}.`}
     </div>`;
 
@@ -885,7 +885,7 @@ function recalc(){
   document.getElementById('sensitivity-bars').innerHTML=bars;
 
   document.getElementById('exec-summary').innerHTML=[
-    {c:'green',t:'ACEITAR — visão c/ ICMS',b:`VPL c/ICMS ${fP(vplI/pv)} positivo a ${fP(taxa)} a.m. Margem P&L de ${fP(mcFinal/pv)}. Crédito líquido ICMS de ${fR(saldoICMS)} permanece na empresa sem custo financeiro.`},
+    {c:'green',t:'ACEITAR — visão c/ ICMS',b:`VPL c/ICMS ${fP(vplI/pv)} positivo à TMA de ${fP(taxa)} a.m. Margem P&L de ${fP(mcFinal/pv)}. Crédito líquido ICMS de ${fR(saldoICMS)} permanece na empresa sem custo financeiro.`},
     {c:'red',  t:'REJEITAR — visão s/ ICMS',b:`VPL s/ICMS ${fP(vplN/pv)} a ${fP(taxa)} a.m. Desembolso de ${fR(rebate)} no D${R.dCP} contra recebimentos tardios. PIS/COFINS de ${fR(piscoV)} reduz o rebate líquido para ${fR(rebate-piscoV)}.`},
     {c:'amber',t:'CONDIÇÃO DE VIABILIDADE',b:`Rebate mínimo bruto: ${fR(rebateMin)} (${fP(rebateMin/pv)} PV). Rebate atual: ${fR(rebate)}. A operação ${r8(gap)>0?'AINDA NÃO É':'JÁ É'} viável no caixa com o rebate contratado.`},
   ].map(({c,t,b})=>`<div class="exec-card ${c}"><div class="exec-title">${t}</div><div class="exec-body">${b}</div></div>`).join('');
