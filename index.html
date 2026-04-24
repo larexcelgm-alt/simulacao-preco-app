@@ -380,7 +380,7 @@ tr.row-event td:first-child {
           <div class="input-section-title">Taxa de Desconto</div>
           <div class="input-group">
             <div class="input-label">Taxa de juros <span class="input-hint">ao mês</span></div>
-            <div class="input-row"><input type="number" id="p-taxa" value="1.5" step="0.1" oninput="recalc()"><span class="input-suffix">% a.m.</span></div>
+            <div class="input-row"><input type="number" id="p-taxa" value="1.5" step="0.1" oninput="syncTaxa('p-taxa')"><span class="input-suffix">% a.m.</span></div>
           </div>
         </div>
       </div>
@@ -496,7 +496,7 @@ tr.row-event td:first-child {
     <div class="card-title">Cálculo Inverso — Precificação por meta</div>
 
     <!-- Selectors row -->
-    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:flex-end">
       <div>
         <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Quero calcular</div>
         <div class="seg" id="ci-what">
@@ -518,6 +518,19 @@ tr.row-event td:first-child {
         <div style="display:flex;align-items:center;gap:8px">
           <input type="number" id="ci-target" value="15" step="0.5" style="width:80px;font-size:13px;padding:6px 10px" oninput="recalc()">
           <span style="font-size:12px;color:var(--text2)">%</span>
+        </div>
+      </div>
+      <!-- TMA inline — sincronizado com Premissas!p-taxa -->
+      <div style="margin-left:auto">
+        <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">
+          TMA
+          <span style="font-size:9px;color:var(--text3);text-transform:none;letter-spacing:0;margin-left:4px;font-style:italic">sincronizada c/ Premissas</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input type="number" id="ci-taxa" value="1.5" step="0.1" min="0"
+            style="width:72px;font-size:13px;padding:6px 10px;border-color:var(--accent2)"
+            oninput="syncTaxa('ci-taxa')">
+          <span style="font-size:12px;color:var(--text2)">% a.m.</span>
         </div>
       </div>
     </div>
@@ -887,6 +900,13 @@ function recalc(){
 // ── Diagram ──
 function setCIWhat(v,btn){ciWhat=v;document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
 function setCIBase(v,btn){ciBase=v;document.querySelectorAll('#ci-base button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
+function syncTaxa(src){
+  const v=document.getElementById(src).value;
+  // sync to the other field
+  const other=src==='ci-taxa'?'p-taxa':'ci-taxa';
+  document.getElementById(other).value=v;
+  recalc();
+}
 function setDiagModel(m,btn){diagMdl=m;document.querySelectorAll('#sg-m button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
 function setDiagType(t,btn){diagTyp=t;document.querySelectorAll('#sg-t button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
 
