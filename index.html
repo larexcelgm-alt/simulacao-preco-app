@@ -20,6 +20,30 @@
   --sans:'IBM Plex Sans',sans-serif;
   --display:'Syne',sans-serif;
 }
+
+/* ── Light theme ── */
+[data-theme="light"]{
+  --bg:#F5F4F0;--bg2:#FFFFFF;--bg3:#EEECEA;--bg4:#E4E2DE;
+  --border:#D0CEC8;--border2:#B8B6B0;
+  --text:#1A1A18;--text2:#4A4A46;--text3:#8A8A84;
+  --green:#2D6A0F;--green-dim:#C6DFB8;--green-bg:#EAF3DE;
+  --red:#9B1F1F;--red-dim:#F0BABA;--red-bg:#FCEBEB;
+  --amber:#7A4310;--amber-bg:#FDF3E3;
+  --blue:#14426E;--blue-light:#1A5FAF;--blue-bg:#E6F1FB;--blue-dim:#C0D8F0;
+  --accent:#4A7A10;--accent2:#3A6008;
+}
+
+/* ── Theme toggle button ── */
+.theme-toggle{
+  position:fixed;bottom:20px;right:20px;z-index:200;
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:50%;width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:18px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.25);
+  transition:all .2s;
+}
+.theme-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
 /* ── Layout ── */
@@ -234,6 +258,24 @@ tr.row-event:hover td {
 tr.row-event td:first-child {
   color: var(--text2);
 }
+
+/* Light theme SVG/diagram adjustments */
+[data-theme="light"] .diagram-wrap{background:#F0EEE8}
+[data-theme="light"] .diagram-legend{color:var(--text3)}
+[data-theme="light"] .nav-item{border-left-color:transparent}
+[data-theme="light"] .nav-item.active{background:rgba(74,122,16,0.08)}
+[data-theme="light"] .sidebar{border-right-color:var(--border)}
+[data-theme="light"] input[type=number],[data-theme="light"] input[type=text]{color:var(--accent);background:var(--bg3)}
+[data-theme="light"] .kpi{border-color:var(--border)}
+[data-theme="light"] tr.total td{background:rgba(74,122,16,0.05)}
+[data-theme="light"] .exec-card.green{background:#EAF3DE}
+[data-theme="light"] .exec-card.red{background:#FCEBEB}
+[data-theme="light"] .exec-card.amber{background:#FDF3E3}
+[data-theme="light"] .sensitivity-bar.viable{background:var(--green-bg)}
+[data-theme="light"] .sensitivity-bar.inviable{background:var(--red-bg)}
+[data-theme="light"] .sensitivity-bar.current{background:var(--amber-bg)}
+[data-theme="light"] .alert.ok{background:var(--green-bg);color:var(--green)}
+[data-theme="light"] .alert.err{background:var(--red-bg);color:var(--red)}
 </style>
 </head>
 <body>
@@ -241,7 +283,10 @@ tr.row-event td:first-child {
 <!-- Mobile top bar -->
 <div class="topbar">
   <div class="topbar-title">SIMULA PREÇO APP</div>
-  <button class="hamburger" onclick="toggleMobileNav()">☰ Menu</button>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="theme-toggle" style="position:static;width:32px;height:32px;font-size:14px;box-shadow:none" id="theme-toggle-mob" onclick="toggleTheme()">🌙</button>
+    <button class="hamburger" onclick="toggleMobileNav()">☰ Menu</button>
+  </div>
 </div>
 
 <!-- Mobile nav overlay -->
@@ -512,7 +557,7 @@ tr.row-event td:first-child {
       <div>
         <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Meta baseada em</div>
         <div class="seg" id="ci-base">
-          <button class="on" onclick="setCIBase('mc',this)">MC Final</button>
+          <button class="on" onclick="setCIBase('mc',this)">FC Final</button>
           <button onclick="setCIBase('vpl',this)">VPL s/ ICMS</button>
           <button onclick="setCIBase('fc',this)">FC Acumulado</button>
         </div>
@@ -579,6 +624,7 @@ tr.row-event td:first-child {
 
 </main>
 </div>
+<button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Alternar tema claro/escuro">🌙</button>
 
 <script>
 // ── State ──
@@ -780,7 +826,7 @@ function recalc(){
   document.getElementById('derived-grid').innerHTML=[
     ['ICMS Créd. ('+(icmsAliqE*100).toFixed(1).replace('.',',')+'%)',fR(icmsC)],['ICMS Déb. ('+(icmsAliqS*100).toFixed(1).replace('.',',')+'%)',fR(icmsD)],['Saldo ICMS',fR(saldoICMS)],
     ['CMV líq.',fR(cmv)],['Venda Líquida',fR(vliq)],['PIS/COFINS Rebate',fR(piscoV)],
-    ['Frete (R$)',fR(freteV)],['Comissão (R$)',fR(comisV)],['MC Final',fR(mcFinal)],
+    ['Frete (R$)',fR(freteV)],['Comissão (R$)',fR(comisV)],['FC Final',fR(mcFinal)],
   ].map(([l,v])=>`<div class="derived-item"><div class="dl">${l}</div><div class="dv">${v}</div></div>`).join('');
 
   // ── Fluxo c/ICMS ──
@@ -797,7 +843,7 @@ function recalc(){
     ['MC2',mc2,mc2/pv,true],
     ['(+) Rebate bruto',rebate,rebate/pv,false],
     ['(-) PIS/COFINS s/ Rebate',-piscoV,-piscoV/pv,false],
-    ['MC Final',mcFinal,mcFinal/pv,true],
+    ['FC Final',mcFinal,mcFinal/pv,true],
   ];
   document.getElementById('tbl-pl').innerHTML=
     `<tr><th>Linha</th><th>R$</th><th style="opacity:0.6">% PV</th></tr>`+
@@ -848,8 +894,8 @@ function recalc(){
     ['FC Final (% PV)',     fP(fcFI/pv),     fP(fcFN/pv),    fP((fcFI-fcFN)/pv),''],
     ['VPL Final (R$)',      fR(vplI),        fR(vplN),       fR(vplI-vplN),     'VPL do timing fiscal do ICMS'],
     ['VPL Final (% PV)',    fP(vplI/pv),     fP(vplN/pv),    fP((vplI-vplN)/pv),`${fP(vplI/pv)} c/ICMS vs ${fP(vplN/pv)} s/ICMS`],
-    ['MC P&L (R$)',         fR(mcFinal),     '—',            '—',               `Margem contábil ${fR(mcFinal)}`],
-    ['MC P&L (% PV)',       fP(mcFinal/pv),  '—',            '—',               `${fP(mcFinal/pv)} — depende 100% do rebate`],
+    ['FC Final (R$)',         fR(mcFinal),     '—',            '—',               `FC Final ${fR(mcFinal)}`],
+    ['FC Final (% PV)',       fP(mcFinal/pv),  '—',            '—',               `${fP(mcFinal/pv)} do PV — depende 100% do rebate`],
     ['Saldo ICMS crédito',  fR(saldoICMS),   '—',            '—',               'Livro fiscal — vale se houver débitos futuros'],
   ];
   document.getElementById('tbl-comp').innerHTML=
@@ -858,9 +904,9 @@ function recalc(){
 
   document.getElementById('interp-gerencial').innerHTML=[
     {t:'Por que os modelos diferem?',b:`Crédito ICMS ${fR(icmsC)} (entrada ${(icmsAliqE*100).toFixed(1).replace('.',',')}%) > Débito ${fR(icmsD)} (saída ${(icmsAliqS*100).toFixed(1).replace('.',',')}%). Saldo de ${fR(saldoICMS)} não sai do caixa — compensação contábil futura. O modelo c/ICMS captura esse benefício temporal; o s/ICMS ignora por não ser movimentação financeira.`},
-    {t:'Quando usar c/ICMS?',b:`Para medir margem contábil e avaliar o retorno da estrutura fiscal. Margem P&L atual: ${fP(mcFinal/pv)}. Adequado quando a empresa tem saldo devedor de ICMS para absorver o crédito.`},
+    {t:'Quando usar c/ICMS?',b:`Para medir margem contábil e avaliar o retorno da estrutura fiscal. FC Final atual: ${fP(mcFinal/pv)} do PV. Adequado quando a empresa tem saldo devedor de ICMS para absorver o crédito.`},
     {t:'Quando usar s/ICMS?',b:`Para gestão de liquidez. VPL de ${fP(vplN/pv)} — operação ${r8(vplN)<0?'consome':'gera'} valor à TMA de ${fP(taxa)} a.m. ${r8(vplN)<0?'Alerta para o financeiro.':'Operação viável no caixa.'}`},
-    {t:'Risco principal',b:`MC2 sem rebate: ${fP(mc2/pv)}. Rebate de ${fR(rebate)} = ${fP(rebate/pv)} do PV — dependência estrutural. Crédito ICMS de ${fR(saldoICMS)} só tem valor se houver débitos futuros. PIS/COFINS ${fP(R.piscoP)} incide sobre o rebate bruto.`},
+    {t:'Risco principal',b:`FC sem rebate (MC2): ${fP(mc2/pv)}. Rebate de ${fR(rebate)} = ${fP(rebate/pv)} do PV — dependência estrutural. Crédito ICMS de ${fR(saldoICMS)} só tem valor se houver débitos futuros. PIS/COFINS ${fP(R.piscoP)} incide sobre o rebate bruto.`},
   ].map(({t,b})=>`<div style="padding:11px 0;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:500;color:var(--text);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px">${t}</div><div style="font-size:12px;color:var(--text2);line-height:1.7;font-weight:300">${b}</div></div>`).join('');
 
   // ── Decisão ──
@@ -916,7 +962,7 @@ function recalc(){
   document.getElementById('sensitivity-bars').innerHTML=bars;
 
   document.getElementById('exec-summary').innerHTML=[
-    {c:'green',t:'ACEITAR — visão c/ ICMS',b:`VPL c/ICMS ${fP(vplI/pv)} positivo à TMA de ${fP(taxa)} a.m. Margem P&L de ${fP(mcFinal/pv)}. Crédito líquido ICMS de ${fR(saldoICMS)} permanece na empresa sem custo financeiro.`},
+    {c:'green',t:'ACEITAR — visão c/ ICMS',b:`VPL c/ICMS ${fP(vplI/pv)} positivo à TMA de ${fP(taxa)} a.m. FC Final de ${fP(mcFinal/pv)} do PV. Crédito líquido ICMS de ${fR(saldoICMS)} permanece na empresa sem custo financeiro.`},
     {c:'red',  t:'REJEITAR — visão s/ ICMS',b:`VPL s/ICMS ${fP(vplN/pv)} a ${fP(taxa)} a.m. Desembolso de ${fR(rebate)} no D${R.dCP} contra recebimentos tardios. PIS/COFINS de ${fR(piscoV)} reduz o rebate líquido para ${fR(rebate-piscoV)}.`},
     {c:'amber',t:'CONDIÇÃO DE VIABILIDADE',b:`Rebate mínimo bruto: ${fR(rebateMin)} (${fP(rebateMin/pv)} PV). Rebate atual: ${fR(rebate)}. A operação ${r8(gap)>0?'AINDA NÃO É':'JÁ É'} viável no caixa com o rebate contratado.`},
   ].map(({c,t,b})=>`<div class="exec-card ${c}"><div class="exec-title">${t}</div><div class="exec-body">${b}</div></div>`).join('');
@@ -1098,7 +1144,7 @@ function renderCI(R){
 
   // ── Build result grid ──────────────────────────────────
   const whatLabels = {pv:'Preço de Venda alvo', rebate:'Rebate necessário', compra:'Compra máxima'};
-  const baseLabels = {mc:'MC Final', vpl:'VPL s/ ICMS', fc:'FC Acumulado'};
+  const baseLabels = {mc:'FC Final', vpl:'VPL s/ ICMS', fc:'FC Acumulado'};
 
   const cards = [
     // Main result
@@ -1260,7 +1306,29 @@ function renderDiagram(R){
   document.getElementById('diag-svg').innerHTML=s;
 }
 
+// ── Theme ──────────────────────────────────────────
+function toggleTheme(){
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  const newTheme = isDark ? 'light' : 'dark';
+  applyTheme(newTheme);
+  try{ localStorage.setItem('simulaPrecoTheme', newTheme); }catch(e){}
+}
+
+function applyTheme(theme){
+  if(theme === 'light'){
+    document.documentElement.setAttribute('data-theme','light');
+    document.querySelectorAll('.theme-toggle').forEach(b=>b.textContent='☀️');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    document.querySelectorAll('.theme-toggle').forEach(b=>b.textContent='🌙');
+  }
+}
+
 // ── Init ──
+try{
+  const savedTheme = localStorage.getItem('simulaPrecoTheme') || 'dark';
+  applyTheme(savedTheme);
+}catch(e){ applyTheme('dark'); }
 loadState();   // restore last session
 recalc();
 </script>
