@@ -331,8 +331,12 @@ tr.row-event td:first-child {
             <div class="input-row"><input type="number" id="p-compra" value="15.54" step="0.01" oninput="recalc()"><span class="input-suffix">R$</span></div>
           </div>
           <div class="input-group">
-            <div class="input-label">Alíquota ICMS</div>
-            <div class="input-row"><input type="number" id="p-icms" value="12" step="0.1" oninput="recalc()"><span class="input-suffix">%</span></div>
+            <div class="input-label">ICMS Entrada <span class="input-hint">alíq. na compra</span></div>
+            <div class="input-row"><input type="number" id="p-icms-e" value="12" step="0.1" oninput="recalc()"><span class="input-suffix">%</span></div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">ICMS Saída <span class="input-hint">alíq. na venda</span></div>
+            <div class="input-row"><input type="number" id="p-icms-s" value="12" step="0.1" oninput="recalc()"><span class="input-suffix">%</span></div>
           </div>
         </div>
         <div class="input-section">
@@ -614,7 +618,7 @@ function gs(id){return document.getElementById(id).value||'';}
 
 // ── Calc ──
 function calc(){
-  const compra=gi('p-compra'), icmsAliq=gi('p-icms')/100;
+  const compra=gi('p-compra'), icmsAliqE=gi('p-icms-e')/100, icmsAliqS=gi('p-icms-s')/100;
   const pv=gi('p-pv'),         freteP=gi('p-frete')/100;
   const comisP=gi('p-comis')/100, rebate=gi('p-rebate');
   const piscoP=gi('p-piscofins')/100, taxa=gi('p-taxa')/100;
@@ -626,8 +630,8 @@ function calc(){
   const fat=d=>Math.pow(1+taxa,d/30);
 
   // Derived
-  const icmsC   = compra*icmsAliq;
-  const icmsD   = pv*icmsAliq;
+  const icmsC   = compra*icmsAliqE;   // crédito — alíquota de entrada
+  const icmsD   = pv*icmsAliqS;       // débito  — alíquota de saída
   const cmv     = compra-icmsC;
   const vliq    = pv-icmsD;
   const freteV  = pv*freteP;
@@ -671,7 +675,7 @@ function calc(){
   const gap       = rebateMin - rebate;
 
   return {
-    compra,icmsAliq,pv,freteP,comisP,rebate,piscoP,taxa,
+    compra,icmsAliqE,icmsAliqS,pv,freteP,comisP,rebate,piscoP,taxa,
     dIC,dFR,dCOM,dID,dCP,dVD,dRB,
     fat, icmsC,icmsD,cmv,vliq,freteV,comisV,piscoV,saldoICMS,
     mc1,mc2,mcFinal,
@@ -727,10 +731,37 @@ function vplRow(lbl,vals){
   return `<tr class="row-dim"><td>${lbl}</td>${vals.map(v=>`<td class="${cls(v)}">${fR(v)}</td>`).join('')}<td class="${cls(tot)}">${fR(tot)}</td></tr>`;
 }
 
+// ── Persistência: localStorage ──────────────────────
+const STORAGE_KEY = 'simulaPrecoApp_v1';
+const INPUT_IDS = ['p-cliente', 'p-compra', 'p-icms-e', 'p-icms-s', 'p-pv', 'p-frete', 'd-frete', 'p-comis', 'd-comis', 'p-rebate', 'p-piscofins', 'p-taxa', 'ci-taxa', 'd-icmsc', 'd-icmsd', 'd-compra', 'd-venda', 'd-rebate', 's-passo', 's-linhas', 'ci-target'];
+
+function saveState(){
+  const data = {};
+  INPUT_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) data[id] = el.value;
+  });
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    INPUT_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if(el && data[id] !== undefined) el.value = data[id];
+    });
+    return true;
+  }catch(e){ return false; }
+}
+
 // ── Main recalc ──
 function recalc(){
+  saveState();
   const R=calc();
-  const{pv,taxa,rebate,icmsC,icmsD,saldoICMS,mc1,mc2,mcFinal,
+  const{pv,taxa,rebate,icmsAliqE,icmsAliqS,icmsC,icmsD,saldoICMS,mc1,mc2,mcFinal,
         freteV,comisV,piscoV,cmv,vliq,
         days,lbls,fcICMS,fcNO,discICMS,discNO,
         cumICMS,cumNO,cumDICMS,cumDNO,
@@ -747,7 +778,7 @@ function recalc(){
 
   // ── Derived ──
   document.getElementById('derived-grid').innerHTML=[
-    ['ICMS Crédito',fR(icmsC)],['ICMS Débito',fR(icmsD)],['Saldo ICMS',fR(saldoICMS)],
+    ['ICMS Créd. ('+(icmsAliqE*100).toFixed(1).replace('.',',')+'%)',fR(icmsC)],['ICMS Déb. ('+(icmsAliqS*100).toFixed(1).replace('.',',')+'%)',fR(icmsD)],['Saldo ICMS',fR(saldoICMS)],
     ['CMV líq.',fR(cmv)],['Venda Líquida',fR(vliq)],['PIS/COFINS Rebate',fR(piscoV)],
     ['Frete (R$)',fR(freteV)],['Comissão (R$)',fR(comisV)],['MC Final',fR(mcFinal)],
   ].map(([l,v])=>`<div class="derived-item"><div class="dl">${l}</div><div class="dv">${v}</div></div>`).join('');
@@ -756,8 +787,8 @@ function recalc(){
   document.getElementById('kpis-icms').innerHTML=kpiH('FC Final',fcFI)+kpiH('FC (% PV)',fcFI/pv,'',true)+kpiH('VPL Final',vplI)+kpiH('VPL (% PV)',vplI/pv,true);
 
   const plRows=[
-    ['Preço de Venda',pv,pv/pv,false],
-    ['(-) ICMS s/ Venda',-icmsD,-icmsD/pv,false],
+    ['Preço de Venda',pv,1,false],
+    ['(-) ICMS s/ Venda ('+(icmsAliqS*100).toFixed(1).replace('.',',')+'%)',-icmsD,-icmsD/pv,false],
     ['Venda Líquida',vliq,vliq/pv,true],
     ['(-) CMV',-cmv,-cmv/pv,false],
     ['MC1',mc1,mc1/pv,true],
@@ -826,7 +857,7 @@ function recalc(){
     compRows.map(([l,e,c,d,obs],i)=>`<tr class="${[1,3,5].includes(i)?'row-dim':''}"><td>${l}</td><td class="val-pos">${e}</td><td style="color:${c==='—'?'var(--text3)':'var(--blue)'}">${c}</td><td style="color:var(--amber)">${d}</td><td style="color:var(--text3);font-size:10px;font-family:var(--sans)">${obs}</td></tr>`).join('');
 
   document.getElementById('interp-gerencial').innerHTML=[
-    {t:'Por que os modelos diferem?',b:`Crédito ICMS ${fR(icmsC)} > Débito ${fR(icmsD)}. Saldo de ${fR(saldoICMS)} não sai do caixa — compensação contábil futura. O modelo c/ICMS captura esse benefício temporal; o s/ICMS ignora por não ser movimentação financeira.`},
+    {t:'Por que os modelos diferem?',b:`Crédito ICMS ${fR(icmsC)} (entrada ${(icmsAliqE*100).toFixed(1).replace('.',',')}%) > Débito ${fR(icmsD)} (saída ${(icmsAliqS*100).toFixed(1).replace('.',',')}%). Saldo de ${fR(saldoICMS)} não sai do caixa — compensação contábil futura. O modelo c/ICMS captura esse benefício temporal; o s/ICMS ignora por não ser movimentação financeira.`},
     {t:'Quando usar c/ICMS?',b:`Para medir margem contábil e avaliar o retorno da estrutura fiscal. Margem P&L atual: ${fP(mcFinal/pv)}. Adequado quando a empresa tem saldo devedor de ICMS para absorver o crédito.`},
     {t:'Quando usar s/ICMS?',b:`Para gestão de liquidez. VPL de ${fP(vplN/pv)} — operação ${r8(vplN)<0?'consome':'gera'} valor à TMA de ${fP(taxa)} a.m. ${r8(vplN)<0?'Alerta para o financeiro.':'Operação viável no caixa.'}`},
     {t:'Risco principal',b:`MC2 sem rebate: ${fP(mc2/pv)}. Rebate de ${fR(rebate)} = ${fP(rebate/pv)} do PV — dependência estrutural. Crédito ICMS de ${fR(saldoICMS)} só tem valor se houver débitos futuros. PIS/COFINS ${fP(R.piscoP)} incide sobre o rebate bruto.`},
@@ -890,6 +921,11 @@ function recalc(){
     {c:'amber',t:'CONDIÇÃO DE VIABILIDADE',b:`Rebate mínimo bruto: ${fR(rebateMin)} (${fP(rebateMin/pv)} PV). Rebate atual: ${fR(rebate)}. A operação ${r8(gap)>0?'AINDA NÃO É':'JÁ É'} viável no caixa com o rebate contratado.`},
   ].map(({c,t,b})=>`<div class="exec-card ${c}"><div class="exec-title">${t}</div><div class="exec-body">${b}</div></div>`).join('');
 
+  // ── Sync ci-taxa display with p-taxa (without triggering syncTaxa loop) ──
+  const ciTaxaEl = document.getElementById('ci-taxa');
+  const pTaxaEl  = document.getElementById('p-taxa');
+  if(ciTaxaEl && pTaxaEl && ciTaxaEl.value !== pTaxaEl.value) ciTaxaEl.value = pTaxaEl.value;
+
   // ── Cálculo Inverso ──
   renderCI(R);
 
@@ -913,7 +949,7 @@ function setDiagType(t,btn){diagTyp=t;document.querySelectorAll('#sg-t button').
 
 // ── Cálculo Inverso ──────────────────────────────────
 function renderCI(R){
-  const{pv,taxa,rebate,piscoP,freteP,comisP,compra,icmsAliq,
+  const{pv,taxa,rebate,piscoP,freteP,comisP,compra,icmsAliqE,icmsAliqS,
         dIC,dFR,dCOM,dID,dCP,dVD,dRB,fat,
         icmsC,icmsD,saldoICMS,freteV,comisV,piscoV,cmv,vliq,
         mc2,vplNoReb,fcFI,fcFN,vplI,vplN} = R;
@@ -922,7 +958,7 @@ function renderCI(R){
 
   // ── Helper: VPL s/ICMS given arbitrary pv, rebate, compra
   const vplNO = (pvX, rbX, cpX) => {
-    const icmsDx = pvX * icmsAliq;
+    const icmsDx = pvX * icmsAliqS;
     const fretex  = pvX * freteP;
     const comisx  = pvX * comisP;
     const piscoVx = rbX * piscoP;
@@ -940,8 +976,8 @@ function renderCI(R){
 
   // ── Helper: MC Final given pv, rebate, compra
   const mcFn = (pvX, rbX, cpX) => {
-    const icmsDx  = pvX  * icmsAliq;
-    const icmsCx  = cpX  * icmsAliq;
+    const icmsDx  = pvX  * icmsAliqS;
+    const icmsCx  = cpX  * icmsAliqE;
     const vliqX   = pvX  - icmsDx;
     const cmvX    = cpX  - icmsCx;
     const fretex  = pvX  * freteP;
@@ -965,7 +1001,7 @@ function renderCI(R){
       // PV*(1 - icms - frete - comis - tgt) = cmv - rebate + pisco
       const piscoFixed = rebate * piscoP;
       const num = cmv - rebate + piscoFixed;
-      const den = 1 - icmsAliq - freteP - comisP - tgt;
+      const den = 1 - icmsAliqS - freteP - comisP - tgt;
       result = den !== 0 ? num / den : null;
       formula = `PV = (CMV − Rebate + PIS/COFINS) ÷ (1 − ICMS% − Frete% − Comissão% − Meta%)`;
       current = pv; currentLabel = 'PV atual';
@@ -1025,7 +1061,7 @@ function renderCI(R){
       // MC = vliq - (compra - compra*icms) - frete - comis + rb - pisco
       // = vliq - compra*(1-icms) - frete - comis + rb - pisco = tgt*pv
       // compra = (vliq - freteV - comisV + rb - pisco - tgt*pv) / (1-icms)
-      result = (vliq - freteV - comisV + rebate - piscoV - tgt*pv) / (1 - icmsAliq);
+      result = (vliq - freteV - comisV + rebate - piscoV - tgt*pv) / (1 - icmsAliqE);
       formula = `Compra = (VendaLíq − Frete − Comissão + Rebate − PIS/COFINS − Meta×PV) ÷ (1 − ICMS%)`;
       current = compra; currentLabel = 'Compra atual';
     } else if(ciBase === 'vpl') {
@@ -1225,6 +1261,7 @@ function renderDiagram(R){
 }
 
 // ── Init ──
+loadState();   // restore last session
 recalc();
 </script>
 </body>
