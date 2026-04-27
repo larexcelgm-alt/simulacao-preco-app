@@ -489,7 +489,7 @@ tr.row-event td:first-child {
   </div>
   <div class="grid4" style="margin-bottom:16px" id="kpis-icms"></div>
   <div class="card" style="margin-bottom:12px">
-    <div class="card-title">P&amp;L — demonstrativo de resultado</div>
+    <div class="card-title">DRE — Demonstrativo de Resultado</div>
     <div class="tbl-wrap"><table id="tbl-pl"></table></div>
   </div>
   <div class="card">
@@ -855,7 +855,7 @@ function recalc(){
   document.getElementById('derived-grid').innerHTML=[
     ['ICMS Créd. ('+(icmsAliqE*100).toFixed(1).replace('.',',')+'%)',fR(icmsC)],['ICMS Déb. ('+(icmsAliqS*100).toFixed(1).replace('.',',')+'%)',fR(icmsD)],['Saldo ICMS',fR(saldoICMS)],
     ['CMV líq.',fR(cmv)],['Venda Líquida',fR(vliq)],['PIS/COFINS Rebate',fR(piscoV)],
-    ['Frete (R$)',fR(freteV)],['Comissão (R$)',fR(comisV)],['FC Final',fR(mcFinal)],
+    ['Frete (R$)',fR(freteV)],['Comissão (R$)',fR(comisV)],['DFC Final',fR(mcFinal)],
   ].map(([l,v])=>`<div class="derived-item"><div class="dl">${l}</div><div class="dv">${v}</div></div>`).join('');
 
   // ── Fluxo c/ICMS ──
@@ -872,7 +872,7 @@ function recalc(){
     ['MC2',mc2,mc2/pv,true],
     ['(+) Rebate bruto',rebate,rebate/pv,false],
     ['(-) PIS/COFINS s/ Rebate',-piscoV,-piscoV/pv,false],
-    ['FC Final',mcFinal,mcFinal/pv,true],
+    ['DFC Final',mcFinal,mcFinal/pv,true],
   ];
   document.getElementById('tbl-pl').innerHTML=
     `<tr><th>Linha</th><th>R$</th><th style="opacity:0.6">% PV</th></tr>`+
@@ -883,9 +883,9 @@ function recalc(){
   const nCols=ud.length+2;
   let t=`<table>${dayHdr(ud)}`;
   fcICMS.forEach((v,i)=>{ t+=eventRow(lbls[i],v,days[i],ud); });
-  t+=cumRow('FC do Período',mapFC(fcICMS,days,ud),false);
-  t+=cumRow('FC Acumulado',mapCum(cumICMS,days,ud),true);
-  t+=pctRow('FC Acumulado (% PV)',mapCum(cumICMS,days,ud),pv);
+  t+=cumRow('DDFC do Período',mapFC(fcICMS,days,ud),false);
+  t+=cumRow('DDFC Acumulado',mapCum(cumICMS,days,ud),true);
+  t+=pctRow('DDFC Acumulado (% PV)',mapCum(cumICMS,days,ud),pv);
   t+=`<tr class="section"><td colspan="${nCols}">DFCD  |  TMA = ${(taxa*100).toFixed(2).replace('.',',')}% a.m.</td></tr>`;
   t+=fatRow('Fator (TMA)',ud,fat);
   t+=vplRow('DFCD do Período',mapVPL(discICMS,days,ud));
@@ -906,9 +906,9 @@ function recalc(){
     const isICMS=i===0||i===3;
     t2+=isICMS?eventRow(lbls[i],0,days[i],ud2,true):eventRow(lbls[i],v,days[i],ud2);
   });
-  t2+=cumRow('FC do Período',mapFC(fcNO,days,ud2),false);
-  t2+=cumRow('FC Acumulado',mapCum(cumNO,days,ud2),true);
-  t2+=pctRow('FC Acumulado (% PV)',mapCum(cumNO,days,ud2),pv);
+  t2+=cumRow('DDFC do Período',mapFC(fcNO,days,ud2),false);
+  t2+=cumRow('DDFC Acumulado',mapCum(cumNO,days,ud2),true);
+  t2+=pctRow('DDFC Acumulado (% PV)',mapCum(cumNO,days,ud2),pv);
   t2+=`<tr class="section"><td colspan="${nCols2}">DFCD  |  TMA = ${(taxa*100).toFixed(2).replace('.',',')}% a.m.</td></tr>`;
   t2+=fatRow('Fator (TMA)',ud2,fat);
   t2+=vplRow('DFCD do Período',mapVPL(discNO,days,ud2));
@@ -919,12 +919,12 @@ function recalc(){
 
   // ── Comparativo ──
   const compRows=[
-    ['FC Final (R$)',       fR(fcFI),        fR(fcFN),       fR(fcFI-fcFN),     'Diferença = benefício temporal do ICMS'],
-    ['FC Final (% PV)',     fP(fcFI/pv),     fP(fcFN/pv),    fP((fcFI-fcFN)/pv),''],
+    ['DFC Final (R$)',       fR(fcFI),        fR(fcFN),       fR(fcFI-fcFN),     'Diferença = benefício temporal do ICMS'],
+    ['DFC Final (% PV)',     fP(fcFI/pv),     fP(fcFN/pv),    fP((fcFI-fcFN)/pv),''],
     ['DFCD Final (R$)',      fR(vplI),        fR(vplN),       fR(vplI-vplN),     'VPL do timing fiscal do ICMS'],
     ['DFCD Final (% PV)',    fP(vplI/pv),     fP(vplN/pv),    fP((vplI-vplN)/pv),`DFCD ${fP(vplI/pv)} c/ICMS vs ${fP(vplN/pv)} s/ICMS`],
-    ['FC Final (R$)',         fR(mcFinal),     '—',            '—',               `FC Final ${fR(mcFinal)}`],
-    ['FC Final (% PV)',       fP(mcFinal/pv),  '—',            '—',               `${fP(mcFinal/pv)} do PV — depende 100% do rebate`],
+    ['DFC Final (R$)',         fR(mcFinal),     '—',            '—',               `FC Final ${fR(mcFinal)}`],
+    ['DFC Final (% PV)',       fP(mcFinal/pv),  '—',            '—',               `${fP(mcFinal/pv)} do PV — depende 100% do rebate`],
     ['Saldo ICMS crédito',  fR(saldoICMS),   '—',            '—',               'Livro fiscal — vale se houver débitos futuros'],
   ];
   document.getElementById('tbl-comp').innerHTML=
@@ -1136,14 +1136,17 @@ function renderCI(R){
     </div>`;
   };
 
-  const ciRowDFCD = (label, day, factorVal, val, cls='') => {
+  const ciRowDFCD = (label, day, factorVal, val, pvRef, cls='') => {
     const vStr = val===null ? '—' : fR(val,4);
+    const pStr = (val!==null && pvRef>0) ? fP(val/pvRef) : '';
     const vColor = val===null ? 'var(--text3)' : val>=0 ? 'var(--green)' : 'var(--red)';
+    const pColor = (val!==null && pvRef>0) ? (val/pvRef>=0?'var(--green)':'var(--red)') : 'var(--text3)';
     return `<div class="ci-row ${cls}">
       <span class="ci-day">D${day}</span>
       <span class="ci-label">${label}</span>
       <span class="ci-factor">${fN(factorVal,4)}</span>
       <span class="ci-val" style="color:${vColor}">${vStr}</span>
+      <span class="ci-pct" style="color:${pColor}">${pStr}</span>
     </div>`;
   };
 
@@ -1199,13 +1202,13 @@ function renderCI(R){
   // ── DFCD block ───────────────────────────────────
   document.getElementById('ci-dfcd-tma')&&(document.getElementById('ci-dfcd-tma').textContent=`| TMA ${fP(taxa)}`);
 
-  let dfcdHtml = '<div style="font-size:10px;color:var(--text3);display:flex;gap:4px;justify-content:flex-end;margin-bottom:4px"><span style="min-width:30px"></span><span style="min-width:44px;text-align:right">Fator</span><span style="min-width:72px;text-align:right">VP (R$)</span></div>';
+  let dfcdHtml = '<div style="font-size:10px;color:var(--text3);display:flex;gap:4px;justify-content:flex-end;margin-bottom:4px"><span style="min-width:30px"></span><span style="min-width:44px;text-align:right">Fator</span><span style="min-width:72px;text-align:right">VP (R$)</span><span style="min-width:52px;text-align:right">% PV</span></div>';
   udDays.forEach(d=>{
     const evs = days_ev.map((dd,i)=>dd===d?{lbl:lbls_ev[i],val:disc_vals[i]}:null).filter(Boolean).filter(e=>e.val!==0);
     const dayFactor = fat(d);
     evs.forEach(e=>{
       const tgt2 = (ciWhat==='compra'&&e.lbl==='Compra') || (ciWhat==='rebate'&&e.lbl==='Rebate bruto') || (ciWhat==='pv'&&e.lbl==='Venda');
-      dfcdHtml += ciRowDFCD(e.lbl, d, dayFactor, e.val, tgt2?'ci-target':'');
+      dfcdHtml += ciRowDFCD(e.lbl, d, dayFactor, e.val, pvX, tgt2?'ci-target':'');
     });
   });
   dfcdHtml += `<div class="ci-row ci-total">
@@ -1213,6 +1216,7 @@ function renderCI(R){
     <span class="ci-label">DFCD Acumulado</span>
     <span class="ci-factor"></span>
     <span class="ci-val" style="color:${dfcdTotal>=0?'var(--green)':'var(--red)'}">${fR(dfcdTotal,4)}</span>
+    <span class="ci-pct" style="color:${(pvX>0&&dfcdTotal/pvX>=0)?'var(--green)':'var(--red)'}">${pvX>0?fP(dfcdTotal/pvX):''}</span>
   </div>`;
 
   // ── Render ────────────────────────────────────────
