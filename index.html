@@ -542,7 +542,7 @@ tr.row-event td:first-child {
   </div>
   <div class="card" style="margin-bottom:12px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-      <div class="card-title" style="margin:0">Sensibilidade DFCD s/ ICMS × Rebate</div>
+      <div class="card-title" style="margin:0">Sensibilidade DFCD × Rebate</div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <span style="font-size:11px;color:var(--text3)">Passo</span>
         <input type="number" id="s-passo" value="0.25" step="0.05" style="width:66px;font-size:12px;padding:4px 8px" oninput="recalc()">
@@ -571,9 +571,9 @@ tr.row-event td:first-child {
       <div>
         <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Meta baseada em</div>
         <div class="seg" id="ci-base">
-          <button class="on" onclick="setCIBase('mc',this)">MC Final (DRE)</button>
-          <button onclick="setCIBase('vpl',this)">DFCD s/ ICMS</button>
-          <button onclick="setCIBase('fc',this)">DFC Acumulado</button>
+          <button class="on" onclick="setCIBase('mc',this)">MC Final</button>
+          <button onclick="setCIBase('fc',this)">DFC</button>
+          <button onclick="setCIBase('vpl',this)">DFCD</button>
         </div>
       </div>
       <div>
@@ -883,9 +883,9 @@ function recalc(){
   const nCols=ud.length+2;
   let t=`<table>${dayHdr(ud)}`;
   fcICMS.forEach((v,i)=>{ t+=eventRow(lbls[i],v,days[i],ud); });
-  t+=cumRow('DDFC do Período',mapFC(fcICMS,days,ud),false);
-  t+=cumRow('DDFC Acumulado',mapCum(cumICMS,days,ud),true);
-  t+=pctRow('DDFC Acumulado (% PV)',mapCum(cumICMS,days,ud),pv);
+  t+=cumRow('DFC do Período',mapFC(fcICMS,days,ud),false);
+  t+=cumRow('DFC Acumulado',mapCum(cumICMS,days,ud),true);
+  t+=pctRow('DFC Acumulado (% PV)',mapCum(cumICMS,days,ud),pv);
   t+=`<tr class="section"><td colspan="${nCols}">DFCD  |  TMA = ${(taxa*100).toFixed(2).replace('.',',')}% a.m.</td></tr>`;
   t+=fatRow('Fator (TMA)',ud,fat);
   t+=vplRow('DFCD do Período',mapVPL(discICMS,days,ud));
@@ -906,9 +906,9 @@ function recalc(){
     const isICMS=i===0||i===3;
     t2+=isICMS?eventRow(lbls[i],0,days[i],ud2,true):eventRow(lbls[i],v,days[i],ud2);
   });
-  t2+=cumRow('DDFC do Período',mapFC(fcNO,days,ud2),false);
-  t2+=cumRow('DDFC Acumulado',mapCum(cumNO,days,ud2),true);
-  t2+=pctRow('DDFC Acumulado (% PV)',mapCum(cumNO,days,ud2),pv);
+  t2+=cumRow('DFC do Período',mapFC(fcNO,days,ud2),false);
+  t2+=cumRow('DFC Acumulado',mapCum(cumNO,days,ud2),true);
+  t2+=pctRow('DFC Acumulado (% PV)',mapCum(cumNO,days,ud2),pv);
   t2+=`<tr class="section"><td colspan="${nCols2}">DFCD  |  TMA = ${(taxa*100).toFixed(2).replace('.',',')}% a.m.</td></tr>`;
   t2+=fatRow('Fator (TMA)',ud2,fat);
   t2+=vplRow('DFCD do Período',mapVPL(discNO,days,ud2));
@@ -1197,7 +1197,7 @@ function renderCI(R){
     },0);
   });
   // DFC total
-  dfcHtml += ciRow('DFC Acumulado', dfcTotal, pvX>0?dfcTotal/pvX:null, 'ci-total');
+  dfcHtml += ciRow('DFC', dfcTotal, pvX>0?dfcTotal/pvX:null, 'ci-total');
 
   // ── DFCD block ───────────────────────────────────
   document.getElementById('ci-dfcd-tma')&&(document.getElementById('ci-dfcd-tma').textContent=`| TMA ${fP(taxa)}`);
@@ -1230,10 +1230,10 @@ function renderCI(R){
 
   // ── Explanation bar ───────────────────────────────
   const whatLabels = {pv:'Preço de Venda', rebate:'Rebate', compra:'Preço de Compra'};
-  const baseLabels = {mc:'MC Final (DRE)', vpl:'DFCD s/ ICMS', fc:'DFC Acumulado'};
+  const baseLabels = {mc:'MC Final', fc:'DFC', vpl:'DFCD'};
   document.getElementById('ci-explanation').innerHTML =
     `<strong style="color:var(--text);font-size:11px;text-transform:uppercase;letter-spacing:0.5px">
-      ${whatLabels[ciWhat]} para ${baseLabels[ciBase]} = ${fP(tgt)} do PV
+      ${whatLabels[ciWhat]} para ${baseLabels[ciBase]} = ${fP(tgt)} do PV &nbsp;|&nbsp; DRE calculada sobre o valor resolvido
     </strong>
     ${valid ? ` — <span style="font-family:var(--mono);color:${r8(gap)>0?'var(--red)':'var(--green)'}">${fR(result,4)}</span>
     <span style="color:var(--text3);margin-left:8px">${r8(gap)>0?'(+'+fR(gap,4)+' vs atual)':'('+fR(gap,4)+' vs atual)'}</span>` : ''}`;
