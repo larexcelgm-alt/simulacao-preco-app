@@ -699,7 +699,7 @@ tr.row-event td:first-child {
 
 <script>
 // ── State ──
-let diagMdl='icms', diagTyp='nom', ciWhat='pv', ciIcms=true;
+let diagMdl='icms', diagTyp='nom', ciWhat='pv', ciIcms=true, ciTargetManual=false;
 
 // ── Nav ──
 function goTo(id){
@@ -891,6 +891,12 @@ function formatPctInputs(){
 function recalc(){
   saveState();
   const R=calc();
+  // Sync ci-target to current MC Final % PV when user hasn't overridden it
+  if(!ciTargetManual){
+    const mcPct = R.pv>0 ? Math.round(R.mcFinal/R.pv*10000)/100 : 15;
+    const el = document.getElementById('ci-target');
+    if(el) el.value = mcPct.toFixed(2);
+  }
   const{pv,taxa,rebate,icmsAliqE,icmsAliqS,icmsC,icmsD,saldoICMS,mc1,mc2,mcFinal,
         freteV,comisV,piscoV,cmv,vliq,
         days,lbls,fcICMS,fcNO,discICMS,discNO,
@@ -1065,7 +1071,7 @@ function recalc(){
 
 // ── Diagram ──
 function setCIIcms(v,btn){ciIcms=(v==='icms');document.querySelectorAll('#ci-icms-seg button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
-function setCIWhat(v,btn){ciWhat=v;document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
+function setCIWhat(v,btn){ciWhat=v;ciTargetManual=false;document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
 
 function syncTaxa(src){
   const v=document.getElementById(src).value;
@@ -1297,7 +1303,7 @@ function renderCI(R){
 
 // ── Diagram ──
 function setCIIcms(v,btn){ciIcms=(v==='icms');document.querySelectorAll('#ci-icms-seg button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
-function setCIWhat(v,btn){ciWhat=v;document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
+function setCIWhat(v,btn){ciWhat=v;ciTargetManual=false;document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
 
 function syncTaxa(src){
   const v=document.getElementById(src).value;
