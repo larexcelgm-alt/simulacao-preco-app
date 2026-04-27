@@ -393,11 +393,11 @@ tr.row-event td:first-child {
           </div>
           <div class="input-group">
             <div class="input-label">ICMS Entrada <span class="input-hint">alíquota na compra</span></div>
-            <div class="input-row"><input type="number" id="p-icms-e" value="12.00" step="0.01" oninput="recalc()"><span class="input-suffix">%</span></div>
+            <div class="input-row"><input type="number" id="p-icms-e" value="12.00" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
           </div>
           <div class="input-group">
             <div class="input-label">ICMS Saída <span class="input-hint">alíquota na venda</span></div>
-            <div class="input-row"><input type="number" id="p-icms-s" value="12.00" step="0.01" oninput="recalc()"><span class="input-suffix">%</span></div>
+            <div class="input-row"><input type="number" id="p-icms-s" value="12.00" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
           </div>
         </div>
         <div class="input-section">
@@ -411,7 +411,7 @@ tr.row-event td:first-child {
             <div class="input-row-2">
               <div class="input-group">
                 <div class="input-label">Alíquota</div>
-                <div class="input-row"><input type="number" id="p-frete" value="2.50" step="0.01" oninput="recalc()"><span class="input-suffix">%</span></div>
+                <div class="input-row"><input type="number" id="p-frete" value="2.50" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
               </div>
               <div class="input-group">
                 <div class="input-label">Prazo</div>
@@ -424,7 +424,7 @@ tr.row-event td:first-child {
             <div class="input-row-2">
               <div class="input-group">
                 <div class="input-label">Alíquota</div>
-                <div class="input-row"><input type="number" id="p-comis" value="0.00" step="0.01" oninput="recalc()"><span class="input-suffix">%</span></div>
+                <div class="input-row"><input type="number" id="p-comis" value="0.00" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
               </div>
               <div class="input-group">
                 <div class="input-label">Prazo</div>
@@ -438,14 +438,14 @@ tr.row-event td:first-child {
           </div>
           <div class="input-group">
             <div class="input-label">PIS/COFINS sobre Rebate <span class="input-hint">incide sobre receita do rebate</span></div>
-            <div class="input-row"><input type="number" id="p-piscofins" value="3.65" step="0.01" oninput="recalc()"><span class="input-suffix">%</span></div>
+            <div class="input-row"><input type="number" id="p-piscofins" value="3.65" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
           </div>
         </div>
         <div class="input-section">
           <div class="input-section-title">TMA — Taxa de Desconto</div>
           <div class="input-group">
             <div class="input-label">TMA — Taxa Mínima de Atratividade <span class="input-hint">ao mês</span></div>
-            <div class="input-row"><input type="number" id="p-taxa" value="1.50" step="0.01" oninput="syncTaxa('p-taxa')"><span class="input-suffix">% a.m.</span></div>
+            <div class="input-row"><input type="number" id="p-taxa" value="1.50" step="0.01" oninput="syncTaxa('p-taxa')" onblur="formatPctInputs()"><span class="input-suffix">% a.m.</span></div>
           </div>
         </div>
       </div>
@@ -574,7 +574,7 @@ tr.row-event td:first-child {
       <div>
         <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Margem-alvo (% PV)</div>
         <div style="display:flex;align-items:center;gap:8px">
-          <input type="number" id="ci-target" value="15.00" step="0.01" style="width:80px;font-size:13px;padding:6px 10px" oninput="recalc()">
+          <input type="number" id="ci-target" value="15.00" step="0.01" style="width:80px;font-size:13px;padding:6px 10px" oninput="recalc()" onblur="formatPctInputs()">
           <span style="font-size:12px;color:var(--text2)">%</span>
         </div>
       </div>
@@ -587,15 +587,15 @@ tr.row-event td:first-child {
         </div>
       </div>
       <!-- TMA inline — sincronizado com Premissas!p-taxa -->
-      <div style="margin-left:auto">
+      <div>
         <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">
           TMA
           <span style="font-size:9px;color:var(--text3);text-transform:none;letter-spacing:0;margin-left:4px;font-style:italic">= Premissas</span>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <input type="number" id="ci-taxa" value="1.50" step="0.01" min="0"
-            style="width:72px;font-size:13px;padding:6px 10px;border-color:var(--accent2)"
-            oninput="syncTaxa('ci-taxa')">
+            style="width:100px;font-size:13px;padding:6px 10px;border-color:var(--accent2)"
+            oninput="syncTaxa('ci-taxa')" onblur="formatPctInputs()">
           <span style="font-size:12px;color:var(--text2)">% a.m.</span>
         </div>
       </div>
@@ -890,7 +890,6 @@ function formatPctInputs(){
 // ── Main recalc ──
 function recalc(){
   saveState();
-  formatPctInputs();
   const R=calc();
   const{pv,taxa,rebate,icmsAliqE,icmsAliqS,icmsC,icmsD,saldoICMS,mc1,mc2,mcFinal,
         freteV,comisV,piscoV,cmv,vliq,
@@ -1073,11 +1072,7 @@ function syncTaxa(src){
   const other=src==='ci-taxa'?'p-taxa':'ci-taxa';
   document.getElementById(other).value=v;
   recalc();
-  // reformat both to 2dp after sync
-  ['p-taxa','ci-taxa'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el&&el.value!==''){const n=parseFloat(el.value);if(!isNaN(n))el.value=n.toFixed(2);}
-  });
+
 }
 function setDiagModel(m,btn){diagMdl=m;document.querySelectorAll('#sg-m button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
 function setDiagType(t,btn){diagTyp=t;document.querySelectorAll('#sg-t button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
@@ -1309,11 +1304,7 @@ function syncTaxa(src){
   const other=src==='ci-taxa'?'p-taxa':'ci-taxa';
   document.getElementById(other).value=v;
   recalc();
-  // reformat both to 2dp after sync
-  ['p-taxa','ci-taxa'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el&&el.value!==''){const n=parseFloat(el.value);if(!isNaN(n))el.value=n.toFixed(2);}
-  });
+
 }
 function setDiagModel(m,btn){diagMdl=m;document.querySelectorAll('#sg-m button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
 function setDiagType(t,btn){diagTyp=t;document.querySelectorAll('#sg-t button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
@@ -1543,7 +1534,9 @@ try{
   applyTheme(savedTheme);
 }catch(e){ applyTheme('dark'); }
 loadState();   // restore last session
+formatPctInputs();
 recalc();
+renderGlossary();
 </script>
 </body>
 </html>
