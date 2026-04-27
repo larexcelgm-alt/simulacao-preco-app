@@ -33,17 +33,13 @@
   --accent:#4A7A10;--accent2:#3A6008;
 }
 
-/* ── Theme toggle button ── */
 .theme-toggle{
-  position:fixed;bottom:20px;right:20px;z-index:200;
-  background:var(--bg2);border:1px solid var(--border2);
-  border-radius:50%;width:40px;height:40px;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:6px;width:32px;height:32px;
   display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:18px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.25);
-  transition:all .2s;
+  cursor:pointer;font-size:14px;transition:all .15s;flex-shrink:0;
 }
-.theme-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.theme-toggle:hover{background:var(--bg4)}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
 /* ── Layout ── */
@@ -314,6 +310,7 @@ tr.row-event td:first-child {
   <div class="nav-item" onclick="goTo('comparativo');toggleMobileNav()">Comparativo</div>
   <div class="nav-item" onclick="goTo('decisao');toggleMobileNav()">Análise de Decisão</div>
   <div class="nav-item" onclick="goTo('diagrama');toggleMobileNav()">Diagrama FC</div>
+  <div class="nav-item" onclick="goTo('glossario');toggleMobileNav()">Glossário</div>
 </div>
 
 <div class="app">
@@ -336,11 +333,11 @@ tr.row-event td:first-child {
     </div>
     <div class="nav-item" onclick="goTo('fluxo-icms')">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M9 4l5 4-5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      DFC c/ ICMS
+      DFC com ICMS
     </div>
     <div class="nav-item" onclick="goTo('fluxo-no')">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M9 4l5 4-5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="2" y1="4" x2="8" y2="13" stroke="currentColor" stroke-width="1" opacity="0.35"/></svg>
-      DFC s/ ICMS
+      DFC sem ICMS
     </div>
     <div class="nav-section" style="margin-top:6px">Análise</div>
     <div class="nav-item" onclick="goTo('comparativo')">
@@ -354,6 +351,11 @@ tr.row-event td:first-child {
     <div class="nav-item" onclick="goTo('diagrama')">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12l3-5 3 3 2-4 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Diagrama FC
+    </div>
+    <div class="nav-section" style="margin-top:6px">Referência</div>
+    <div class="nav-item" onclick="goTo('glossario')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 2h8l2 2v10H3V2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><line x1="6" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="6" y1="9" x2="11" y2="9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Glossário
     </div>
   </div>
   <div class="sidebar-footer">
@@ -390,12 +392,12 @@ tr.row-event td:first-child {
             <div class="input-row"><input type="number" id="p-compra" value="15.54" step="0.01" oninput="recalc()"><span class="input-suffix">R$</span></div>
           </div>
           <div class="input-group">
-            <div class="input-label">ICMS Entrada <span class="input-hint">alíq. na compra</span></div>
-            <div class="input-row"><input type="number" id="p-icms-e" value="12" step="0.1" oninput="recalc()"><span class="input-suffix">%</span></div>
+            <div class="input-label">ICMS Entrada <span class="input-hint">alíquota na compra</span></div>
+            <div class="input-row"><input type="number" id="p-icms-e" value="12.00" step="0.01" oninput="recalc()"><span class="input-suffix">%</span></div>
           </div>
           <div class="input-group">
-            <div class="input-label">ICMS Saída <span class="input-hint">alíq. na venda</span></div>
-            <div class="input-row"><input type="number" id="p-icms-s" value="12" step="0.1" oninput="recalc()"><span class="input-suffix">%</span></div>
+            <div class="input-label">ICMS Saída <span class="input-hint">alíquota na venda</span></div>
+            <div class="input-row"><input type="number" id="p-icms-s" value="12.00" step="0.01" oninput="recalc()"><span class="input-suffix">%</span></div>
           </div>
         </div>
         <div class="input-section">
@@ -409,7 +411,7 @@ tr.row-event td:first-child {
             <div class="input-row-2">
               <div class="input-group">
                 <div class="input-label">Alíquota</div>
-                <div class="input-row"><input type="number" id="p-frete" value="2.5" step="0.1" oninput="recalc()"><span class="input-suffix">%</span></div>
+                <div class="input-row"><input type="number" id="p-frete" value="2.50" step="0.01" oninput="recalc()"><span class="input-suffix">%</span></div>
               </div>
               <div class="input-group">
                 <div class="input-label">Prazo</div>
@@ -422,7 +424,7 @@ tr.row-event td:first-child {
             <div class="input-row-2">
               <div class="input-group">
                 <div class="input-label">Alíquota</div>
-                <div class="input-row"><input type="number" id="p-comis" value="0" step="0.1" oninput="recalc()"><span class="input-suffix">%</span></div>
+                <div class="input-row"><input type="number" id="p-comis" value="0.00" step="0.01" oninput="recalc()"><span class="input-suffix">%</span></div>
               </div>
               <div class="input-group">
                 <div class="input-label">Prazo</div>
@@ -435,15 +437,15 @@ tr.row-event td:first-child {
             <div class="input-row"><input type="number" id="p-rebate" value="10.41" step="0.01" oninput="recalc()"><span class="input-suffix">R$</span></div>
           </div>
           <div class="input-group">
-            <div class="input-label">PIS/COFINS s/ Rebate <span class="input-hint">incide sobre receita do rebate</span></div>
-            <div class="input-row"><input type="number" id="p-piscofins" value="3.65" step="0.05" oninput="recalc()"><span class="input-suffix">%</span></div>
+            <div class="input-label">PIS/COFINS sobre Rebate <span class="input-hint">incide sobre receita do rebate</span></div>
+            <div class="input-row"><input type="number" id="p-piscofins" value="3.65" step="0.01" oninput="recalc()"><span class="input-suffix">%</span></div>
           </div>
         </div>
         <div class="input-section">
           <div class="input-section-title">TMA — Taxa de Desconto</div>
           <div class="input-group">
             <div class="input-label">TMA — Taxa Mínima de Atratividade <span class="input-hint">ao mês</span></div>
-            <div class="input-row"><input type="number" id="p-taxa" value="1.5" step="0.1" oninput="syncTaxa('p-taxa')"><span class="input-suffix">% a.m.</span></div>
+            <div class="input-row"><input type="number" id="p-taxa" value="1.50" step="0.01" oninput="syncTaxa('p-taxa')"><span class="input-suffix">% a.m.</span></div>
           </div>
         </div>
       </div>
@@ -481,10 +483,10 @@ tr.row-event td:first-child {
   </div>
 </div>
 
-<!-- ══ FLUXO c/ICMS ══ -->
+<!-- ══ FLUXO com ICMS ══ -->
 <div class="page" id="page-fluxo-icms">
   <div class="page-header">
-    <div class="page-title">DFC — Fluxo Financeiro c/ ICMS</div>
+    <div class="page-title">DFC — Fluxo Financeiro com ICMS</div>
     <div class="page-subtitle">Captura o efeito temporal do crédito fiscal</div>
   </div>
   <div class="grid4" style="margin-bottom:16px" id="kpis-icms"></div>
@@ -498,10 +500,10 @@ tr.row-event td:first-child {
   </div>
 </div>
 
-<!-- ══ FLUXO s/ICMS ══ -->
+<!-- ══ FLUXO sem ICMS ══ -->
 <div class="page" id="page-fluxo-no">
   <div class="page-header">
-    <div class="page-title">DFC — Fluxo Financeiro s/ ICMS</div>
+    <div class="page-title">DFC — Fluxo Financeiro sem ICMS</div>
     <div class="page-subtitle">Apenas movimentos financeiros efetivos — ICMS como compensação fiscal sem desembolso</div>
   </div>
   <div class="grid4" style="margin-bottom:16px" id="kpis-no"></div>
@@ -518,7 +520,7 @@ tr.row-event td:first-child {
 <div class="page" id="page-comparativo">
   <div class="page-header">
     <div class="page-title">Comparativo</div>
-    <div class="page-subtitle">c/ ICMS vs. s/ ICMS — a diferença é o VPL do timing fiscal</div>
+    <div class="page-subtitle">com ICMS vs. sem ICMS — a diferença é o VPL do timing fiscal</div>
   </div>
   <div class="card" style="margin-bottom:12px">
     <div class="card-title">Indicadores</div>
@@ -568,19 +570,20 @@ tr.row-event td:first-child {
           <button onclick="setCIWhat('compra',this)">Preço de Compra</button>
         </div>
       </div>
-      <div>
-        <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Meta baseada em</div>
-        <div class="seg" id="ci-base">
-          <button class="on" onclick="setCIBase('mc',this)">MC Final</button>
-          <button onclick="setCIBase('fc',this)">DFC</button>
-          <button onclick="setCIBase('vpl',this)">DFCD</button>
-        </div>
-      </div>
+      
       <div>
         <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Margem-alvo (% PV)</div>
         <div style="display:flex;align-items:center;gap:8px">
-          <input type="number" id="ci-target" value="15" step="0.5" style="width:80px;font-size:13px;padding:6px 10px" oninput="recalc()">
+          <input type="number" id="ci-target" value="15.00" step="0.01" style="width:80px;font-size:13px;padding:6px 10px" oninput="recalc()">
           <span style="font-size:12px;color:var(--text2)">%</span>
+        </div>
+      </div>
+      <!-- com/sem ICMS toggle for DFC and DFCD -->
+      <div>
+        <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Fluxos de Caixa</div>
+        <div class="seg" id="ci-icms-seg">
+          <button class="on" onclick="setCIIcms('icms',this)">com ICMS</button>
+          <button onclick="setCIIcms('no',this)">sem ICMS</button>
         </div>
       </div>
       <!-- TMA inline — sincronizado com Premissas!p-taxa -->
@@ -590,7 +593,7 @@ tr.row-event td:first-child {
           <span style="font-size:9px;color:var(--text3);text-transform:none;letter-spacing:0;margin-left:4px;font-style:italic">= Premissas</span>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
-          <input type="number" id="ci-taxa" value="1.5" step="0.1" min="0"
+          <input type="number" id="ci-taxa" value="1.50" step="0.01" min="0"
             style="width:72px;font-size:13px;padding:6px 10px;border-color:var(--accent2)"
             oninput="syncTaxa('ci-taxa')">
           <span style="font-size:12px;color:var(--text2)">% a.m.</span>
@@ -604,15 +607,15 @@ tr.row-event td:first-child {
     <!-- Three blocks: DRE | DFC | DFCD -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px" id="ci-three-blocks">
       <div>
-        <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--accent2)">DRE — Resultado</div>
+        <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--accent2)">DRE — Cenário Calculado (MC Final)</div>
         <div id="ci-dre"></div>
       </div>
       <div>
-        <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border2)">DFC — Fluxo Nominal</div>
+        <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border2)">DFC — Fluxo Nominal (mesmo cenário DRE)</div>
         <div id="ci-dfc"></div>
       </div>
       <div>
-        <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--blue)">DFCD — Fluxo Descontado <span id="ci-dfcd-tma" style="color:var(--blue);font-weight:400"></span></div>
+        <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--blue)">DFCD — DFC Descontado (TMA) <span id="ci-dfcd-tma" style="color:var(--blue);font-weight:400"></span></div>
         <div id="ci-dfcd"></div>
       </div>
     </div>
@@ -651,23 +654,62 @@ tr.row-event td:first-child {
   </div>
 </div>
 
+
+<!-- ══ GLOSSÁRIO ══ -->
+<div class="page" id="page-glossario">
+  <div class="page-header">
+    <div class="page-title">Glossário</div>
+    <div class="page-subtitle">Terminologia padronizada do Simula Preço App</div>
+  </div>
+
+  <div class="grid2" style="gap:16px">
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">Demonstrativos Financeiros</div>
+        <div id="gloss-dem"></div>
+      </div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">Indicadores de Margem &amp; Custos</div>
+        <div id="gloss-ind"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Cálculo Inverso &amp; Precificação</div>
+        <div id="gloss-ci"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">Tributação &amp; Fiscal</div>
+        <div id="gloss-fis"></div>
+      </div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">Precificação &amp; Mercado</div>
+        <div id="gloss-prec"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Sistemas &amp; Fontes de Dados</div>
+        <div id="gloss-sis"></div>
+      </div>
+    </div>
+  </div>
+</div>
 </main>
 </div>
-<button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Alternar tema claro/escuro">🌙</button>
+
 
 <script>
 // ── State ──
-let diagMdl='icms', diagTyp='nom', ciWhat='pv', ciBase='mc';
+let diagMdl='icms', diagTyp='nom', ciWhat='pv', ciIcms=true;
 
 // ── Nav ──
 function goTo(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  // Update both sidebar and mobile nav
   document.querySelectorAll('.nav-item, .mobile-nav .nav-item').forEach(n=>{
     if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active');
   });
+  if(id==='glossario') renderGlossary();
 }
 function toggleMobileNav(){
   document.getElementById('mobile-nav').classList.toggle('open');
@@ -722,11 +764,11 @@ function calc(){
   // Events: 8 slots
   // days array: [dIC, dFR, dCOM, dID, dCP, dVD, dRB, dRB]
   const days  = [dIC, dFR, dCOM, dID, dCP, dVD, dRB, dRB];
-  const lbls  = ['ICMS Crédito','(-) Frete','(-) Comissão','(-) ICMS Débito','(-) Compra','(+) Venda','(+) Rebate bruto','(-) PIS/COFINS s/ Rebate'];
+  const lbls  = ['ICMS Crédito','(-) Frete','(-) Comissão','(-) ICMS Débito','(-) Compra','(+) Venda','(+) Rebate bruto','(-) PIS/COFINS sobre Rebate'];
 
-  // Flows c/ICMS
+  // Flows com ICMS
   const fcICMS= [icmsC, -freteV, -comisV, -icmsD, -compra, pv, rebate, -piscoV];
-  // Flows s/ICMS (ICMS lines = 0)
+  // Flows sem ICMS (ICMS lines = 0)
   const fcNO  = [0,     -freteV, -comisV,       0, -compra, pv, rebate, -piscoV];
 
   const discICMS = fcICMS.map((f,i)=>f/fat(days[i]));
@@ -832,9 +874,23 @@ function loadState(){
   }catch(e){ return false; }
 }
 
+
+// ── Format % fields to always show 2 decimal places ──────────────────────
+const PCT_IDS = ['p-taxa','p-icms-e','p-icms-s','p-frete','p-comis','p-piscofins','ci-taxa','ci-target'];
+function formatPctInputs(){
+  PCT_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if(el && el.value !== '') {
+      const v = parseFloat(el.value);
+      if(!isNaN(v)) el.value = v.toFixed(2);
+    }
+  });
+}
+
 // ── Main recalc ──
 function recalc(){
   saveState();
+  formatPctInputs();
   const R=calc();
   const{pv,taxa,rebate,icmsAliqE,icmsAliqS,icmsC,icmsD,saldoICMS,mc1,mc2,mcFinal,
         freteV,comisV,piscoV,cmv,vliq,
@@ -853,17 +909,17 @@ function recalc(){
 
   // ── Derived ──
   document.getElementById('derived-grid').innerHTML=[
-    ['ICMS Créd. ('+(icmsAliqE*100).toFixed(1).replace('.',',')+'%)',fR(icmsC)],['ICMS Déb. ('+(icmsAliqS*100).toFixed(1).replace('.',',')+'%)',fR(icmsD)],['Saldo ICMS',fR(saldoICMS)],
-    ['CMV líq.',fR(cmv)],['Venda Líquida',fR(vliq)],['PIS/COFINS Rebate',fR(piscoV)],
+    ['ICMS Crédito ('+(icmsAliqE*100).toFixed(2).replace('.',',')+'%)',fR(icmsC)],['ICMS Débito ('+(icmsAliqS*100).toFixed(2).replace('.',',')+'%)',fR(icmsD)],['Saldo ICMS',fR(saldoICMS)],
+    ['CMV Líquido',fR(cmv)],['Venda Líquida',fR(vliq)],['PIS/COFINS sobre Rebate',fR(piscoV)],
     ['Frete (R$)',fR(freteV)],['Comissão (R$)',fR(comisV)],['DFC Final',fR(mcFinal)],
   ].map(([l,v])=>`<div class="derived-item"><div class="dl">${l}</div><div class="dv">${v}</div></div>`).join('');
 
-  // ── Fluxo c/ICMS ──
+  // ── Fluxo com ICMS ──
   document.getElementById('kpis-icms').innerHTML=kpiH('DFC Final',fcFI)+kpiH('DFC (% PV)',fcFI/pv,true)+kpiH('DFCD Final',vplI)+kpiH('DFCD (% PV)',vplI/pv,true);
 
   const plRows=[
     ['Preço de Venda',pv,1,false],
-    ['(-) ICMS s/ Venda ('+(icmsAliqS*100).toFixed(1).replace('.',',')+'%)',-icmsD,-icmsD/pv,false],
+    ['(-) ICMS sobre Venda ('+(icmsAliqS*100).toFixed(2).replace('.',',')+'%)',-icmsD,-icmsD/pv,false],
     ['Venda Líquida',vliq,vliq/pv,true],
     ['(-) CMV',-cmv,-cmv/pv,false],
     ['MC1',mc1,mc1/pv,true],
@@ -871,14 +927,14 @@ function recalc(){
     ['(-) Frete',-freteV,-freteV/pv,false],
     ['MC2',mc2,mc2/pv,true],
     ['(+) Rebate bruto',rebate,rebate/pv,false],
-    ['(-) PIS/COFINS s/ Rebate',-piscoV,-piscoV/pv,false],
+    ['(-) PIS/COFINS sobre Rebate',-piscoV,-piscoV/pv,false],
     ['DFC Final',mcFinal,mcFinal/pv,true],
   ];
   document.getElementById('tbl-pl').innerHTML=
     `<tr><th>Linha</th><th>R$</th><th style="opacity:0.6">% PV</th></tr>`+
     plRows.map(([l,v,p,t])=>`<tr${t?' class="total"':''}><td>${l}</td><td class="${cls(v)}">${fR(v,4)}</td><td class="${cls(p)}">${fP(p)}</td></tr>`).join('');
 
-  // FC + // ── DFC c/ICMS
+  // FC + // ── DFC com ICMS
   const ud=getUD(days);
   const nCols=ud.length+2;
   let t=`<table>${dayHdr(ud)}`;
@@ -894,7 +950,7 @@ function recalc(){
   t+='</table>';
   document.getElementById('tbl-fc-icms').outerHTML=t.replace('<table','<table id="tbl-fc-icms"');
 
-  // ── Fluxo s/ICMS ──
+  // ── Fluxo sem ICMS ──
   document.getElementById('kpis-no').innerHTML=kpiH('DFC Final',fcFN)+kpiH('DFC (% PV)',fcFN/pv,true)+kpiH('DFCD Final',vplN)+kpiH('DFCD (% PV)',vplN/pv,true);
   document.getElementById('nota-no').innerHTML=
     `Crédito ICMS ${fR(icmsC)} &gt; Débito ${fR(icmsD)} — sem desembolso ao fisco. Saldo credor de <strong style="color:var(--amber)">${fR(saldoICMS)}</strong> no livro fiscal para compensação futura.`;
@@ -922,19 +978,19 @@ function recalc(){
     ['DFC Final (R$)',       fR(fcFI),        fR(fcFN),       fR(fcFI-fcFN),     'Diferença = benefício temporal do ICMS'],
     ['DFC Final (% PV)',     fP(fcFI/pv),     fP(fcFN/pv),    fP((fcFI-fcFN)/pv),''],
     ['DFCD Final (R$)',      fR(vplI),        fR(vplN),       fR(vplI-vplN),     'VPL do timing fiscal do ICMS'],
-    ['DFCD Final (% PV)',    fP(vplI/pv),     fP(vplN/pv),    fP((vplI-vplN)/pv),`DFCD ${fP(vplI/pv)} c/ICMS vs ${fP(vplN/pv)} s/ICMS`],
-    ['DFC Final (R$)',         fR(mcFinal),     '—',            '—',               `FC Final ${fR(mcFinal)}`],
+    ['DFCD Final (% PV)',    fP(vplI/pv),     fP(vplN/pv),    fP((vplI-vplN)/pv),`DFCD ${fP(vplI/pv)} com ICMS vs ${fP(vplN/pv)} sem ICMS`],
+    ['DFC Final (R$)',         fR(mcFinal),     '—',            '—',               `DFC Final ${fR(mcFinal)}`],
     ['DFC Final (% PV)',       fP(mcFinal/pv),  '—',            '—',               `${fP(mcFinal/pv)} do PV — depende 100% do rebate`],
-    ['Saldo ICMS crédito',  fR(saldoICMS),   '—',            '—',               'Livro fiscal — vale se houver débitos futuros'],
+    ['Saldo ICMS Crédito',  fR(saldoICMS),   '—',            '—',               'Livro fiscal — vale se houver débitos futuros'],
   ];
   document.getElementById('tbl-comp').innerHTML=
-    `<tr><th>Indicador</th><th>c/ ICMS</th><th>s/ ICMS</th><th>Diferença</th><th>Observação</th></tr>`+
+    `<tr><th>Indicador</th><th>com ICMS</th><th>sem ICMS</th><th>Diferença</th><th>Observação</th></tr>`+
     compRows.map(([l,e,c,d,obs],i)=>`<tr class="${[1,3,5].includes(i)?'row-dim':''}"><td>${l}</td><td class="val-pos">${e}</td><td style="color:${c==='—'?'var(--text3)':'var(--blue)'}">${c}</td><td style="color:var(--amber)">${d}</td><td style="color:var(--text3);font-size:10px;font-family:var(--sans)">${obs}</td></tr>`).join('');
 
   document.getElementById('interp-gerencial').innerHTML=[
-    {t:'Por que os modelos diferem?',b:`Crédito ICMS ${fR(icmsC)} (entrada ${(icmsAliqE*100).toFixed(1).replace('.',',')}%) > Débito ${fR(icmsD)} (saída ${(icmsAliqS*100).toFixed(1).replace('.',',')}%). Saldo de ${fR(saldoICMS)} não sai do caixa — compensação contábil futura. O modelo c/ICMS captura esse benefício temporal; o s/ICMS ignora por não ser movimentação financeira.`},
-    {t:'Quando usar c/ICMS?',b:`Para medir margem contábil e avaliar o retorno da estrutura fiscal. FC Final atual: ${fP(mcFinal/pv)} do PV. Adequado quando a empresa tem saldo devedor de ICMS para absorver o crédito.`},
-    {t:'Quando usar s/ICMS?',b:`Para gestão de liquidez. VPL de ${fP(vplN/pv)} — operação ${r8(vplN)<0?'consome':'gera'} valor à TMA de ${fP(taxa)} a.m. ${r8(vplN)<0?'Alerta para o financeiro.':'Operação viável no caixa.'}`},
+    {t:'Por que os modelos diferem?',b:`Crédito ICMS ${fR(icmsC)} (entrada ${(icmsAliqE*100).toFixed(2).replace('.',',')}%) > Débito ${fR(icmsD)} (saída ${(icmsAliqS*100).toFixed(2).replace('.',',')}%). Saldo de ${fR(saldoICMS)} não sai do caixa — compensação contábil futura. O modelo com ICMS captura esse benefício temporal; o sem ICMS ignora por não ser movimentação financeira.`},
+    {t:'Quando usar com ICMS?',b:`Para medir margem contábil e avaliar o retorno da estrutura fiscal. DFC Final atual: ${fP(mcFinal/pv)} do PV. Adequado quando a empresa tem saldo devedor de ICMS para absorver o crédito.`},
+    {t:'Quando usar sem ICMS?',b:`Para gestão de liquidez. VPL de ${fP(vplN/pv)} — operação ${r8(vplN)<0?'consome':'gera'} valor à TMA de ${fP(taxa)} a.m. ${r8(vplN)<0?'Alerta para o financeiro.':'Operação viável no caixa.'}`},
     {t:'Risco principal',b:`FC sem rebate (MC2): ${fP(mc2/pv)}. Rebate de ${fR(rebate)} = ${fP(rebate/pv)} do PV — dependência estrutural. Crédito ICMS de ${fR(saldoICMS)} só tem valor se houver débitos futuros. PIS/COFINS ${fP(R.piscoP)} incide sobre o rebate bruto.`},
   ].map(({t,b})=>`<div style="padding:11px 0;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:500;color:var(--text);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px">${t}</div><div style="font-size:12px;color:var(--text2);line-height:1.7;font-weight:300">${b}</div></div>`).join('');
 
@@ -962,7 +1018,7 @@ function recalc(){
 
   const viable=r8(vplN)>=0;
   document.getElementById('decisao-rapida').innerHTML=
-    `<div class="alert ${viable?'ok':'err'}"><strong>${viable?'Viável financeiramente.':'Inviável no caixa.'}</strong><br>DFCD c/ICMS: ${fP(vplI/pv)} · DFCD s/ICMS: ${fP(vplN/pv)}</div>
+    `<div class="alert ${viable?'ok':'err'}"><strong>${viable?'Viável financeiramente.':'Inviável no caixa.'}</strong><br>DFCD com ICMS: ${fP(vplI/pv)} · DFCD sem ICMS: ${fP(vplN/pv)}</div>
     <div style="font-size:11px;color:var(--text3);line-height:1.7;font-weight:300">
       ${viable?`A operação gera valor à TMA de ${fP(taxa)} a.m. mesmo desconsiderando o crédito fiscal.`:
                `Requer rebate de ${fR(rebateMin)} para equilibrar o caixa. Gap atual: ${fR(gap)}.`}
@@ -991,8 +1047,8 @@ function recalc(){
   document.getElementById('sensitivity-bars').innerHTML=bars;
 
   document.getElementById('exec-summary').innerHTML=[
-    {c:'green',t:'ACEITAR — visão c/ ICMS',b:`DFCD c/ICMS ${fP(vplI/pv)} positivo à TMA de ${fP(taxa)} a.m. FC Final de ${fP(mcFinal/pv)} do PV. Crédito líquido ICMS de ${fR(saldoICMS)} permanece na empresa sem custo financeiro.`},
-    {c:'red',  t:'REJEITAR — visão s/ ICMS',b:`DFCD s/ICMS ${fP(vplN/pv)} a ${fP(taxa)} a.m. Desembolso de ${fR(rebate)} no D${R.dCP} contra recebimentos tardios. PIS/COFINS de ${fR(piscoV)} reduz o rebate líquido para ${fR(rebate-piscoV)}.`},
+    {c:'green',t:'ACEITAR — visão com ICMS',b:`DFCD com ICMS ${fP(vplI/pv)} positivo à TMA de ${fP(taxa)} a.m. DFC Final de ${fP(mcFinal/pv)} do PV. Crédito líquido ICMS de ${fR(saldoICMS)} permanece na empresa sem custo financeiro.`},
+    {c:'red',  t:'REJEITAR — visão sem ICMS',b:`DFCD sem ICMS ${fP(vplN/pv)} a ${fP(taxa)} a.m. Desembolso de ${fR(rebate)} no D${R.dCP} contra recebimentos tardios. PIS/COFINS de ${fR(piscoV)} reduz o rebate líquido para ${fR(rebate-piscoV)}.`},
     {c:'amber',t:'CONDIÇÃO DE VIABILIDADE',b:`Rebate mínimo bruto: ${fR(rebateMin)} (${fP(rebateMin/pv)} PV). Rebate atual: ${fR(rebate)}. A operação ${r8(gap)>0?'AINDA NÃO É':'JÁ É'} viável no caixa com o rebate contratado.`},
   ].map(({c,t,b})=>`<div class="exec-card ${c}"><div class="exec-title">${t}</div><div class="exec-body">${b}</div></div>`).join('');
 
@@ -1009,14 +1065,19 @@ function recalc(){
 }
 
 // ── Diagram ──
+function setCIIcms(v,btn){ciIcms=(v==='icms');document.querySelectorAll('#ci-icms-seg button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
 function setCIWhat(v,btn){ciWhat=v;document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
-function setCIBase(v,btn){ciBase=v;document.querySelectorAll('#ci-base button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
+
 function syncTaxa(src){
   const v=document.getElementById(src).value;
-  // sync to the other field
   const other=src==='ci-taxa'?'p-taxa':'ci-taxa';
   document.getElementById(other).value=v;
   recalc();
+  // reformat both to 2dp after sync
+  ['p-taxa','ci-taxa'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&el.value!==''){const n=parseFloat(el.value);if(!isNaN(n))el.value=n.toFixed(2);}
+  });
 }
 function setDiagModel(m,btn){diagMdl=m;document.querySelectorAll('#sg-m button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
 function setDiagType(t,btn){diagTyp=t;document.querySelectorAll('#sg-t button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
@@ -1043,51 +1104,44 @@ function renderCI(R){
   };
 
   // ── Solve ────────────────────────────────────────
-  let result=null, formula='', currentVal=null, currentLabel='';
-
-  if(ciWhat==='pv'){
-    currentVal=pv; currentLabel='PV atual';
-    if(ciBase==='mc'){
-      const num=cmv-rebate+rebate*piscoP;
-      const den=1-icmsAliqS-freteP-comisP-tgt;
-      result=den!==0?num/den:null;
-    } else if(ciBase==='vpl'){
-      const A=-freteP/fat(dFR)-comisP/fat(dCOM)+1/fat(dVD)-tgt;
-      const B=compra/fat(dCP)-rebate*(1-piscoP)/fat(dRB);
-      result=A!==0?B/A:null;
+  // ── Solve all three bases independently ─────────
+  const solveFor = (base) => {
+    if(ciWhat==='pv'){
+      if(base==='mc'){
+        const num=cmv-rebate+rebate*piscoP, den=1-icmsAliqS-freteP-comisP-tgt;
+        return den!==0?num/den:null;
+      } else if(base==='vpl'){
+        const A=-freteP/fat(dFR)-comisP/fat(dCOM)+1/fat(dVD)-tgt;
+        const B=compra/fat(dCP)-rebate*(1-piscoP)/fat(dRB);
+        return A!==0?B/A:null;
+      } else {
+        const num=compra-rebate+rebate*piscoP, den=1-freteP-comisP-tgt;
+        return den!==0?num/den:null;
+      }
+    } else if(ciWhat==='rebate'){
+      if(base==='mc')  return (tgt*pv-vliq+cmv+freteV+comisV)/(1-piscoP);
+      if(base==='vpl') return (tgt*pv-vplNoReb)*fat(dRB)/(1-piscoP);
+      return (tgt*pv+freteV+comisV+compra-pv)/(1-piscoP);
     } else {
-      const num=compra-rebate+rebate*piscoP;
-      const den=1-freteP-comisP-tgt;
-      result=den!==0?num/den:null;
+      if(base==='mc')  return (vliq-freteV-comisV+rebate-piscoV-tgt*pv)/(1-icmsAliqE);
+      if(base==='vpl') return (-freteV/fat(dFR)-comisV/fat(dCOM)+pv/fat(dVD)+rebate*(1-piscoP)/fat(dRB)-tgt*pv)*fat(dCP);
+      return -freteV-comisV+pv+rebate*(1-piscoP)-tgt*pv;
     }
-  } else if(ciWhat==='rebate'){
-    currentVal=rebate; currentLabel='Rebate atual';
-    if(ciBase==='mc'){
-      result=(tgt*pv-vliq+cmv+freteV+comisV)/(1-piscoP);
-    } else if(ciBase==='vpl'){
-      result=(tgt*pv-vplNoReb)*fat(dRB)/(1-piscoP);
-    } else {
-      result=(tgt*pv+freteV+comisV+compra-pv)/(1-piscoP);
-    }
-  } else {
-    currentVal=compra; currentLabel='Compra atual';
-    if(ciBase==='mc'){
-      result=(vliq-freteV-comisV+rebate-piscoV-tgt*pv)/(1-icmsAliqE);
-    } else if(ciBase==='vpl'){
-      result=(-freteV/fat(dFR)-comisV/fat(dCOM)+pv/fat(dVD)+rebate*(1-piscoP)/fat(dRB)-tgt*pv)*fat(dCP);
-    } else {
-      result=-freteV-comisV+pv+rebate*(1-piscoP)-tgt*pv;
-    }
-  }
+  };
 
-  const valid = result!==null && r8(result)>0;
-  const gap   = valid ? r8(result-currentVal) : null;
+  // Single resolution via MC Final — DRE, DFC and DFCD show same scenario
+  const resMC = solveFor('mc');
+  const currentVal = ciWhat==='pv'?pv : ciWhat==='rebate'?rebate : compra;
+  const ok_mc = resMC!==null && r8(resMC)>0;
+  const res_v = ok_mc ? resMC : currentVal;
+  const pvX = ciWhat==='pv'     ? res_v : pv;
+  const rbX = ciWhat==='rebate' ? res_v : rebate;
+  const cpX = ciWhat==='compra' ? res_v : compra;
+  const valid = ok_mc;
+  const gap   = ok_mc ? r8(resMC-currentVal) : null;
+  const result = resMC;
 
-  // ── Resolved values ───────────────────────────────
-  const pvX  = ciWhat==='pv'     ? (valid?result:pv)     : pv;
-  const rbX  = ciWhat==='rebate' ? (valid?result:rebate) : rebate;
-  const cpX  = ciWhat==='compra' ? (valid?result:compra) : compra;
-
+  // ── Compute derived values for DRE (MC resolution) ──
   const icmsCx  = cpX  * icmsAliqE;
   const icmsDx  = pvX  * icmsAliqS;
   const cmvX    = cpX  - icmsCx;
@@ -1099,22 +1153,27 @@ function renderCI(R){
   const mc2X    = mc1X - comisvX - fretevX;
   const mcFinalX= mc2X + rbX - piscovX;
 
-  // DFC events (nominal) — same ordering as main model
-  const days_ev  = [dIC, dFR, dCOM, dID, dCP, dVD, dRB, dRB];
-  const lbls_ev  = ['ICMS Crédito','Frete','Comissão','ICMS Débito','Compra','Venda','Rebate bruto','PIS/COFINS Rebate'];
-  const fc_icms  = [icmsCx,-fretevX,-comisvX,-icmsDx,-cpX,pvX,rbX,-piscovX];
-  const fc_no    = [0,     -fretevX,-comisvX,0,       -cpX,pvX,rbX,-piscovX];
-  const fc_vals  = fc_icms; // CI always shows c/ICMS flow
+  // ── Build flow arrays for each resolution ──
+  const days_ev = [dIC, dFR, dCOM, dID, dCP, dVD, dRB, dRB];
+  const lbls_ev = ['ICMS Crédito','Frete','Comissão','ICMS Débito','Compra','Venda','Rebate bruto','PIS/COFINS sobre Rebate'];
 
-  // DFCD
-  const disc_vals = fc_vals.map((v,i)=>v/fat(days_ev[i]));
+  const mkFlow = (pR,rR,cR, withIcms) => {
+    const icC=cR*icmsAliqE, icD=pR*icmsAliqS;
+    const fr=pR*freteP, co=pR*comisP, pi=rR*piscoP;
+    const f=[icC,-fr,-co,-icD,-cR,pR,rR,-pi];
+    if(!withIcms){f[0]=0;f[3]=0;}
+    return f;
+  };
+  const fc_vals = mkFlow(pvX,rbX,cpX,true);
+  const fc_dfc  = mkFlow(pvX,rbX,cpX,ciIcms);
+  const fc_dfcd = fc_dfc;
 
-  // Cumulative
-  const dfcCum  = fc_vals.reduce((a,b,i)=>[...a,(a[i-1]||0)+b],[]);
-  const dfcdCum = disc_vals.reduce((a,b,i)=>[...a,(a[i-1]||0)+b],[]);
-
+  const disc_vals = fc_dfcd.map((v,i)=>v/fat(days_ev[i]));
+  const dfcCum    = fc_dfc.reduce((a,b,i)=>[...a,(a[i-1]||0)+b],[]);
+  const dfcdCum   = disc_vals.reduce((a,b,i)=>[...a,(a[i-1]||0)+b],[]);
   const dfcTotal  = dfcCum[7];
   const dfcdTotal = dfcdCum[7];
+  const pvDFCD = pvX;
 
   // ── Helper render functions ───────────────────────
   const isTargetLine = (lbl) => {
@@ -1150,19 +1209,20 @@ function renderCI(R){
     </div>`;
   };
 
-  // ── DRE block ────────────────────────────────────
+  // ── DRE block — uses resolved values (pvX, rbX, cpX) ──────────────────
+  // DRE, DFC and DFCD all show the SAME resolved scenario — three perspectives
   const dreLines = [
-    ['Preço de Venda',       pvX,       pvX>0?pvX/pvX:null,     isTargetLine('Preço de Venda')?'ci-target':''],
-    ['(-) ICMS s/ Venda',    -icmsDx,   -icmsAliqS,              'ci-sub'],
-    ['Venda Líquida',        vliqX,     pvX>0?vliqX/pvX:null,    'ci-total'],
-    ['(-) CMV',              -cmvX,     pvX>0?-cmvX/pvX:null,    'ci-sub'],
-    ['MC1',                  mc1X,      pvX>0?mc1X/pvX:null,     'ci-total'],
-    ['(-) Comissão',         -comisvX,  -comisP,                 'ci-sub'],
-    ['(-) Frete',            -fretevX,  -freteP,                 'ci-sub'],
-    ['MC2',                  mc2X,      pvX>0?mc2X/pvX:null,     'ci-total'],
-    ['(+) Rebate bruto',     rbX,       pvX>0?rbX/pvX:null,      isTargetLine('(+) Rebate bruto')?'ci-target':''],
-    ['(-) PIS/COFINS Rebate',-piscovX,  -piscoP,                 'ci-sub'],
-    ['MC Final',             mcFinalX,  pvX>0?mcFinalX/pvX:null, ciBase==='mc'?'ci-target':'ci-total'],
+    ['Preço de Venda',        pvX,       pvX>0?1:null,                 ciWhat==='pv'?'ci-target':''],
+    ['(-) ICMS sobre Venda',    -icmsDx,   -icmsAliqS,                    'ci-sub'],
+    ['Venda Líquida',         vliqX,     pvX>0?vliqX/pvX:null,         'ci-total'],
+    ['(-) CMV',              -cmvX,     pvX>0?-cmvX/pvX:null,          'ci-sub'],
+    ['MC1',                   mc1X,      pvX>0?mc1X/pvX:null,          'ci-total'],
+    ['(-) Comissão',         -comisvX,  -comisP,                        'ci-sub'],
+    ['(-) Frete',            -fretevX,  -freteP,                        'ci-sub'],
+    ['MC2',                   mc2X,      pvX>0?mc2X/pvX:null,          'ci-total'],
+    ['(+) Rebate bruto',      rbX,       pvX>0?rbX/pvX:null,            ciWhat==='rebate'?'ci-target':''],
+    ['(-) PIS/COFINS sobre Rebate',-piscovX,  -piscoP,                        'ci-sub'],
+    ['MC Final',              mcFinalX,  pvX>0?mcFinalX/pvX:null,      ciWhat==='compra'?'ci-target':'ci-total'],
   ];
 
   let dreHtml = '<div style="font-size:10px;color:var(--text3);display:flex;justify-content:flex-end;gap:8px;margin-bottom:4px"><span style="min-width:72px;text-align:right">R$</span><span style="min-width:52px;text-align:right">% PV</span></div>';
@@ -1181,7 +1241,7 @@ function renderCI(R){
   let dfcHtml = '<div style="font-size:10px;color:var(--text3);display:flex;justify-content:flex-end;gap:8px;margin-bottom:4px"><span style="min-width:30px"></span><span style="min-width:72px;text-align:right">R$</span><span style="min-width:52px;text-align:right">% PV</span></div>';
   let dfcRunning = 0;
   udDays.forEach(d=>{
-    const evs = days_ev.map((dd,i)=>dd===d?{lbl:lbls_ev[i],val:fc_vals[i]}:null).filter(Boolean).filter(e=>e.val!==0);
+    const evs = days_ev.map((dd,i)=>dd===d?{lbl:lbls_ev[i],val:fc_dfc[i]}:null).filter(Boolean).filter(e=>e.val!==0);
     evs.forEach(e=>{
       const tgt2 = (ciWhat==='compra'&&e.lbl==='Compra') || (ciWhat==='rebate'&&e.lbl==='Rebate bruto') || (ciWhat==='pv'&&e.lbl==='Venda');
       dfcHtml += `<div class="ci-row ${tgt2?'ci-target':''}">
@@ -1208,7 +1268,7 @@ function renderCI(R){
     const dayFactor = fat(d);
     evs.forEach(e=>{
       const tgt2 = (ciWhat==='compra'&&e.lbl==='Compra') || (ciWhat==='rebate'&&e.lbl==='Rebate bruto') || (ciWhat==='pv'&&e.lbl==='Venda');
-      dfcdHtml += ciRowDFCD(e.lbl, d, dayFactor, e.val, pvX, tgt2?'ci-target':'');
+      dfcdHtml += ciRowDFCD(e.lbl, d, dayFactor, e.val, pvDFCD, tgt2?'ci-target':'');
     });
   });
   dfcdHtml += `<div class="ci-row ci-total">
@@ -1216,7 +1276,7 @@ function renderCI(R){
     <span class="ci-label">DFCD Acumulado</span>
     <span class="ci-factor"></span>
     <span class="ci-val" style="color:${dfcdTotal>=0?'var(--green)':'var(--red)'}">${fR(dfcdTotal,4)}</span>
-    <span class="ci-pct" style="color:${(pvX>0&&dfcdTotal/pvX>=0)?'var(--green)':'var(--red)'}">${pvX>0?fP(dfcdTotal/pvX):''}</span>
+    <span class="ci-pct" style="color:${(pvDFCD>0&&dfcdTotal/pvDFCD>=0)?'var(--green)':'var(--red)'}">${pvDFCD>0?fP(dfcdTotal/pvDFCD):''}</span>
   </div>`;
 
   // ── Render ────────────────────────────────────────
@@ -1230,25 +1290,30 @@ function renderCI(R){
 
   // ── Explanation bar ───────────────────────────────
   const whatLabels = {pv:'Preço de Venda', rebate:'Rebate', compra:'Preço de Compra'};
-  const baseLabels = {mc:'MC Final', fc:'DFC', vpl:'DFCD'};
-  document.getElementById('ci-explanation').innerHTML =
-    `<strong style="color:var(--text);font-size:11px;text-transform:uppercase;letter-spacing:0.5px">
-      ${whatLabels[ciWhat]} para ${baseLabels[ciBase]} = ${fP(tgt)} do PV &nbsp;|&nbsp; DRE calculada sobre o valor resolvido
-    </strong>
-    ${valid ? ` — <span style="font-family:var(--mono);color:${r8(gap)>0?'var(--red)':'var(--green)'}">${fR(result,4)}</span>
-    <span style="color:var(--text3);margin-left:8px">${r8(gap)>0?'(+'+fR(gap,4)+' vs atual)':'('+fR(gap,4)+' vs atual)'}</span>` : ''}`;
+  document.getElementById('ci-explanation').innerHTML=
+    `<strong style="color:var(--text);font-size:11px;text-transform:uppercase;letter-spacing:0.5px">${whatLabels[ciWhat]} · Meta ${fP(tgt)} do PV</strong>
+    &nbsp;·&nbsp;
+    <span style="color:var(--text3);font-size:11px">
+      Resultado: <span style="font-family:var(--mono);color:${ok_mc?'var(--green)':'var(--red)'}">${ok_mc?fR(resMC,4):'insolúvel'}</span>
+      ${gap!==null?` <span style="color:var(--text3)">(${gap>0?'+':''}${fR(gap,4)} vs atual)</span>`:''}
+      &nbsp;·&nbsp;Fluxos: ${ciIcms?'com ICMS':'sem ICMS'}
+    </span>`;
 }
 
-
 // ── Diagram ──
+function setCIIcms(v,btn){ciIcms=(v==='icms');document.querySelectorAll('#ci-icms-seg button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
 function setCIWhat(v,btn){ciWhat=v;document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
-function setCIBase(v,btn){ciBase=v;document.querySelectorAll('#ci-base button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
+
 function syncTaxa(src){
   const v=document.getElementById(src).value;
-  // sync to the other field
   const other=src==='ci-taxa'?'p-taxa':'ci-taxa';
   document.getElementById(other).value=v;
   recalc();
+  // reformat both to 2dp after sync
+  ['p-taxa','ci-taxa'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&el.value!==''){const n=parseFloat(el.value);if(!isNaN(n))el.value=n.toFixed(2);}
+  });
 }
 function setDiagModel(m,btn){diagMdl=m;document.querySelectorAll('#sg-m button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
 function setDiagType(t,btn){diagTyp=t;document.querySelectorAll('#sg-t button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
@@ -1286,7 +1351,7 @@ function renderDiagram(R){
 
   const TLY=195, SC=9.5, MH=28;
   const GRN='#7BC47A', RED='#E07070', GRAY='#5A5C54';
-  const DLBLS=['ICMS créd.','Frete','Comissão','ICMS déb.','Compra','Venda','Rebate bruto','PIS/COFINS'];
+  const DLBLS=['ICMS Crédito','Frete','Comissão','ICMS Débito','Compra','Venda','Rebate bruto','PIS/COFINS'];
 
   let s='';
   s+=`<rect x="40" y="20" width="850" height="${TLY-20}" rx="0" fill="rgba(200,232,122,0.015)"/>`;
@@ -1359,6 +1424,117 @@ function applyTheme(theme){
     document.documentElement.removeAttribute('data-theme');
     document.querySelectorAll('.theme-toggle').forEach(b=>b.textContent='🌙');
   }
+}
+
+
+// ── Glossário ────────────────────────────────────────────────────────────
+function renderGlossary(){
+  const row = (term, sigla, def) =>
+    `<div style="padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
+        <span style="font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent)">${sigla}</span>
+        ${term ? `<span style="font-size:11px;color:var(--text3)">— ${term}</span>` : ''}
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.65;font-weight:300">${def}</div>
+    </div>`;
+
+  // DEMONSTRATIVOS
+  document.getElementById('gloss-dem').innerHTML = [
+    ['Demonstrativo de Resultado do Exercício','DRE',
+      'Visão contábil completa da operação: receita bruta, deduções (ICMS saída), venda líquida, custos, margens e resultado final. No app, o DRE é sempre calculado a partir das premissas atuais e nunca é afetado pelo seletor de fluxo.'],
+    ['Demonstração de Fluxo de Caixa','DFC',
+      'Registra todas as entradas e saídas financeiras nos seus respectivos momentos (dias). Valores nominais, sem desconto. O seletor <em>com/sem ICMS</em> controla se os eventos fiscais (D0 e D45) aparecem no fluxo.'],
+    ['Demonstração de Fluxo de Caixa Descontado','DFCD',
+      'O próprio DFC com cada evento trazido a valor presente pela TMA. Permite avaliar o valor real da operação considerando o custo do dinheiro no tempo. DFCD = DFC descontado evento a evento.'],
+  ].map(([t,s,d])=>row(t,s,d)).join('');
+
+  // INDICADORES
+  document.getElementById('gloss-ind').innerHTML = [
+    ['Margem de Contribuição 1','MC1',
+      'Venda Líquida (PV menos ICMS saída) menos o CMV líquido de ICMS crédito. Representa a contribuição bruta do produto antes dos custos variáveis de distribuição.'],
+    ['Margem de Contribuição 2','MC2',
+      'MC1 menos Frete e Comissão. Mede a contribuição após os principais custos variáveis operacionais. Quando negativa, indica que a operação depende inteiramente do Rebate para ser viável.'],
+    ['Margem de Contribuição Final','MC Final',
+      'MC2 mais Rebate bruto menos PIS/COFINS sobre o Rebate. Resultado final da operação na visão contábil (DRE).'],
+    ['Percentual sobre o Preço de Venda','% PV',
+      'Base de análise vertical utilizada em todo o app. Cada linha do DRE e dos fluxos é expressa como percentual do Preço de Venda, permitindo comparar operações de tamanhos diferentes.'],
+    ['Custo da Mercadoria Vendida','CMV',
+      'Valor de Compra bruto menos o ICMS Crédito (alíquota de entrada × valor bruto). Representa o custo real líquido do produto que entra na formação do resultado contábil.'],
+    ['Venda Líquida','VL',
+      'Preço de Venda menos ICMS Débito (alíquota de saída × PV). Representa a receita efetiva que permanece na empresa após o repasse do imposto sobre a venda.'],
+  ].map(([t,s,d])=>row(t,s,d)).join('');
+
+  // TRIBUTAÇÃO
+  document.getElementById('gloss-fis').innerHTML = [
+    ['Imposto sobre Circulação de Mercadorias e Serviços','ICMS',
+      'Imposto estadual que incide sobre a circulação de mercadorias. Gera crédito na entrada (compra) e débito na saída (venda). As alíquotas de entrada e saída podem ser diferentes, gerando saldo credor ou devedor.'],
+    ['ICMS Crédito (Entrada)','ICMS-C',
+      'Crédito fiscal gerado no ato da compra (D0 — momento da nota fiscal de entrada). Calculado: Valor Bruto da Compra × Alíquota ICMS Entrada. Disponível imediatamente para compensação com débitos futuros.'],
+    ['ICMS Débito (Saída)','ICMS-D',
+      'Débito fiscal gerado na venda. Calculado: PV × Alíquota ICMS Saída. É apurado e recolhido ao fisco no período de apuração (D45 no modelo).'],
+    ['Saldo Líquido de ICMS','Saldo ICMS',
+      'ICMS Crédito menos ICMS Débito. Se positivo: empresa acumula crédito fiscal — sem desembolso. Se negativo: há recolhimento ao fisco. No modelo com ICMS do app, esse saldo é capturado como evento temporal nos fluxos DFC e DFCD.'],
+    ['Substituição Tributária','ST',
+      'Regime em que o fabricante ou distribuidor recolhe o ICMS antecipadamente por toda a cadeia. Nas operações ST não há crédito/débito para os elos subsequentes. Identificado na tabela fiscal pelo tipo "PREÇO FINAL".'],
+    ['Código Especificador da Substituição Tributária','CEST',
+      'Código de 7 dígitos que identifica mercadorias sujeitas a Substituição Tributária ou antecipação do ICMS. Obrigatório no documento fiscal quando aplicável.'],
+    ['Contribuição para o Financiamento da Seguridade Social','COFINS',
+      'Contribuição federal sobre a receita bruta. No app, incide sobre o Rebate recebido. Alíquota padrão no regime cumulativo: 3,00%. Produtos monofásicos (ex: medicamentos) podem ter alíquota zero na cadeia.'],
+    ['Programa de Integração Social','PIS',
+      'Contribuição federal sobre a receita bruta. No app, incide sobre o Rebate junto com a COFINS. Alíquota padrão no regime cumulativo: 0,65%. Mesmo regime de exceção monofásico aplicável.'],
+    ['PIS + COFINS (campo unificado)','PIS/COFINS',
+      'Campo único no app representando a alíquota combinada de PIS e COFINS sobre o Rebate. Padrão: 3,65% (0,65% PIS + 3,00% COFINS) no regime cumulativo. Altere conforme o regime da empresa.'],
+    ['Redutor de Base de Cálculo','Redutor ICMS',
+      'Benefício fiscal estadual que reduz a base sobre a qual o ICMS é calculado, gerando uma alíquota efetiva menor. Em SP, não se aplica quando o cliente está no Simples Nacional, pois esse regime não apropria crédito de ICMS.'],
+    ['Simples Nacional','SN',
+      'Regime tributário simplificado para micro e pequenas empresas. Clientes nesse regime não se beneficiam do crédito de ICMS transferido pelo fornecedor. Isso impacta a negociação de preço e a aplicação de redutores fiscais.'],
+    ['Código Fiscal de Operações e Prestações','CFOP',
+      'Código de 4 dígitos que descreve a natureza da operação fiscal (compra, venda, transferência etc.). Determina o tratamento tributário aplicável à nota fiscal.'],
+    ['Nomenclatura Comum do Mercosul','NCM',
+      'Classificação fiscal do produto com 8 dígitos. Define a alíquota de IPI, regime de PIS/COFINS (monofásico ou não) e incidência de ICMS-ST. Essencial para determinar o tratamento tributário correto.'],
+  ].map(([t,s,d])=>row(t,s,d)).join('');
+
+  // PRECIFICAÇÃO
+  document.getElementById('gloss-prec').innerHTML = [
+    ['Preço Máximo ao Consumidor','PMC',
+      'Teto de preço definido pela CMED/ANVISA para medicamentos e correlatos. Calculado por categoria de alíquota de ICMS (0%, 12%, 17%, 18%, 19%, 20%). O app utilizará o PMC correspondente à UF do cliente quando integrado à base CMED.'],
+    ['Preço Máximo de Venda ao Governo','PMVG',
+      'Preço de referência para fornecimento ao setor público. Base de reembolso no Programa Farmácia Popular. Geralmente inferior ao PMC. Operações com o governo utilizam o PMVG como preço de venda.'],
+    ['Preço de Venda','PV',
+      'Preço praticado na venda ao cliente. Base de cálculo (100%) para a análise vertical (% PV) em todo o app. No Cálculo Inverso, pode ser a variável a resolver.'],
+    ['Bonificação Comercial','Rebate',
+      'Valor recebido do fornecedor, geralmente vinculado a volume de compras, metas de sell-out ou participação em campanhas. No modelo, é o componente que frequentemente define a viabilidade da operação — sem rebate, a maioria das operações apresenta MC2 fortemente negativa.'],
+    ['Taxa Mínima de Atratividade','TMA',
+      'Taxa de desconto mensal utilizada no DFCD para trazer fluxos futuros a valor presente. Representa o custo de oportunidade do capital: o retorno mínimo exigido para justificar o investimento na operação. Fórmula do fator: (1 + TMA)^(n/30), onde n = dias até o evento.'],
+    ['Ponto de Equilíbrio / Breakeven','BE',
+      'Rebate mínimo necessário para que o DFCD da operação seja igual a zero. Fórmula: Rebate_mín = −(DFCD sem Rebate) × Fator_D_rebate ÷ (1 − Alíquota PIS/COFINS). Abaixo desse valor, a operação destrói valor financeiro a TMA.'],
+    ['Gap de Rebate','Gap',
+      'Diferença entre o Rebate mínimo (Breakeven) e o Rebate atual contratado. Gap positivo: o rebate atual não cobre o custo financeiro — operação destrói valor. Gap negativo: rebate supera o mínimo — operação já é viável financeiramente.'],
+  ].map(([t,s,d])=>row(t,s,d)).join('');
+
+  // CÁLCULO INVERSO
+  document.getElementById('gloss-ci').innerHTML = [
+    ['Cálculo Inverso / Precificação por Meta','CI',
+      'Dado um percentual-alvo (ex: 15,00% do PV) e uma métrica base (MC Final, DFC ou DFCD), o app resolve qual variável (PV, Rebate ou Preço de Compra) é necessária para atingir essa meta. Três equações distintas, resoluções analíticas fechadas sem iteração.'],
+    ['Margem-Alvo','Meta %',
+      'Percentual sobre o PV que se deseja atingir no Cálculo Inverso. Expresso sempre em relação ao Preço de Venda. Exemplos: 15,00% de MC Final, 10,00% de DFC, 8,00% de DFCD.'],
+    ['Análise Vertical','AV',
+      'Técnica de análise que expressa cada linha do demonstrativo como percentual de uma base (no app: sempre o PV = 100,00%). Permite comparar estruturas de custo e margem independentemente do valor absoluto das operações.'],
+  ].map(([t,s,d])=>row(t,s,d)).join('');
+
+  // SIGLAS DE SISTEMAS E FONTES
+  document.getElementById('gloss-sis').innerHTML = [
+    ['Câmara de Regulação do Mercado de Medicamentos','CMED',
+      'Órgão interministerial que regula os preços de medicamentos no Brasil. Publica mensalmente a tabela de preços máximos (PMC e PMVG) por produto, apresentação e alíquota de ICMS. Fonte oficial para integração de preços no app.'],
+    ['Agência Nacional de Vigilância Sanitária','ANVISA',
+      'Agência federal responsável pela regulação sanitária. Disponibiliza a tabela CMED e o registro de medicamentos. A base de dados pública da ANVISA é a fonte de integração prevista para a fase 2 do projeto.'],
+    ['Conselho Nacional de Política Fazendária','CONFAZ',
+      'Órgão que reúne os secretários de Fazenda dos estados e o ministro da Fazenda federal. Publica os convênios e protocolos que definem as regras de ICMS interestadual, ST e benefícios fiscais. Fonte de referência para a tabela fiscal do app.'],
+    ['Enterprise Resource Planning (sistema de gestão)','ERP / Delage',
+      'Sistema de gestão integrada da Andorinha Med. Fonte primária de dados para o app: tabela de produtos (Lista André), base fiscal (BasePMPF) e cadastro de clientes. A integração via exportação JSON ou API REST é detalhada no documento de alinhamento TI.'],
+    ['Código de Produto','EAN',
+      'European Article Number — código de barras padrão GS1 que identifica unicamente um produto no mercado. No app, permite busca e seleção de produto por leitura de código de barras ou digitação.'],
+  ].map(([t,s,d])=>row(t,s,d)).join('');
 }
 
 // ── Init ──
