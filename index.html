@@ -1,13 +1,5 @@
 <!DOCTYPE html>
-<html 
-          <div class="input-group">
-            <div class="input-label">PIS/COFINS Compra <span class="input-hint">crédito — D0 (configurável)</span></div>
-            <div class="input-row"><input type="number" id="d-piscofs-c" value="0" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
-          </div>
-          <div class="input-group">
-            <div class="input-label">PIS/COFINS Venda <span class="input-hint">recolhimento/compensação</span></div>
-            <div class="input-row"><input type="number" id="d-piscofs-v" value="75" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
-          </div>lang="pt-BR">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -496,6 +488,14 @@ tr.row-event td:first-child {
         </div>
         <div class="input-group">
           <div class="input-label">Rebate — recebimento</div>
+          <div class="input-group">
+            <div class="input-label">PIS/COFINS Compra <span class="input-hint">crédito — prazo</span></div>
+            <div class="input-row"><input type="number" id="d-piscofs-c" value="0" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">PIS/COFINS Venda <span class="input-hint">recolhimento/compensação</span></div>
+            <div class="input-row"><input type="number" id="d-piscofs-v" value="75" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+          </div>
           <div class="input-row"><input type="number" id="d-rebate" value="120" step="1" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()"><span class="input-suffix">dias</span></div>
         </div>
         <div style="font-size:10px;color:var(--text2);margin-top:4px;font-style:italic">Frete e Comissão têm prazos próprios acima ↑</div>
