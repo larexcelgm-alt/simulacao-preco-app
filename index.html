@@ -374,9 +374,14 @@ tr.row-event td:first-child {
 
 <!-- ══ PREMISSAS ══ -->
 <div class="page active" id="page-premissas">
-  <div class="page-header">
-    <div class="page-title">Premissas</div>
-    <div class="page-subtitle">Todos os campos são inputs — qualquer alteração recalcula o modelo instantaneamente</div>
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div>
+      <div class="page-title">Premissas</div>
+      <div class="page-subtitle">Todos os campos são inputs — qualquer alteração recalcula o modelo instantaneamente</div>
+    </div>
+    <button onclick="resetApp()" style="background:none;border:1px solid var(--border2);border-radius:5px;padding:6px 14px;font-size:11px;color:var(--text2);cursor:pointer;white-space:nowrap;margin-top:6px;transition:all .15s" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'" title="Restaurar premissas para os valores originais">
+      ↺ Atualizar Premissas
+    </button>
   </div>
   <div class="grid2">
     <div>
@@ -384,7 +389,7 @@ tr.row-event td:first-child {
         <div class="card-title">Identificação</div>
         <div class="input-group">
           <div class="input-label">Nome do cliente</div>
-          <input type="text" id="p-cliente" value="ULTRAFARMA" oninput="recalc()" placeholder="Nome do cliente">
+          <input type="text" id="p-cliente" value="ULTRAFARMA" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()" placeholder="Nome do cliente">
         </div>
       </div>
       <div class="card">
@@ -393,33 +398,33 @@ tr.row-event td:first-child {
           <div class="input-section-title">Mercadoria &amp; Fiscal</div>
           <div class="input-group">
             <div class="input-label">Valor Mercadoria (bruto) <span class="input-hint">com ICMS</span></div>
-            <div class="input-row"><input type="number" id="p-compra" value="15.54" step="0.01" oninput="recalc()"><span class="input-suffix">R$</span></div>
+            <div class="input-row"><input type="number" id="p-compra" value="15.54" step="0.01" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()"><span class="input-suffix">R$</span></div>
           </div>
           <div class="input-group">
             <div class="input-label">ICMS Entrada <span class="input-hint">alíquota na compra</span></div>
-            <div class="input-row"><input type="number" id="p-icms-e" value="12.00" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
+            <div class="input-row"><input type="number" id="p-icms-e" value="12.00" step="0.01" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
           </div>
           <div class="input-group">
             <div class="input-label">ICMS Saída <span class="input-hint">alíquota na venda</span></div>
-            <div class="input-row"><input type="number" id="p-icms-s" value="12.00" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
+            <div class="input-row"><input type="number" id="p-icms-s" value="12.00" step="0.01" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
           </div>
         </div>
         <div class="input-section">
           <div class="input-section-title">Preço &amp; Custos</div>
           <div class="input-group">
             <div class="input-label">Preço de Venda</div>
-            <div class="input-row"><input type="number" id="p-pv" value="5.39" step="0.01" oninput="recalc()"><span class="input-suffix">R$</span></div>
+            <div class="input-row"><input type="number" id="p-pv" value="5.39" step="0.01" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()"><span class="input-suffix">R$</span></div>
           </div>
           <div class="input-group">
             <div class="input-label">Frete <span class="input-hint">% do PV · pgt. D<span id="lbl-d-frete">15</span></span></div>
             <div class="input-row-2">
               <div class="input-group">
                 <div class="input-label">Alíquota</div>
-                <div class="input-row"><input type="number" id="p-frete" value="2.50" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
+                <div class="input-row"><input type="number" id="p-frete" value="2.50" step="0.01" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
               </div>
               <div class="input-group">
                 <div class="input-label">Prazo</div>
-                <div class="input-row"><input type="number" id="d-frete" value="15" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+                <div class="input-row"><input type="number" id="d-frete" value="15" step="1" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()"><span class="input-suffix">dias</span></div>
               </div>
             </div>
           </div>
@@ -428,28 +433,28 @@ tr.row-event td:first-child {
             <div class="input-row-2">
               <div class="input-group">
                 <div class="input-label">Alíquota</div>
-                <div class="input-row"><input type="number" id="p-comis" value="0.00" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
+                <div class="input-row"><input type="number" id="p-comis" value="0.00" step="0.01" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
               </div>
               <div class="input-group">
                 <div class="input-label">Prazo</div>
-                <div class="input-row"><input type="number" id="d-comis" value="30" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+                <div class="input-row"><input type="number" id="d-comis" value="30" step="1" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()"><span class="input-suffix">dias</span></div>
               </div>
             </div>
           </div>
           <div class="input-group">
             <div class="input-label">Rebate <span class="input-hint">recebimento do fornecedor</span></div>
-            <div class="input-row"><input type="number" id="p-rebate" value="10.41" step="0.01" oninput="recalc()"><span class="input-suffix">R$</span></div>
+            <div class="input-row"><input type="number" id="p-rebate" value="10.41" step="0.01" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()"><span class="input-suffix">R$</span></div>
           </div>
           <div class="input-group">
             <div class="input-label">PIS/COFINS sobre Rebate <span class="input-hint">incide sobre receita do rebate</span></div>
-            <div class="input-row"><input type="number" id="p-piscofins" value="3.65" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
+            <div class="input-row"><input type="number" id="p-piscofins" value="3.65" step="0.01" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
           </div>
         </div>
         <div class="input-section">
           <div class="input-section-title">TMA — Taxa de Desconto</div>
           <div class="input-group">
             <div class="input-label">TMA — Taxa Mínima de Atratividade <span class="input-hint">ao mês</span></div>
-            <div class="input-row"><input type="number" id="p-taxa" value="1.50" step="0.01" oninput="syncTaxa('p-taxa')" onblur="formatPctInputs()"><span class="input-suffix">% a.m.</span></div>
+            <div class="input-row"><input type="number" id="p-taxa" value="1.50" step="0.01" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();syncTaxa('p-taxa')" onblur="formatPctInputs()"><span class="input-suffix">% a.m.</span></div>
           </div>
         </div>
       </div>
@@ -459,23 +464,23 @@ tr.row-event td:first-child {
         <div class="card-title">Prazos dos eventos (dias)</div>
         <div class="input-group">
           <div class="input-label">ICMS Crédito (entrada)</div>
-          <div class="input-row"><input type="number" id="d-icmsc" value="0" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+          <div class="input-row"><input type="number" id="d-icmsc" value="0" step="1" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()"><span class="input-suffix">dias</span></div>
         </div>
         <div class="input-group">
           <div class="input-label">ICMS Débito (apuração)</div>
-          <div class="input-row"><input type="number" id="d-icmsd" value="45" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+          <div class="input-row"><input type="number" id="d-icmsd" value="45" step="1" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()"><span class="input-suffix">dias</span></div>
         </div>
         <div class="input-group">
           <div class="input-label">Compra — pagamento fornecedor</div>
-          <div class="input-row"><input type="number" id="d-compra" value="60" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+          <div class="input-row"><input type="number" id="d-compra" value="60" step="1" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()"><span class="input-suffix">dias</span></div>
         </div>
         <div class="input-group">
           <div class="input-label">Venda — recebimento</div>
-          <div class="input-row"><input type="number" id="d-venda" value="75" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+          <div class="input-row"><input type="number" id="d-venda" value="75" step="1" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()"><span class="input-suffix">dias</span></div>
         </div>
         <div class="input-group">
           <div class="input-label">Rebate — recebimento</div>
-          <div class="input-row"><input type="number" id="d-rebate" value="120" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+          <div class="input-row"><input type="number" id="d-rebate" value="120" step="1" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()"><span class="input-suffix">dias</span></div>
         </div>
         <div style="font-size:10px;color:var(--text2);margin-top:4px;font-style:italic">Frete e Comissão têm prazos próprios acima ↑</div>
       </div>
@@ -553,9 +558,9 @@ tr.row-event td:first-child {
       <div class="card-title" style="margin:0">Sensibilidade DFCD × Rebate</div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <span style="font-size:11px;color:var(--text2)">Passo</span>
-        <input type="number" id="s-passo" value="0.25" step="0.05" style="width:66px;font-size:12px;padding:4px 8px" oninput="recalc()">
+        <input type="number" id="s-passo" value="0.25" step="0.05" style="width:66px;font-size:12px;padding:4px 8px" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()">
         <span style="font-size:11px;color:var(--text2)">Linhas ±</span>
-        <input type="number" id="s-linhas" value="5" step="1" min="2" max="8" style="width:50px;font-size:12px;padding:4px 8px" oninput="recalc()">
+        <input type="number" id="s-linhas" value="5" step="1" min="2" max="8" style="width:50px;font-size:12px;padding:4px 8px" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()">
       </div>
     </div>
     <div id="sensitivity-bars"></div>
@@ -718,7 +723,7 @@ tr.row-event td:first-child {
 
 <script>
 // ── State ──
-let diagMdl='icms', diagTyp='nom', ciWhat='pv', ciIcms=true, ciScenario=null;
+let diagMdl='icms', diagTyp='nom', ciWhat='pv', ciIcms=true, ciScenario=null, ciTargetSet=false, ciOriginals=null;
 
 // ── Nav ──
 function goTo(id){
@@ -882,8 +887,7 @@ function saveState(){
   });
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
   ciScenario = null;
-  ciTargetSet = false; // user changed a premise → liberate CI target field
-  ciOriginals = null;   // user changed a premise → reset originals snapshot
+  ciOriginals = captureCIOriginals(); // update snapshot on manual premise change
 }
 
 function loadState(){
@@ -913,34 +917,7 @@ function formatPctInputs(){
 }
 
 
-// ── Auto-aplica resultado CI às Premissas ────────────────────────────────
-let ciApplying = false;  // guard against infinite loop
-let ciTargetSet = false; // true when user has explicitly set meta%
 
-function applyCIAuto(what, value){
-  if(ciApplying || !value || isNaN(value) || value <= 0) return;
-  const fieldMap = {pv:'p-pv', rebate:'p-rebate', compra:'p-compra'};
-  const fieldId = fieldMap[what];
-  if(!fieldId) return;
-  const el = document.getElementById(fieldId);
-  if(!el) return;
-  const newVal = parseFloat(value).toFixed(4);
-  if(el.value === newVal) return; // already set — stable
-  if(document.activeElement === el) return; // user is typing — don't overwrite
-  ciApplying = true;
-  const savedTargetSet = ciTargetSet; // preserve meta% lock
-  el.value = newVal;
-  // save without triggering full saveState (which resets ciTargetSet)
-  const data = {};
-  INPUT_IDS.forEach(id => {
-    const el2 = document.getElementById(id);
-    if(el2) data[id] = el2.value;
-  });
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
-  recalc();
-  ciTargetSet = savedTargetSet; // restore after recalc
-  ciApplying = false;
-}
 
 
 // ── Memória de Cálculo toggle ─────────────────────────────────────────────
@@ -981,56 +958,49 @@ function restoreCIOriginal(what){
 
 // ── Reset completo às premissas padrão ───────────────────────────────────
 function resetApp(){
-  if(!confirm('Resetar todas as premissas para os valores padrão?\nTodos os dados da sessão serão apagados.')) return;
+  if(!confirm('Atualizar premissas para os valores anteriores às simulações?\nO Cálculo Inverso será reiniciado.')) return;
 
-  // Clear localStorage
-  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
-
-  // Default values
-  const defaults = {
-    'p-cliente':'',
-    'p-compra':'15.5400',
-    'p-icms-e':'12.00',
-    'p-icms-s':'12.00',
-    'p-pv':'5.3900',
-    'p-frete':'2.50',
-    'd-frete':'15',
-    'p-comis':'0.00',
-    'd-comis':'30',
-    'p-rebate':'10.4100',
-    'p-piscofins':'3.65',
-    'p-taxa':'1.50',
-    'd-icmsc':'0',
-    'd-icmsd':'45',
-    'd-compra':'60',
-    'd-venda':'75',
-    'd-rebate':'120',
-    's-passo':'1',
-    's-linhas':'5',
-    'ci-target':'15.00',
-    'ci-taxa':'1.50',
-  };
-
-  INPUT_IDS.forEach(id => {
-    const el = document.getElementById(id);
-    if(el && defaults[id] !== undefined) el.value = defaults[id];
-    else if(el) el.value = '';
-  });
+  // Restore to ciOriginals (last manually-set values) if available
+  if(ciOriginals){
+    const fieldMap = {pv:'p-pv', rebate:'p-rebate', compra:'p-compra'};
+    Object.entries(fieldMap).forEach(([key,id])=>{
+      const el=document.getElementById(id);
+      if(el && ciOriginals[key]!==undefined) el.value=ciOriginals[key].toFixed(4);
+    });
+  }
 
   // Reset all CI state
   ciTargetSet = false;
-  ciOriginals = null;
   ciScenario  = null;
   ciApplying  = false;
   ciWhat      = 'pv';
   ciIcms      = true;
+  // Keep ciOriginals — it's still valid as the restore point
 
   // Reset CI selectors visually
   document.querySelectorAll('#ci-what button').forEach((b,i)=>{b.classList.toggle('on',i===0);});
   document.querySelectorAll('#ci-icms-seg button').forEach((b,i)=>{b.classList.toggle('on',i===0);});
 
+  // Save restored state
+  saveState();
   recalc();
   goTo('premissas');
+}
+
+
+// ── Aplicar resultado CI às Premissas (acionado pelo botão) ──────────────
+function applyCIResult(what, value){
+  if(!value || isNaN(value) || value <= 0) return;
+  const fieldMap = {pv:'p-pv', rebate:'p-rebate', compra:'p-compra'};
+  const el = document.getElementById(fieldMap[what]);
+  if(!el) return;
+  el.value = parseFloat(value).toFixed(4);
+  // Save to localStorage without updating ciOriginals
+  // ciOriginals stays as the pre-simulation baseline for ↺ Atualizar Premissas
+  const data = {};
+  INPUT_IDS.forEach(id => { const e2=document.getElementById(id); if(e2) data[id]=e2.value; });
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+  recalc();
 }
 
 // ── Main recalc ──
@@ -1038,8 +1008,10 @@ function recalc(){
   saveState();
   const R=calc();
   // Sync ci-target to current MC Final % when it's not being edited
+  // Sync ci-target to MC Final ONLY when user has NOT set a manual meta%
+  // and is not in middle of a CI apply/restore operation
   const ciTargetEl = document.getElementById('ci-target');
-  if(ciTargetEl && !ciTargetSet && !ciApplying && document.activeElement !== ciTargetEl){
+  if(ciTargetEl && !ciTargetSet && document.activeElement !== ciTargetEl){
     const mcPct = R.pv>0 ? +(R.mcFinal/R.pv*100).toFixed(2) : 15;
     ciTargetEl.value = mcPct.toFixed(2);
   }
@@ -1361,7 +1333,9 @@ function syncCITargetToMC(){
 function setCIWhat(v,btn){
   const prev = ciWhat;
   ciWhat=v;
-  ciTargetSet=false;
+  // Lock meta% at current value — whether typed by user or auto-synced
+  // This prevents recalc() from re-syncing meta to a different MC Final
+  ciTargetSet = true;
   document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   // Restore previous variable's original value, then recalc with clean base
@@ -1783,8 +1757,7 @@ function renderCI(R){
   }
   renderFluxosCI();
 
-  // Auto-apply DRE result to the corresponding premise field
-  if(vMC.ok && !ciApplying) applyCIAuto(ciWhat, vMC.res);
+
 
   // ── Memória de Cálculo ────────────────────────────────────────────────
   const mWrap = document.getElementById('ci-memoria-wrap');
@@ -1819,7 +1792,9 @@ function syncCITargetToMC(){
 function setCIWhat(v,btn){
   const prev = ciWhat;
   ciWhat=v;
-  ciTargetSet=false;
+  // Lock meta% at current value — whether typed by user or auto-synced
+  // This prevents recalc() from re-syncing meta to a different MC Final
+  ciTargetSet = true;
   document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   // Restore previous variable's original value, then recalc with clean base
