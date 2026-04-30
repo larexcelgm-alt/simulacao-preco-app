@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html 
+          <div class="input-group">
+            <div class="input-label">PIS/COFINS Venda <span class="input-hint">recolhimento/compensação</span></div>
+            <div class="input-row"><input type="number" id="d-piscofs-v" value="75" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+          </div>lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -408,6 +412,14 @@ tr.row-event td:first-child {
             <div class="input-label">ICMS Saída <span class="input-hint">alíquota na venda</span></div>
             <div class="input-row"><input type="number" id="p-icms-s" value="12.00" step="0.01" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
           </div>
+          <div class="input-group">
+            <div class="input-label">PIS/COFINS Compra <span class="input-hint">crédito D0 — Lucro Real</span></div>
+            <div class="input-row"><input type="number" id="p-piscofs-c" value="9.25" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
+          </div>
+          <div class="input-group">
+            <div class="input-label">PIS/COFINS Venda <span class="input-hint">débito — Lucro Real</span></div>
+            <div class="input-row"><input type="number" id="p-piscofs-v" value="9.25" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
+          </div>
         </div>
         <div class="input-section">
           <div class="input-section-title">Preço &amp; Custos</div>
@@ -447,7 +459,7 @@ tr.row-event td:first-child {
           </div>
           <div class="input-group">
             <div class="input-label">PIS/COFINS sobre Rebate <span class="input-hint">incide sobre receita do rebate</span></div>
-            <div class="input-row"><input type="number" id="p-piscofins" value="3.65" step="0.01" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
+            <div class="input-row"><input type="number" id="p-piscofins" value="4.65" step="0.01" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
           </div>
         </div>
         <div class="input-section">
@@ -772,6 +784,8 @@ function gs(id){return document.getElementById(id).value||'';}
 // ── Calc ──
 function calc(){
   const compra=gi('p-compra'), icmsAliqE=gi('p-icms-e')/100, icmsAliqS=gi('p-icms-s')/100;
+  const piscofsCp=gi('p-piscofs-c')/100, piscofsVp=gi('p-piscofs-v')/100;
+  const dPiscofsV=gi('d-piscofs-v')||75;
   const pv=gi('p-pv'),         freteP=gi('p-frete')/100;
   const comisP=gi('p-comis')/100, rebate=gi('p-rebate');
   const piscoP=gi('p-piscofins')/100, taxa=gi('p-taxa')/100;
@@ -783,10 +797,12 @@ function calc(){
   const fat=d=>Math.pow(1+taxa,d/30);
 
   // Derived
-  const icmsC   = compra*icmsAliqE;   // crédito — alíquota de entrada
-  const icmsD   = pv*icmsAliqS;       // débito  — alíquota de saída
-  const cmv     = compra-icmsC;
-  const vliq    = pv-icmsD;
+  const icmsC      = compra*icmsAliqE;          // crédito ICMS — alíquota entrada
+  const icmsD      = pv*icmsAliqS;              // débito  ICMS — alíquota saída
+  const piscofsC   = compra*piscofsCp;          // crédito PIS/COFINS compra (D0)
+  const piscofsV   = pv*piscofsVp;              // débito  PIS/COFINS venda
+  const cmv        = compra-icmsC-piscofsC;     // CMV líquido de ICMS e PIS/COFINS
+  const vliq       = pv-icmsD-piscofsV;         // Venda Líquida deduzida de ICMS e PIS/COFINS
   const freteV  = pv*freteP;
   const comisV  = pv*comisP;
   const piscoV  = rebate*piscoP;   // PIS/COFINS on rebate
@@ -828,7 +844,8 @@ function calc(){
   const gap       = rebateMin - rebate;
 
   return {
-    compra,icmsAliqE,icmsAliqS,pv,freteP,comisP,rebate,piscoP,taxa,
+    compra,icmsAliqE,icmsAliqS,piscofsCp,piscofsVp,dPiscofsV,
+    piscofsC,piscofsV,pv,freteP,comisP,rebate,piscoP,taxa,
     dIC,dFR,dCOM,dID,dCP,dVD,dRB,
     fat, icmsC,icmsD,cmv,vliq,freteV,comisV,piscoV,saldoICMS,
     mc1,mc2,mcFinal,
@@ -847,7 +864,7 @@ const kpiH=(l,v,isPct=false)=>{
 // ── Table helpers ──
 
 // Unique days preserving order
-function getUD(days){ const s=new Set(); return days.filter(d=>s.has(d)?false:s.add(d)); }
+function getUD(days){ const s=new Set(); return days.filter(d=>s.has(d)?false:s.add(d)).sort((a,b)=>a-b); }
 
 // For each unique day: last cumulative value after all events on that day
 function mapCum(cums,days,ud){ return ud.map(d=>{let v=null;days.forEach((dd,i)=>{if(dd===d)v=cums[i]});return v!==null?v:0}); }
@@ -914,7 +931,7 @@ function loadState(){
 
 
 // ── Format % fields to always show 2 decimal places ──────────────────────
-const PCT_IDS = ['p-taxa','p-icms-e','p-icms-s','p-frete','p-comis','p-piscofins','ci-taxa','ci-target'];
+const PCT_IDS = ['p-taxa','p-icms-e','p-icms-s','p-frete','p-comis','p-piscofins','p-piscofs-c','p-piscofs-v','ci-taxa','ci-target'];
 function formatPctInputs(){
   PCT_IDS.forEach(id => {
     const el = document.getElementById(id);
@@ -1048,7 +1065,8 @@ function recalc(){
     ciTargetEl.value = mcPct.toFixed(2);
   }
 
-  const{pv,taxa,rebate,icmsAliqE,icmsAliqS,icmsC,icmsD,saldoICMS,mc1,mc2,mcFinal,
+  const{pv,taxa,rebate,icmsAliqE,icmsAliqS,piscofsCp,piscofsVp,dPiscofsV,piscofsC,piscofsV,
+        icmsC,icmsD,saldoICMS,mc1,mc2,mcFinal,
         freteV,comisV,piscoV,cmv,vliq,
         days,lbls,fcICMS,fcNO,discICMS,discNO,
         cumICMS,cumNO,cumDICMS,cumDNO,
@@ -1077,7 +1095,7 @@ function recalc(){
     ['Preço de Venda',pv,1,false],
     ['(-) ICMS sobre Venda ('+(icmsAliqS*100).toFixed(2).replace('.',',')+'%)',-icmsD,-icmsD/pv,false],
     ['Venda Líquida',vliq,vliq/pv,true],
-    ['(-) CMV',-cmv,-cmv/pv,false],
+    ['(-) CMV (líq. ICMS + PIS/COFINS)',-cmv,-cmv/pv,false],
     ['MC1',mc1,mc1/pv,true],
     ['(-) Comissão',-comisV,-comisV/pv,false],
     ['(-) Frete',-freteV,-freteV/pv,false],
@@ -1516,6 +1534,7 @@ function buildMemoria(what, tgt, pvX, rbX, cpX, vMC, vFC, vDFCD, P){
 // ── Cálculo Inverso ──────────────────────────────────
 function renderCI(R){
   const{pv,taxa,rebate,piscoP,freteP,comisP,compra,icmsAliqE,icmsAliqS,
+        piscofsCp,piscofsVp,dPiscofsV,piscofsC,piscofsV,
         dIC,dFR,dCOM,dID,dCP,dVD,dRB,fat,
         icmsC,icmsD,saldoICMS,freteV,comisV,piscoV,cmv,vliq,
         mc2,vplNoReb,fcFI,fcFN,vplI,vplN} = R;
@@ -1699,7 +1718,7 @@ function renderCI(R){
   // ── DFC block builder ──────────────────────────────────────────────────
   const buildDFC = (fc_arr, v_res) => {
     const pvRef = v_res.pv2;
-    const ud = [...new Set(days_ev)];
+    const ud = [...new Set(days_ev)].sort((a,b)=>a-b);
     let h='<div style="font-size:10px;color:var(--text2);display:flex;justify-content:flex-end;gap:8px;margin-bottom:4px"><span style="min-width:30px"></span><span style="min-width:72px;text-align:right">R$</span><span style="min-width:52px;text-align:right">% PV</span></div>';
     ud.forEach(d=>{
       const evs=days_ev.map((dd,i)=>dd===d?{lbl:lbls_ev[i],val:fc_arr[i]}:null).filter(Boolean).filter(e=>e.val!==0);
@@ -1723,7 +1742,7 @@ function renderCI(R){
   // ── DFCD block builder ─────────────────────────────────────────────────
   const buildDFCD = (disc_arr, fc_arr, v_res) => {
     const pvRef = v_res.pv2;
-    const ud = [...new Set(days_ev)];
+    const ud = [...new Set(days_ev)].sort((a,b)=>a-b);
     // Show resolved variable value prominently
     const resolvedLabel = ciWhat==='pv'?'Preço de Venda resolvido':ciWhat==='rebate'?'Rebate resolvido':'Compra resolvida';
     const resolvedVal   = ciWhat==='pv'?v_res.pv2:ciWhat==='rebate'?v_res.rb2:v_res.cp2;
@@ -1956,113 +1975,128 @@ function applyTheme(theme){
 
 // ── Glossário ────────────────────────────────────────────────────────────
 function renderGlossary(){
-  const row = (term, sigla, def) =>
+  const row = (sigla, nome, def) =>
     `<div style="padding:10px 0;border-bottom:1px solid var(--border)">
       <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
         <span style="font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent)">${sigla}</span>
-        ${term ? `<span style="font-size:11px;color:var(--text2)">— ${term}</span>` : ''}
+        ${nome ? `<span style="font-size:11px;color:var(--text2)">— ${nome}</span>` : ''}
       </div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.65;font-weight:300">${def}</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.65">${def}</div>
     </div>`;
 
-  // DEMONSTRATIVOS
+  // ── Demonstrativos ────────────────────────────────────────────────────
   document.getElementById('gloss-dem').innerHTML = [
-    ['Demonstrativo de Resultado do Exercício','DRE',
-      'Visão contábil completa da operação: receita bruta, deduções (ICMS saída), venda líquida, custos, margens e resultado final. No app, o DRE é sempre calculado a partir das premissas atuais e nunca é afetado pelo seletor de fluxo.'],
-    ['Demonstração de Fluxo de Caixa','DFC',
-      'Registra todas as entradas e saídas financeiras nos seus respectivos momentos (dias). Valores nominais, sem desconto. O seletor <em>com/sem ICMS</em> controla se os eventos fiscais (D0 e D45) aparecem no fluxo.'],
-    ['Demonstração de Fluxo de Caixa Descontado','DFCD',
-      'O próprio DFC com cada evento trazido a valor presente pela TMA. Permite avaliar o valor real da operação considerando o custo do dinheiro no tempo. DFCD = DFC descontado evento a evento.'],
-  ].map(([t,s,d])=>row(t,s,d)).join('');
+    ['DRE','Demonstrativo de Resultado',
+      `Visão contábil completa da operação. Estrutura atual do modelo:<br>
+       <span style="font-family:var(--mono);font-size:11px;color:var(--text);line-height:2">
+       PV<br>
+       (−) ICMS sobre Venda<br>
+       (−) PIS/COFINS sobre Venda<br>
+       = Venda Líquida<br>
+       (−) CMV líquido (Compra − ICMS Crédito − PIS/COFINS Crédito)<br>
+       = MC1<br>
+       (−) Comissão &nbsp;(−) Frete<br>
+       = MC2<br>
+       (+) Rebate bruto<br>
+       (−) PIS/COFINS sobre Rebate<br>
+       = MC Final
+       </span>`],
+    ['DFC','Demonstração de Fluxo de Caixa — Nominal',
+      'Registra todas as entradas e saídas financeiras nos seus respectivos momentos (dias). Valores nominais, sem desconto pela TMA. O seletor <em>com/sem ICMS</em> controla se os eventos fiscais (crédito D0 e débito D45) aparecem no fluxo. Com PIS/COFINS ativo, adiciona crédito em D0 e débito na data de recolhimento configurada.'],
+    ['DFCD','Demonstração de Fluxo de Caixa Descontado',
+      'O próprio DFC com cada evento trazido a valor presente pela TMA. DFCD = Σ (FC_n ÷ (1+TMA)^(d_n/30)). Permite avaliar o valor real da operação considerando o custo do dinheiro no tempo. O bloco exibe: DFC (R$) | Fator | VP (R$) | % PV para cada evento.'],
+  ].map(([s,n,d])=>row(s,n,d)).join('');
 
-  // INDICADORES
+  // ── Indicadores ───────────────────────────────────────────────────────
   document.getElementById('gloss-ind').innerHTML = [
-    ['Margem de Contribuição 1','MC1',
-      'Venda Líquida (PV menos ICMS saída) menos o CMV líquido de ICMS crédito. Representa a contribuição bruta do produto antes dos custos variáveis de distribuição.'],
-    ['Margem de Contribuição 2','MC2',
-      'MC1 menos Frete e Comissão. Mede a contribuição após os principais custos variáveis operacionais. Quando negativa, indica que a operação depende inteiramente do Rebate para ser viável.'],
-    ['Margem de Contribuição Final','MC Final',
-      'MC2 mais Rebate bruto menos PIS/COFINS sobre o Rebate. Resultado final da operação na visão contábil (DRE).'],
-    ['Percentual sobre o Preço de Venda','% PV',
-      'Base de análise vertical utilizada em todo o app. Cada linha do DRE e dos fluxos é expressa como percentual do Preço de Venda, permitindo comparar operações de tamanhos diferentes.'],
-    ['Custo da Mercadoria Vendida','CMV',
-      'Valor de Compra bruto menos o ICMS Crédito (alíquota de entrada × valor bruto). Representa o custo real líquido do produto que entra na formação do resultado contábil.'],
-    ['Venda Líquida','VL',
-      'Preço de Venda menos ICMS Débito (alíquota de saída × PV). Representa a receita efetiva que permanece na empresa após o repasse do imposto sobre a venda.'],
-  ].map(([t,s,d])=>row(t,s,d)).join('');
+    ['MC1','Margem de Contribuição 1',
+      'Venda Líquida menos CMV líquido. A Venda Líquida deduz ICMS e PIS/COFINS sobre a venda; o CMV deduz ICMS Crédito e PIS/COFINS Crédito da compra. Representa a contribuição bruta do produto antes dos custos variáveis de distribuição.'],
+    ['MC2','Margem de Contribuição 2',
+      'MC1 menos Frete e Comissão. Quando negativa, indica que a operação depende inteiramente do Rebate para ser viável.'],
+    ['MC Final','Margem de Contribuição Final',
+      'MC2 mais Rebate bruto menos PIS/COFINS sobre Rebate. Resultado final na visão contábil (DRE). Base do Cálculo Inverso via DRE.'],
+    ['% PV','Percentual sobre o Preço de Venda',
+      'Base de análise vertical: cada linha do DRE e dos fluxos é expressa como percentual do PV (= 100,00%), permitindo comparar operações de tamanhos diferentes.'],
+    ['CMV','Custo da Mercadoria Vendida',
+      'CMV = Compra − ICMS Crédito − PIS/COFINS Crédito. Representa o custo real líquido do produto que entra na formação do resultado contábil. No regime Lucro Real, tanto o ICMS quanto o PIS/COFINS gerados na compra reduzem o CMV.'],
+    ['VL','Venda Líquida',
+      'VL = PV − ICMS Débito − PIS/COFINS Débito. Receita efetiva após dedução dos tributos sobre a venda.'],
+  ].map(([s,n,d])=>row(s,n,d)).join('');
 
-  // TRIBUTAÇÃO
+  // ── Tributação ────────────────────────────────────────────────────────
   document.getElementById('gloss-fis').innerHTML = [
-    ['Imposto sobre Circulação de Mercadorias e Serviços','ICMS',
-      'Imposto estadual que incide sobre a circulação de mercadorias. Gera crédito na entrada (compra) e débito na saída (venda). As alíquotas de entrada e saída podem ser diferentes, gerando saldo credor ou devedor.'],
-    ['ICMS Crédito (Entrada)','ICMS-C',
-      'Crédito fiscal gerado no ato da compra (D0 — momento da nota fiscal de entrada). Calculado: Valor Bruto da Compra × Alíquota ICMS Entrada. Disponível imediatamente para compensação com débitos futuros.'],
-    ['ICMS Débito (Saída)','ICMS-D',
-      'Débito fiscal gerado na venda. Calculado: PV × Alíquota ICMS Saída. É apurado e recolhido ao fisco no período de apuração (D45 no modelo).'],
-    ['Saldo Líquido de ICMS','Saldo ICMS',
-      'ICMS Crédito menos ICMS Débito. Se positivo: empresa acumula crédito fiscal — sem desembolso. Se negativo: há recolhimento ao fisco. No modelo com ICMS do app, esse saldo é capturado como evento temporal nos fluxos DFC e DFCD.'],
-    ['Substituição Tributária','ST',
-      'Regime em que o fabricante ou distribuidor recolhe o ICMS antecipadamente por toda a cadeia. Nas operações ST não há crédito/débito para os elos subsequentes. Identificado na tabela fiscal pelo tipo "PREÇO FINAL".'],
-    ['Código Especificador da Substituição Tributária','CEST',
-      'Código de 7 dígitos que identifica mercadorias sujeitas a Substituição Tributária ou antecipação do ICMS. Obrigatório no documento fiscal quando aplicável.'],
-    ['Contribuição para o Financiamento da Seguridade Social','COFINS',
-      'Contribuição federal sobre a receita bruta. No app, incide sobre o Rebate recebido. Alíquota padrão no regime cumulativo: 3,00%. Produtos monofásicos (ex: medicamentos) podem ter alíquota zero na cadeia.'],
-    ['Programa de Integração Social','PIS',
-      'Contribuição federal sobre a receita bruta. No app, incide sobre o Rebate junto com a COFINS. Alíquota padrão no regime cumulativo: 0,65%. Mesmo regime de exceção monofásico aplicável.'],
-    ['PIS + COFINS (campo unificado)','PIS/COFINS',
-      'Campo único no app representando a alíquota combinada de PIS e COFINS sobre o Rebate. Padrão: 3,65% (0,65% PIS + 3,00% COFINS) no regime cumulativo. Altere conforme o regime da empresa.'],
-    ['Redutor de Base de Cálculo','Redutor ICMS',
-      'Benefício fiscal estadual que reduz a base sobre a qual o ICMS é calculado, gerando uma alíquota efetiva menor. Em SP, não se aplica quando o cliente está no Simples Nacional, pois esse regime não apropria crédito de ICMS.'],
-    ['Simples Nacional','SN',
-      'Regime tributário simplificado para micro e pequenas empresas. Clientes nesse regime não se beneficiam do crédito de ICMS transferido pelo fornecedor. Isso impacta a negociação de preço e a aplicação de redutores fiscais.'],
-    ['Código Fiscal de Operações e Prestações','CFOP',
-      'Código de 4 dígitos que descreve a natureza da operação fiscal (compra, venda, transferência etc.). Determina o tratamento tributário aplicável à nota fiscal.'],
-    ['Nomenclatura Comum do Mercosul','NCM',
-      'Classificação fiscal do produto com 8 dígitos. Define a alíquota de IPI, regime de PIS/COFINS (monofásico ou não) e incidência de ICMS-ST. Essencial para determinar o tratamento tributário correto.'],
-  ].map(([t,s,d])=>row(t,s,d)).join('');
+    ['ICMS','Imposto sobre Circulação de Mercadorias e Serviços',
+      'Imposto estadual. Gera crédito na compra (entrada) e débito na venda (saída). As alíquotas de entrada e saída são configuráveis separadamente. O saldo (crédito − débito) é capturado como evento temporal nos fluxos DFC e DFCD quando o modo <em>com ICMS</em> está ativo.'],
+    ['ICMS-C','ICMS Crédito',
+      'Crédito fiscal gerado na entrada da mercadoria em D0. Calculado: Compra × Alíquota ICMS Entrada. Reduz o CMV no DRE e aparece como entrada no DFC com ICMS.'],
+    ['ICMS-D','ICMS Débito',
+      'Débito fiscal gerado na venda, recolhido em D45 (configurável). Calculado: PV × Alíquota ICMS Saída. Reduz a Venda Líquida no DRE e aparece como saída no DFC com ICMS.'],
+    ['PIS/COFINS-C','PIS/COFINS Crédito (Compra)',
+      'Crédito de PIS (0,65%) + COFINS (7,60%) gerado na compra — regime não-cumulativo (Lucro Real). Alíquota padrão: 9,25%. Ocorre em D0 junto ao ICMS Crédito. Reduz o CMV no DRE. Se alíquota = 0%, evento não aparece nos fluxos.'],
+    ['PIS/COFINS-D','PIS/COFINS Débito (Venda)',
+      'Débito de PIS + COFINS sobre a receita de venda — regime não-cumulativo. Alíquota padrão: 9,25%. Recolhido/compensado na data configurada (padrão D75). Reduz a Venda Líquida no DRE.'],
+    ['PIS/COFINS-R','PIS/COFINS sobre Rebate',
+      'Incidência de PIS + COFINS sobre o Rebate recebido do fornecedor. Alíquota: 4,65% (PIS 0,65% + COFINS 4,00%) no regime não-cumulativo — Lucro Real da Andorinha Med. Campo independente das alíquotas de compra/venda.'],
+    ['ST','Substituição Tributária',
+      'Regime em que o fabricante recolhe o ICMS antecipadamente por toda a cadeia. Nas operações ST não há crédito/débito de ICMS para os elos seguintes.'],
+    ['SN','Simples Nacional',
+      'Clientes nesse regime não apropriam crédito de ICMS transferido pelo fornecedor. Impacta a negociação de preço e a aplicação de redutores fiscais.'],
+    ['NCM','Nomenclatura Comum do Mercosul',
+      'Classificação fiscal do produto (8 dígitos). Define o regime de PIS/COFINS (monofásico = alíquota zero na cadeia) e incidência de ICMS-ST.'],
+    ['CFOP','Código Fiscal de Operações e Prestações',
+      'Código de 4 dígitos que descreve a natureza da operação fiscal e determina o tratamento tributário aplicável.'],
+    ['CEST','Código Especificador da Substituição Tributária',
+      'Código de 7 dígitos que identifica mercadorias sujeitas a ST ou antecipação de ICMS. Obrigatório no documento fiscal quando aplicável.'],
+  ].map(([s,n,d])=>row(s,n,d)).join('');
 
-  // PRECIFICAÇÃO
-  document.getElementById('gloss-prec').innerHTML = [
-    ['Preço Máximo ao Consumidor','PMC',
-      'Teto de preço definido pela CMED/ANVISA para medicamentos e correlatos. Calculado por categoria de alíquota de ICMS (0%, 12%, 17%, 18%, 19%, 20%). O app utilizará o PMC correspondente à UF do cliente quando integrado à base CMED.'],
-    ['Preço Máximo de Venda ao Governo','PMVG',
-      'Preço de referência para fornecimento ao setor público. Base de reembolso no Programa Farmácia Popular. Geralmente inferior ao PMC. Operações com o governo utilizam o PMVG como preço de venda.'],
-    ['Preço de Venda','PV',
-      'Preço praticado na venda ao cliente. Base de cálculo (100%) para a análise vertical (% PV) em todo o app. No Cálculo Inverso, pode ser a variável a resolver.'],
-    ['Bonificação Comercial','Rebate',
-      'Valor recebido do fornecedor, geralmente vinculado a volume de compras, metas de sell-out ou participação em campanhas. No modelo, é o componente que frequentemente define a viabilidade da operação — sem rebate, a maioria das operações apresenta MC2 fortemente negativa.'],
-    ['Taxa Mínima de Atratividade','TMA',
-      'Taxa de desconto mensal utilizada no DFCD para trazer fluxos futuros a valor presente. Representa o custo de oportunidade do capital: o retorno mínimo exigido para justificar o investimento na operação. Fórmula do fator: (1 + TMA)^(n/30), onde n = dias até o evento.'],
-    ['Ponto de Equilíbrio / Breakeven','BE',
-      'Rebate mínimo necessário para que o DFCD da operação seja igual a zero. Fórmula: Rebate_mín = −(DFCD sem Rebate) × Fator_D_rebate ÷ (1 − Alíquota PIS/COFINS). Abaixo desse valor, a operação destrói valor financeiro a TMA.'],
-    ['Gap de Rebate','Gap',
-      'Diferença entre o Rebate mínimo (Breakeven) e o Rebate atual contratado. Gap positivo: o rebate atual não cobre o custo financeiro — operação destrói valor. Gap negativo: rebate supera o mínimo — operação já é viável financeiramente.'],
-  ].map(([t,s,d])=>row(t,s,d)).join('');
-
-  // CÁLCULO INVERSO
+  // ── Cálculo Inverso ───────────────────────────────────────────────────
   document.getElementById('gloss-ci').innerHTML = [
-    ['Cálculo Inverso / Precificação por Meta','CI',
-      'Dado um percentual-alvo (ex: 15,00% do PV) e uma métrica base (MC Final, DFC ou DFCD), o app resolve qual variável (PV, Rebate ou Preço de Compra) é necessária para atingir essa meta. Três equações distintas, resoluções analíticas fechadas sem iteração.'],
-    ['Margem-Alvo','Meta %',
-      'Percentual sobre o PV que se deseja atingir no Cálculo Inverso. Expresso sempre em relação ao Preço de Venda. Exemplos: 15,00% de MC Final, 10,00% de DFC, 8,00% de DFCD.'],
-    ['Análise Vertical','AV',
-      'Técnica de análise que expressa cada linha do demonstrativo como percentual de uma base (no app: sempre o PV = 100,00%). Permite comparar estruturas de custo e margem independentemente do valor absoluto das operações.'],
-  ].map(([t,s,d])=>row(t,s,d)).join('');
+    ['CI','Cálculo Inverso / Precificação por Meta',
+      'Dado um percentual-alvo (ex: 18,00% do PV), o app resolve analiticamente — sem iteração — qual variável (PV, Rebate ou Compra) é necessária para atingir essa meta. São 5 equações independentes por variável: DRE, DFC sem ICMS, DFC com ICMS, DFCD sem ICMS e DFCD com ICMS. Cada base gera um resultado diferente, evidenciando o custo financeiro do timing.'],
+    ['Meta %','Margem-Alvo sobre o PV',
+      'Percentual sobre o PV que se deseja atingir. Fica travado ao clicar em qualquer variável do CI. Só sincroniza com o MC Final atual quando o usuário altera uma premissa manualmente.'],
+    ['ciOriginals','Snapshot das Premissas',
+      'Captura automática de PV, Rebate e Compra no momento em que o usuário atualiza as premissas. Usado pelo botão ↩ Restaurar Premissas para desfazer simulações e voltar à base original.'],
+    ['AV','Análise Vertical',
+      'Cada linha do demonstrativo expressa como % do PV (= 100,00%). Permite comparar estruturas de custo e margem independentemente do valor absoluto.'],
+    ['BE','Breakeven / Ponto de Equilíbrio',
+      'Rebate mínimo para que o DFCD = 0. Fórmula: Rebate_mín = −(DFCD sem Rebate) × fat(D_rebate) ÷ (1 − Alíq. PIS/COFINS Rebate).'],
+    ['Gap','Gap de Rebate',
+      'Gap = Rebate atual − Rebate mínimo. Positivo: operação viável. Negativo: rebate insuficiente para cobrir o custo financeiro à TMA.'],
+  ].map(([s,n,d])=>row(s,n,d)).join('');
 
-  // SIGLAS DE SISTEMAS E FONTES
+  // ── Precificação & Mercado ────────────────────────────────────────────
+  document.getElementById('gloss-prec').innerHTML = [
+    ['PV','Preço de Venda',
+      'Preço praticado ao cliente. Base de cálculo (100%) para análise vertical. No CI pode ser a variável resolvida.'],
+    ['PMC','Preço Máximo ao Consumidor',
+      'Teto legal definido pela CMED/ANVISA para medicamentos. Calculado por categoria de alíquota de ICMS (0%, 12%, 17%, 18%, 19%, 20%). A integração com a base CMED está prevista na Fase 2.'],
+    ['PMVG','Preço Máximo de Venda ao Governo',
+      'Base de reembolso no Programa Farmácia Popular e referência para compras governamentais.'],
+    ['Rebate','Bonificação Comercial',
+      'Valor recebido do fornecedor, vinculado a volume de compras, metas ou campanhas. Componente crítico da equação — sem Rebate, a maioria das operações apresenta MC2 fortemente negativa.'],
+    ['TMA','Taxa Mínima de Atratividade',
+      'Taxa de desconto mensal para o DFCD. Representa o custo de oportunidade do capital. Fator: (1+TMA)^(d/30). Padrão: 1,50% a.m.'],
+  ].map(([s,n,d])=>row(s,n,d)).join('');
+
+  // ── Sistemas & Fontes ─────────────────────────────────────────────────
   document.getElementById('gloss-sis').innerHTML = [
-    ['Câmara de Regulação do Mercado de Medicamentos','CMED',
-      'Órgão interministerial que regula os preços de medicamentos no Brasil. Publica mensalmente a tabela de preços máximos (PMC e PMVG) por produto, apresentação e alíquota de ICMS. Fonte oficial para integração de preços no app.'],
-    ['Agência Nacional de Vigilância Sanitária','ANVISA',
-      'Agência federal responsável pela regulação sanitária. Disponibiliza a tabela CMED e o registro de medicamentos. A base de dados pública da ANVISA é a fonte de integração prevista para a fase 2 do projeto.'],
-    ['Conselho Nacional de Política Fazendária','CONFAZ',
-      'Órgão que reúne os secretários de Fazenda dos estados e o ministro da Fazenda federal. Publica os convênios e protocolos que definem as regras de ICMS interestadual, ST e benefícios fiscais. Fonte de referência para a tabela fiscal do app.'],
-    ['Enterprise Resource Planning (sistema de gestão)','ERP / Delage',
-      'Sistema de gestão integrada da Andorinha Med. Fonte primária de dados para o app: tabela de produtos (Lista André), base fiscal (BasePMPF) e cadastro de clientes. A integração via exportação JSON ou API REST é detalhada no documento de alinhamento TI.'],
-    ['Código de Produto','EAN',
-      'European Article Number — código de barras padrão GS1 que identifica unicamente um produto no mercado. No app, permite busca e seleção de produto por leitura de código de barras ou digitação.'],
-  ].map(([t,s,d])=>row(t,s,d)).join('');
+    ['CMED','Câmara de Regulação do Mercado de Medicamentos',
+      'Órgão interministerial que publica mensalmente os preços máximos (PMC e PMVG) por produto, apresentação e alíquota de ICMS. Fonte oficial para integração de preços.'],
+    ['ANVISA','Agência Nacional de Vigilância Sanitária',
+      'Disponibiliza a tabela CMED e o registro de medicamentos. Fonte prevista para integração na Fase 2.'],
+    ['CONFAZ','Conselho Nacional de Política Fazendária',
+      'Publica os convênios e protocolos que definem as regras de ICMS interestadual, ST e benefícios fiscais. Fonte de referência para a tabela fiscal.'],
+    ['ERP','Enterprise Resource Planning (Delage)',
+      'Sistema de gestão da Andorinha Med. Fonte primária de dados: tabela de produtos, base fiscal e cadastro de clientes. Integração via JSON ou API REST prevista na Fase 1.'],
+    ['EAN','European Article Number',
+      'Código de barras GS1 que identifica unicamente um produto. Permite busca por leitura de código ou digitação na integração com o Delage.'],
+    ['Lucro Real','Regime Tributário',
+      'Regime adotado pela Andorinha Med. Permite apropriar créditos de PIS/COFINS (9,25%) nas compras — sistema não-cumulativo. PIS/COFINS sobre Rebate: 4,65% (PIS 0,65% + COFINS 4,00%).'],
+  ].map(([s,n,d])=>row(s,n,d)).join('');
 }
+
+
 
 // ── Init ──
 try{
