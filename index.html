@@ -906,7 +906,7 @@ function vplRow(lbl,vals){
 }
 
 // ── Persistência: localStorage ──────────────────────
-const STORAGE_KEY = 'simulaPrecoApp_v1';
+const STORAGE_KEY = 'simulaPrecoApp_v2';
 const INPUT_IDS = ['p-cliente', 'p-compra', 'p-icms-e', 'p-icms-s', 'p-pv', 'p-frete', 'd-frete', 'p-comis', 'd-comis', 'p-rebate', 'p-piscofins', 'p-taxa', 'ci-taxa', 'd-icmsc', 'd-icmsd', 'd-compra', 'd-venda', 'd-rebate', 's-passo', 's-linhas', 'ci-target'];
 
 function saveState(){
@@ -988,35 +988,22 @@ function restoreCIOriginal(what){
 
 // ── Reset completo às premissas padrão ───────────────────────────────────
 function resetApp(){
-  if(!confirm('Atualizar premissas para os valores anteriores às simulações?\nO Cálculo Inverso será reiniciado.')) return;
+  // Snapshot current premise values as the new baseline
+  ciOriginals = captureCIOriginals();
 
-  // Restore to ciOriginals (last manually-set values) if available
-  if(ciOriginals){
-    const fieldMap = {pv:'p-pv', rebate:'p-rebate', compra:'p-compra'};
-    Object.entries(fieldMap).forEach(([key,id])=>{
-      const el=document.getElementById(id);
-      if(el && ciOriginals[key]!==undefined) el.value=ciOriginals[key].toFixed(4);
-    });
-  }
-
-  // Reset all CI state
+  // Reset CI state
   ciTargetSet = false;
   ciScenario  = null;
-  ciApplying  = false;
   ciWhat      = 'pv';
-  ciIcms      = true;
-  // Keep ciOriginals — it's still valid as the restore point
 
   // Reset CI selectors visually
-  document.querySelectorAll('#ci-what button').forEach((b,i)=>{b.classList.toggle('on',i===0);});
-  document.querySelectorAll('#ci-icms-seg button').forEach((b,i)=>{b.classList.toggle('on',i===0);});
+  document.querySelectorAll('#ci-what button').forEach((b,i)=>b.classList.toggle('on',i===0));
+  document.querySelectorAll('#ci-icms-seg button').forEach((b,i)=>b.classList.toggle('on',i===0));
 
-  // Save restored state
+  // Save and recalc
   saveState();
   recalc();
-  goTo('premissas');
 }
-
 
 // ── Aplicar resultado CI às Premissas (acionado pelo botão) ──────────────
 function applyCIResult(what, value){
@@ -1288,7 +1275,7 @@ function setDiagType(t,btn){diagTyp=t;document.querySelectorAll('#sg-t button').
 
 
 // ── Memória de Cálculo ────────────────────────────────────────────────────
-function buildMemoria(what, tgt, pvX, rbX, cpX, vMC, vFC, vDFCD, P){
+function buildMemoria(what, tgt, pvX, rbX, cpX, vMC, vMC, vDFCD, P){
   const {pv,rebate,compra,icmsAliqE,icmsAliqS,freteP,comisP,piscoP,taxa,
          dIC,dFR,dCOM,dID,dCP,dVD,dRB,fat,
          freteV,comisV,piscoV,icmsC,icmsD,vliq,cmv} = P;
@@ -1335,7 +1322,7 @@ function buildMemoria(what, tgt, pvX, rbX, cpX, vMC, vFC, vDFCD, P){
     const denFC = 1 - freteP - comisP - tgt;
     h += row('Numerador', 'Compra − Rebate líq.', R$(numFC));
     h += row('Denominador', '1 − Frete − Comissão − Meta', f4(denFC));
-    h += row('PV (DFC sem ICMS)', '', R$(vFC.ok?vFC.res:0), true);
+    h += row('PV (DFC sem ICMS)', '', R$(vMC.ok?vMC.res:0), true);
     h += sep;
 
     h += hdr('Resolução DFCD = Meta × PV (com desconto TMA)');
@@ -1415,7 +1402,7 @@ function buildMemoria(what, tgt, pvX, rbX, cpX, vMC, vFC, vDFCD, P){
 // ── Cálculo Inverso ──────────────────────────────────
 function renderCI(R){
   const{pv,taxa,rebate,piscoP,freteP,comisP,compra,icmsAliqE,icmsAliqS,
-        piscofsCp,piscofsVp,dPiscofsV,piscofsC,piscofsV,
+        piscofsCp,piscofsVp,dPiscofsC,dPiscofsV,piscofsC,piscofsV,
         dIC,dFR,dCOM,dID,dCP,dVD,dRB,fat,
         icmsC,icmsD,saldoICMS,freteV,comisV,piscoV,cmv,vliq,
         mc2,vplNoReb,fcFI,fcFN,vplI,vplN} = R;
@@ -1428,7 +1415,8 @@ function renderCI(R){
   const solveFor = (base) => {
     if(ciWhat==='pv'){
       if(base==='mc'){
-        const num=cmv-rebate+rebate*piscoP, den=1-icmsAliqS-freteP-comisP-tgt;
+        const num=compra*(1-icmsAliqE-piscofsCp)-rebate*(1-piscoP);
+        const den=1-icmsAliqS-piscofsVp-freteP-comisP-tgt;
         return den!==0?num/den:null;
       }
       if(base==='fc_no'){
@@ -1446,57 +1434,64 @@ function renderCI(R){
         return den!==0?num/den:null;
       }
       if(base==='dfcd_no'){
-        // DFCD sem ICMS: -fr/f15 -co/f30 -compra/f60 +pv/f75 +(rb-rb*p)/f120 = tgt*pv
-        const A = -freteP/fat(dFR) - comisP/fat(dCOM) + 1/fat(dVD) - tgt;
-        const B = compra/fat(dCP) - rebate*(1-piscoP)/fat(dRB);
+        // sem ICMS: piscofsC/f0 -fr/f15 -co/f30 -compra/f60 +pv*(1-piscofsVp)/f75 +rb*(1-p)/f120 = tgt*pv
+        const A=-freteP/fat(dFR)-comisP/fat(dCOM)+(1-piscofsVp)/fat(dVD)-tgt;
+        const B=compra/fat(dCP)-compra*piscofsCp/fat(dIC)-rebate*(1-piscoP)/fat(dRB);
         return A!==0?B/A:null;
       }
       if(base==='dfcd_si'){
-        // DFCD com ICMS: icmsC/f0 -fr/f15 -co/f30 -icmsD/f45 -compra/f60 +pv/f75 +(rb-p)/f120 = tgt*pv
-        // Group pv terms: pv*(-fr/f15 -co/f30 -icmsAliqS/f45 +1/f75 -tgt) = compra/f60 -icmsC/f0 -rb*(1-p)/f120
-        const A = -freteP/fat(dFR) - comisP/fat(dCOM) - icmsAliqS/fat(dID) + 1/fat(dVD) - tgt;
-        const B = compra/fat(dCP) - compra*icmsAliqE/fat(dIC) - rebate*(1-piscoP)/fat(dRB);
+        // pv*(-fr/f15 -co/f30 -icmsAliqS/f45 +(1-piscofsVp)/f75 -tgt) = compra/f60 -(icmsC+pfC)/f0 -rb*(1-p)/f120
+        const A=-freteP/fat(dFR)-comisP/fat(dCOM)-icmsAliqS/fat(dID)+(1-piscofsVp)/fat(dVD)-tgt;
+        const B=compra/fat(dCP)-compra*(icmsAliqE+piscofsCp)/fat(dIC)-rebate*(1-piscoP)/fat(dRB);
         return A!==0?B/A:null;
       }
     }
     if(ciWhat==='rebate'){
-      if(base==='mc')    return (tgt*pv - vliq + cmv + freteV + comisV)/(1-piscoP);
-      if(base==='fc_no') return (tgt*pv + freteV + comisV + compra - pv)/(1-piscoP);
-      if(base==='fc_si') return (tgt*pv + freteV + comisV - icmsC + icmsD + compra - pv)/(1-piscoP);
+      if(base==='mc'){
+        const vliq2=pv*(1-icmsAliqS-piscofsVp);
+        const cmv2=compra*(1-icmsAliqE-piscofsCp);
+        return (tgt*pv-vliq2+cmv2+freteV+comisV)/(1-piscoP);
+      }
+      if(base==='fc_no') return (tgt*pv + freteV + comisV - piscofsC + piscofsV + compra - pv)/(1-piscoP);
+      if(base==='fc_si') return (tgt*pv + freteV + comisV - icmsC + icmsD - piscofsC + piscofsV + compra - pv)/(1-piscoP);
       if(base==='dfcd_no'){
         const vplNR = (-freteV)/fat(dFR)+(-comisV)/fat(dCOM)+(-compra)/fat(dCP)+pv/fat(dVD);
         return (tgt*pv - vplNR)*fat(dRB)/(1-piscoP);
       }
       if(base==='dfcd_si'){
-        const vplNR = icmsC/fat(dIC)+(-freteV)/fat(dFR)+(-comisV)/fat(dCOM)+(-icmsD)/fat(dID)+(-compra)/fat(dCP)+pv/fat(dVD);
-        return (tgt*pv - vplNR)*fat(dRB)/(1-piscoP);
+        const vplNR=(icmsC+piscofsC)/fat(dIC)-freteV/fat(dFR)-comisV/fat(dCOM)-icmsD/fat(dID)-compra/fat(dCP)+pv*(1-piscofsVp)/fat(dVD);
+        return (tgt*pv-vplNR)*fat(dRB)/(1-piscoP);
       }
     }
     if(ciWhat==='compra'){
-      if(base==='mc')    return (vliq - freteV - comisV + rebate - piscoV - tgt*pv)/(1-icmsAliqE);
-      if(base==='fc_no') return -freteV - comisV + pv + rebate*(1-piscoP) - tgt*pv;
-      if(base==='fc_si'){
-        // icmsC = compra*icmsAliqE → compra*(1-icmsAliqE) = rest
-        // compra*icmsAliqE - freteV - comisV - icmsD - compra + pv + rb*(1-p) = tgt*pv
-        // compra*(icmsAliqE - 1) = tgt*pv + freteV + comisV + icmsD - pv - rb*(1-p)
-        // compra = (tgt*pv + freteV + comisV + icmsD - pv - rb*(1-p)) / (icmsAliqE-1)
-        return (tgt*pv + freteV + comisV + icmsD - pv - rebate*(1-piscoP)) / (icmsAliqE-1);
+      // MC: vliq2 - cmv2 - freteV - comisV + rb*(1-p) = tgt*pv
+      // cmv2 = cp*(1-icmsAliqE-piscofsCp) → solve for cp
+      if(base==='mc'){
+        const vliq2=pv*(1-icmsAliqS-piscofsVp);
+        return (vliq2-freteV-comisV+rebate*(1-piscoP)-tgt*pv)/(1-icmsAliqE-piscofsCp);
       }
+      // DFC sem ICMS: pfC - fr - co - cp + pv - pfV + rb*(1-p) = tgt*pv
+      // cp*(piscofsCp-1) = tgt*pv+freteV+comisV-piscofsV-pv-rb*(1-p)
+      if(base==='fc_no'){
+        return (tgt*pv+freteV+comisV-piscofsV-pv-rebate*(1-piscoP))/(piscofsCp-1);
+      }
+      // DFC com ICMS: (icmsAliqE+piscofsCp-1)*cp = tgt*pv+freteV+comisV+icmsD-piscofsV-pv-rb*(1-p)
+      if(base==='fc_si'){
+        return (tgt*pv+freteV+comisV+icmsD-piscofsV-pv-rebate*(1-piscoP))/(icmsAliqE+piscofsCp-1);
+      }
+      // DFCD sem ICMS: piscofsC/f0 + terms_fixed - compra/f60 = tgt*pv
       if(base==='dfcd_no'){
-        const rest = (-freteV)/fat(dFR)+(-comisV)/fat(dCOM)+pv/fat(dVD)+rebate*(1-piscoP)/fat(dRB)-tgt*pv;
-        return rest*fat(dCP);
+        const rest_no=-freteV/fat(dFR)-comisV/fat(dCOM)+pv*(1-piscofsVp)/fat(dVD)+rebate*(1-piscoP)/fat(dRB);
+        const coef_no=piscofsCp/fat(dIC)-1/fat(dCP);
+        return coef_no!==0?(tgt*pv-rest_no)/coef_no:null;
       }
       if(base==='dfcd_si'){
-        // compra*icmsAliqE/f0 - compra/f60 + rest = tgt*pv
-        // compra*(icmsAliqE/f0 - 1/f60) = tgt*pv - rest
-        const rest = (-freteV)/fat(dFR)+(-comisV)/fat(dCOM)+(-icmsD)/fat(dID)+pv/fat(dVD)+rebate*(1-piscoP)/fat(dRB);
-        const coef = icmsAliqE/fat(dIC) - 1/fat(dCP);
-        return coef!==0?(tgt*pv - rest)/coef:null;
+        const rest=-freteV/fat(dFR)-comisV/fat(dCOM)-icmsD/fat(dID)+pv*(1-piscofsVp)/fat(dVD)+rebate*(1-piscoP)/fat(dRB);
+        const coef=(icmsAliqE+piscofsCp)/fat(dIC)-1/fat(dCP);
+        return coef!==0?(tgt*pv-rest)/coef:null;
       }
     }
-    return null;
   };
-
   // ── Solve all 5 bases ─────────────────────────────────────────────────
   const curVal = ciWhat==='pv'?pv : ciWhat==='rebate'?rebate : compra;
   const mkV = (res) => {
@@ -1519,21 +1514,22 @@ function renderCI(R){
   // ── DRE always uses MC resolution ────────────────────────────────────
   const {pv2:pvX, rb2:rbX, cp2:cpX} = vMC;
   const icmsCx=cpX*icmsAliqE, icmsDx=pvX*icmsAliqS;
-  const cmvX=cpX-icmsCx, vliqX=pvX-icmsDx;
   const fretevX=pvX*freteP, comisvX=pvX*comisP, piscovX=rbX*piscoP;
-  const mc1X=vliqX-cmvX, mc2X=mc1X-comisvX-fretevX, mcFinalX=mc2X+rbX-piscovX;
+  // mc1X/mc2X/mcFinalX computed after dreLines block
 
   // ── Build flow for a given resolved scenario ──────────────────────────
   const mkFlow = (v, withIcms) => {
-    const ic=v.cp2*icmsAliqE, id=v.pv2*icmsAliqS;
-    const fr=v.pv2*freteP, co=v.pv2*comisP, pi=v.rb2*piscoP;
-    const f=[ic,-fr,-co,-id,-v.cp2,v.pv2,v.rb2,-pi];
-    if(!withIcms){f[0]=0;f[3]=0;}
+    const ic =v.cp2*icmsAliqE,   id=v.pv2*icmsAliqS;
+    const pfc=v.cp2*piscofsCp,   pfv=v.pv2*piscofsVp;
+    const fr =v.pv2*freteP, co=v.pv2*comisP, pi=v.rb2*piscoP;
+    // Events: icmsC, piscofsC, frete, comis, icmsD, piscofsVD, compra, venda, rebate, piscoRebate
+    const f=[ic,pfc,-fr,-co,-id,-pfv,-v.cp2,v.pv2,v.rb2,-pi];
+    if(!withIcms){f[0]=0;f[4]=0;} // zero icmsC(idx 0) and icmsD(idx 4) when sem ICMS
     return f;
   };
 
-  const days_ev = [dIC,dFR,dCOM,dID,dCP,dVD,dRB,dRB];
-  const lbls_ev = ['ICMS Crédito','Frete','Comissão','ICMS Débito','Compra','Venda','Rebate bruto','PIS/COFINS sobre Rebate'];
+  const days_ev = [dIC,dPiscofsC,dFR,dCOM,dID,dPiscofsV,dCP,dVD,dRB,dRB];
+  const lbls_ev = ['ICMS Crédito','PIS/COFINS Crédito','Frete','Comissão','ICMS Débito','PIS/COFINS Débito','Compra','Venda','Rebate bruto','PIS/COFINS sobre Rebate'];
 
   // Scenario 1: sem ICMS
   const fc_no  = mkFlow(vFCno,  false);
@@ -1580,11 +1576,21 @@ function renderCI(R){
     (ciWhat==='pv'&&lbl==='Venda')||(ciWhat==='rebate'&&lbl==='Rebate bruto')||(ciWhat==='compra'&&lbl==='Compra');
 
   // ── DRE block ─────────────────────────────────────────────────────────
+  // PIS/COFINS for resolved scenario
+  const piscofsCx = cpX * piscofsCp;
+  const piscofsVx = pvX * piscofsVp;
+  const cmvX2  = cpX - icmsCx - piscofsCx;  // CMV net of ICMS + PIS/COFINS
+  const vliqX2 = pvX - icmsDx - piscofsVx;   // Venda Líquida net
+
+  const mc1X=vliqX2-(cpX-icmsCx-piscofsCx);
+  const mc2X=mc1X-comisvX-fretevX, mcFinalX=mc2X+rbX-piscovX;
+
   const dreLines = [
     ['Preço de Venda', pvX, 1, ciWhat==='pv'?'ci-target':''],
     ['(-) ICMS sobre Venda', -icmsDx, -icmsAliqS, 'ci-sub'],
-    ['Venda Líquida', vliqX, vliqX/pvX, 'ci-total'],
-    ['(-) CMV', -cmvX, -cmvX/pvX, 'ci-sub'],
+    ...(piscofsVp>0?[['(-) PIS/COFINS sobre Venda', -piscofsVx, -piscofsVp, 'ci-sub']]:[]),
+    ['Venda Líquida', vliqX2, vliqX2/pvX, 'ci-total'],
+    ['(-) CMV', -cmvX2, -cmvX2/pvX, 'ci-sub'],
     ['MC1', mc1X, mc1X/pvX, 'ci-total'],
     ['(-) Comissão', -comisvX, -comisP, 'ci-sub'],
     ['(-) Frete', -fretevX, -freteP, 'ci-sub'],
@@ -1646,17 +1652,21 @@ function renderCI(R){
     return h;
   };
 
-  // ── Render based on ciIcms selector ──────────────────────────────────
-  const vFC   = ciIcms ? vFCsi  : vFCno;
-  const vDFCD = ciIcms ? vDsi   : vDno;
-  const fc_arr = ciIcms ? fc_si : fc_no;
+  // ── Render ────────────────────────────────────────────────────────────
+  // DRE and DFC always use MC resolution — they must show identical totals
+  // ciIcms toggle only controls ICMS event visibility in DFC (not the total)
+  const vDFCD  = ciIcms ? vDsi : vDno;
+  // mc_v object for mkFlow — uses resolved pvX/rbX/cpX from MC resolution
+  const mc_vals = {pv2:pvX, rb2:rbX, cp2:cpX};
+  const fc_mc  = mkFlow(mc_vals, true);      // full flow with ICMS (total = MC Final)
+  const fc_arr = mkFlow(mc_vals, ciIcms);    // ICMS shown/hidden per toggle
 
-  // DFCD uses its OWN resolved values — not the MC scenario
-  const fc_dfcd_own = mkFlow(vDFCD, ciIcms);
+  // DFCD uses its OWN resolved values
+  const fc_dfcd_own   = mkFlow(vDFCD, ciIcms);
   const disc_dfcd_own = fc_dfcd_own.map((v,i) => v/fat(days_ev[i]));
 
   document.getElementById('ci-dre').innerHTML  = dreHtml;
-  document.getElementById('ci-dfc').innerHTML  = buildDFC(fc_arr, vFC);
+  document.getElementById('ci-dfc').innerHTML  = buildDFC(fc_arr, mc_vals);
   document.getElementById('ci-dfcd').innerHTML = buildDFCD(disc_dfcd_own, fc_dfcd_own, vDFCD);
 
   // Update DFCD header TMA label
@@ -1682,7 +1692,7 @@ function renderCI(R){
   const mEl   = document.getElementById('ci-memoria');
   if(mWrap && mEl){
     mWrap.style.display = 'block';
-    const mRows = buildMemoria(ciWhat, tgt, pvX, rbX, cpX, vMC, vFC, vDFCD,
+    const mRows = buildMemoria(ciWhat, tgt, pvX, rbX, cpX, vMC, vMC, vDFCD,
                                {pv,rebate,compra,icmsAliqE,icmsAliqS,freteP,comisP,piscoP,taxa,
                                 dIC,dFR,dCOM,dID,dCP,dVD,dRB,fat,
                                 freteV,comisV,piscoV,icmsC,icmsD,vliq,cmv});
@@ -1694,7 +1704,7 @@ function renderCI(R){
       <strong style="color:var(--text);font-size:11px;text-transform:uppercase;letter-spacing:0.5px">${whatLabels[ciWhat]} · Meta ${fP(tgt)} do PV · ${scenLabel}</strong>
       <span style="color:var(--text2);font-size:11px">
         DRE: <span style="font-family:var(--mono);color:${vMC.ok?'var(--green)':'var(--red)'}">${vMC.ok?fR(vMC.res,4):'—'}</span>${fmt_gap(vMC.gap)}
-        &nbsp;|&nbsp; DFC: <span style="font-family:var(--mono);color:${vFC.ok?'var(--green)':'var(--red)'}">${vFC.ok?fR(vFC.res,4):'—'}</span>${fmt_gap(vFC.gap)}
+        &nbsp;|&nbsp; DFC: <span style="font-family:var(--mono);color:${vMC.ok?'var(--green)':'var(--red)'}">${vMC.ok?fR(vMC.res,4):'—'}</span>${fmt_gap(vMC.gap)}
         &nbsp;|&nbsp; DFCD: <span style="font-family:var(--mono);color:${vDFCD.ok?'var(--green)':'var(--red)'}">${vDFCD.ok?fR(vDFCD.res,4):'—'}</span>${fmt_gap(vDFCD.gap)}
       </span>
     </div>`;
