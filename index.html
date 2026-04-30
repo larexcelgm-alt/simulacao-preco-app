@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html 
           <div class="input-group">
+            <div class="input-label">PIS/COFINS Compra <span class="input-hint">crédito — D0 (configurável)</span></div>
+            <div class="input-row"><input type="number" id="d-piscofs-c" value="0" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
+          </div>
+          <div class="input-group">
             <div class="input-label">PIS/COFINS Venda <span class="input-hint">recolhimento/compensação</span></div>
             <div class="input-row"><input type="number" id="d-piscofs-v" value="75" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
           </div>lang="pt-BR">
@@ -785,7 +789,7 @@ function gs(id){return document.getElementById(id).value||'';}
 function calc(){
   const compra=gi('p-compra'), icmsAliqE=gi('p-icms-e')/100, icmsAliqS=gi('p-icms-s')/100;
   const piscofsCp=gi('p-piscofs-c')/100, piscofsVp=gi('p-piscofs-v')/100;
-  const dPiscofsV=gi('d-piscofs-v')||75;
+  const dPiscofsC=gi('d-piscofs-c')||0, dPiscofsV=gi('d-piscofs-v')||75;
   const pv=gi('p-pv'),         freteP=gi('p-frete')/100;
   const comisP=gi('p-comis')/100, rebate=gi('p-rebate');
   const piscoP=gi('p-piscofins')/100, taxa=gi('p-taxa')/100;
@@ -844,7 +848,7 @@ function calc(){
   const gap       = rebateMin - rebate;
 
   return {
-    compra,icmsAliqE,icmsAliqS,piscofsCp,piscofsVp,dPiscofsV,
+    compra,icmsAliqE,icmsAliqS,piscofsCp,piscofsVp,dPiscofsC,dPiscofsV,
     piscofsC,piscofsV,pv,freteP,comisP,rebate,piscoP,taxa,
     dIC,dFR,dCOM,dID,dCP,dVD,dRB,
     fat, icmsC,icmsD,cmv,vliq,freteV,comisV,piscoV,saldoICMS,
@@ -2032,9 +2036,9 @@ function renderGlossary(){
     ['ICMS-D','ICMS Débito',
       'Débito fiscal gerado na venda, recolhido em D45 (configurável). Calculado: PV × Alíquota ICMS Saída. Reduz a Venda Líquida no DRE e aparece como saída no DFC com ICMS.'],
     ['PIS/COFINS-C','PIS/COFINS Crédito (Compra)',
-      'Crédito de PIS (0,65%) + COFINS (7,60%) gerado na compra — regime não-cumulativo (Lucro Real). Alíquota padrão: 9,25%. Ocorre em D0 junto ao ICMS Crédito. Reduz o CMV no DRE. Se alíquota = 0%, evento não aparece nos fluxos.'],
+      'Crédito de PIS (0,65%) + COFINS (7,60%) gerado na compra — regime não-cumulativo (Lucro Real). Alíquota padrão: 9,25%. Prazo configurável (padrão D0 — mesmo dia da entrada da nota). Reduz o CMV no DRE. Se alíquota = 0%, evento não aparece nos fluxos.'],
     ['PIS/COFINS-D','PIS/COFINS Débito (Venda)',
-      'Débito de PIS + COFINS sobre a receita de venda — regime não-cumulativo. Alíquota padrão: 9,25%. Recolhido/compensado na data configurada (padrão D75). Reduz a Venda Líquida no DRE.'],
+      'Débito de PIS + COFINS sobre a receita de venda — regime não-cumulativo. Alíquota padrão: 9,25%. Data de recolhimento/compensação configurável nas Premissas (padrão D75). Reduz a Venda Líquida no DRE. Se alíquota = 0%, evento não aparece nos fluxos.'],
     ['PIS/COFINS-R','PIS/COFINS sobre Rebate',
       'Incidência de PIS + COFINS sobre o Rebate recebido do fornecedor. Alíquota: 4,65% (PIS 0,65% + COFINS 4,00%) no regime não-cumulativo — Lucro Real da Andorinha Med. Campo independente das alíquotas de compra/venda.'],
     ['ST','Substituição Tributária',
