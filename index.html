@@ -1030,6 +1030,7 @@ function applyCIResult(what, value){
   const data = {};
   INPUT_IDS.forEach(id => { const e2=document.getElementById(id); if(e2) data[id]=e2.value; });
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+  ciScenario = null;
   recalc();
 }
 
@@ -1098,6 +1099,7 @@ function recalc(){
   const plRows=[
     ['Preço de Venda',pv,1,false],
     ['(-) ICMS sobre Venda ('+(icmsAliqS*100).toFixed(2).replace('.',',')+'%)',-icmsD,-icmsD/pv,false],
+    ...(piscofsV>0?[['(-) PIS/COFINS sobre Venda ('+(piscofsVp*100).toFixed(2).replace('.',',')+'%)',-piscofsV,-piscofsV/pv,false]]:[]),
     ['Venda Líquida',vliq,vliq/pv,true],
     ['(-) CMV (líq. ICMS + PIS/COFINS)',-cmv,-cmv/pv,false],
     ['MC1',mc1,mc1/pv,true],
@@ -1795,22 +1797,8 @@ function renderCI(R){
   const scenLabel = ciIcms ? 'com ICMS' : 'sem ICMS';
   const fmt_gap = (g) => g===null?'':(g>0?` (+${fR(g,4)} vs atual)`:`(${fR(g,4)} vs atual)`);
 
-  // ── Update DFC pages with CI scenario ───────────────────────────────
-  const activeScenario = ciIcms ? {
-    pvX: vDsi.pv2, rbX: vDsi.rb2, cpX: vDsi.cp2, valid: vDsi.ok, base: 'dfcd_si'
-  } : {
-    pvX: vDno.pv2, rbX: vDno.rb2, cpX: vDno.cp2, valid: vDno.ok, base: 'dfcd_no'
-  };
-  if(activeScenario.valid){
-    ciScenario = {
-      pvX: activeScenario.pvX, rbX: activeScenario.rbX, cpX: activeScenario.cpX,
-      pvMC: vMC.pv2, rbMC: vMC.rb2, cpMC: vMC.cp2,
-      withIcms: ciIcms, tgt
-    };
-  } else {
-    ciScenario = null;
-  }
-  renderFluxosCI();
+  // DFC pages reflect premissas state — Apply button commits CI results
+  ciScenario = null;
 
 
 
