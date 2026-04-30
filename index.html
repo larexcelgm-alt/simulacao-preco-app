@@ -130,14 +130,14 @@ input[type=number],input[type=text]{
 input[type=text]{color:var(--green)}
 input[type=number]:focus,input[type=text]:focus{border-color:var(--accent2);background:var(--bg4)}
 input[type=number]::-webkit-inner-spin-button{opacity:0.3}
-.input-suffix{font-size:11px;color:var(--text3);min-width:30px;flex-shrink:0}
+.input-suffix{font-size:11px;color:var(--text2);min-width:30px;flex-shrink:0}
 .input-mini{width:80px!important;flex:none}
 
 /* ── KPIs ── */
 .kpi{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:11px 13px}
 .kpi-lbl{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;font-weight:500}
 .kpi-val{font-family:var(--mono);font-size:15px;font-weight:500}
-.kpi-sub{font-size:10px;color:var(--text3);margin-top:2px;font-family:var(--mono)}
+.kpi-sub{font-size:10px;color:var(--text2);margin-top:2px;font-family:var(--mono)}
 .pos{color:var(--green)}.neg{color:var(--red)}.neu{color:var(--text2)}.amb{color:var(--amber)}
 
 /* ── Tables ── */
@@ -167,7 +167,7 @@ tr.section td:first-child{font-family:var(--sans)}
 /* ── Diagram ── */
 .diagram-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:18px}
 svg.diagram{width:100%;display:block;overflow:visible}
-.diagram-legend{display:flex;gap:16px;flex-wrap:wrap;padding:12px 0 0;font-size:11px;color:var(--text3);border-top:1px solid var(--border)}
+.diagram-legend{display:flex;gap:16px;flex-wrap:wrap;padding:12px 0 0;font-size:11px;color:var(--text2);border-top:1px solid var(--border)}
 .dl-item{display:flex;align-items:center;gap:5px}
 .dl-dot{width:8px;height:8px;border-radius:2px}
 .dl-dash{width:18px;height:0;border-top:1.5px dashed var(--text3)}
@@ -283,9 +283,9 @@ tr.row-event td:first-child {
 .ci-row.ci-sub{opacity:0.7}
 .ci-label{color:var(--text2);flex:1}
 .ci-val{font-family:var(--mono);font-size:11px;text-align:right;min-width:72px}
-.ci-pct{font-family:var(--mono);font-size:10px;text-align:right;min-width:52px;color:var(--text3)}
-.ci-factor{font-family:var(--mono);font-size:10px;color:var(--text3);min-width:44px;text-align:right}
-.ci-day{font-size:10px;color:var(--text3);min-width:30px}
+.ci-pct{font-family:var(--mono);font-size:10px;text-align:right;min-width:52px;color:var(--text2)}
+.ci-factor{font-family:var(--mono);font-size:10px;color:var(--text2);min-width:44px;text-align:right}
+.ci-day{font-size:10px;color:var(--text2);min-width:30px}
 </style>
 </head>
 <body>
@@ -302,11 +302,11 @@ tr.row-event td:first-child {
 <!-- Mobile nav overlay -->
 <div class="mobile-nav" id="mobile-nav">
   <button class="mobile-nav-close" onclick="toggleMobileNav()">✕ Fechar</button>
-  <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding:0 4px">Modelo</div>
+  <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding:0 4px">Modelo</div>
   <div class="nav-item active" onclick="goTo('premissas');toggleMobileNav()">Premissas</div>
   <div class="nav-item" onclick="goTo('fluxo-icms');toggleMobileNav()">DFC com ICMS</div>
   <div class="nav-item" onclick="goTo('fluxo-no');toggleMobileNav()">DFC sem ICMS</div>
-  <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:12px 0 8px;padding:0 4px">Análise</div>
+  <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin:12px 0 8px;padding:0 4px">Análise</div>
   <div class="nav-item" onclick="goTo('comparativo');toggleMobileNav()">Comparativo</div>
   <div class="nav-item" onclick="goTo('decisao');toggleMobileNav()">Análise de Decisão</div>
   <div class="nav-item" onclick="goTo('diagrama');toggleMobileNav()">Diagrama FC</div>
@@ -363,7 +363,7 @@ tr.row-event td:first-child {
     <div class="sf-row" id="sb-pv">PV = R$ 5,39</div>
     <div class="sf-row" id="sb-rebate">Rebate = R$ 10,41</div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-      <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px">Tema</span>
+      <span style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px">Tema</span>
       <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema claro/escuro">🌙</button>
     </div>
   </div>
@@ -477,7 +477,7 @@ tr.row-event td:first-child {
           <div class="input-label">Rebate — recebimento</div>
           <div class="input-row"><input type="number" id="d-rebate" value="120" step="1" oninput="recalc()"><span class="input-suffix">dias</span></div>
         </div>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px;font-style:italic">Frete e Comissão têm prazos próprios acima ↑</div>
+        <div style="font-size:10px;color:var(--text2);margin-top:4px;font-style:italic">Frete e Comissão têm prazos próprios acima ↑</div>
       </div>
       <div class="card">
         <div class="card-title">Valores derivados</div>
@@ -552,9 +552,9 @@ tr.row-event td:first-child {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
       <div class="card-title" style="margin:0">Sensibilidade DFCD × Rebate</div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <span style="font-size:11px;color:var(--text3)">Passo</span>
+        <span style="font-size:11px;color:var(--text2)">Passo</span>
         <input type="number" id="s-passo" value="0.25" step="0.05" style="width:66px;font-size:12px;padding:4px 8px" oninput="recalc()">
-        <span style="font-size:11px;color:var(--text3)">Linhas ±</span>
+        <span style="font-size:11px;color:var(--text2)">Linhas ±</span>
         <input type="number" id="s-linhas" value="5" step="1" min="2" max="8" style="width:50px;font-size:12px;padding:4px 8px" oninput="recalc()">
       </div>
     </div>
@@ -580,7 +580,7 @@ tr.row-event td:first-child {
       <div>
         <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Margem-alvo (% PV)</div>
         <div style="display:flex;align-items:center;gap:8px">
-          <input type="number" id="ci-target" value="15.00" step="0.01" style="width:80px;font-size:13px;padding:6px 10px" oninput="ciTargetSet=true;recalc()" onblur="formatPctInputs()">
+          <input type="number" id="ci-target" value="15.00" step="0.01" style="width:80px;font-size:13px;padding:6px 10px" oninput="ciTargetSet=true; recalc()" onblur="formatPctInputs()">
           <span style="font-size:12px;color:var(--text2)">%</span>
         </div>
       </div>
@@ -596,7 +596,7 @@ tr.row-event td:first-child {
       <div>
         <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">
           TMA
-          <span style="font-size:9px;color:var(--text3);text-transform:none;letter-spacing:0;margin-left:4px;font-style:italic">= Premissas</span>
+          <span style="font-size:9px;color:var(--text2);text-transform:none;letter-spacing:0;margin-left:4px;font-style:italic">= Premissas</span>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <input type="number" id="ci-taxa" value="1.50" step="0.01" min="0"
@@ -607,7 +607,7 @@ tr.row-event td:first-child {
       </div>
     </div>
 
-    <!-- Explanation bar -->
+    <!-- Explanation bar — resultado obtido em primeiro plano -->
     <div id="ci-explanation" style="font-size:12px;color:var(--text2);line-height:1.6;padding:8px 12px;background:var(--bg3);border-radius:5px;border-left:2px solid var(--accent2);margin-bottom:14px"></div>
 
     <!-- Three blocks: DRE | DFC | DFCD -->
@@ -616,6 +616,10 @@ tr.row-event td:first-child {
         <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--accent2)">DRE — Cenário Calculado (MC Final)</div>
         <div id="ci-dre"></div>
       </div>
+
+    
+
+    <!-- Memória de Cálculo — em último plano -->
       <div>
         <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border2)">DFC — Fluxo Nominal (mesmo cenário DRE)</div>
         <div id="ci-dfc"></div>
@@ -623,6 +627,15 @@ tr.row-event td:first-child {
       <div>
         <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--blue)"><span id="ci-dfcd-title">DFCD — DFC Descontado (TMA)</span> <span id="ci-dfcd-tma" style="color:var(--blue);font-weight:400"></span></div>
         <div id="ci-dfcd"></div>
+
+    <!-- Memória de Cálculo — em último plano -->
+    <div id="ci-memoria-wrap" style="margin-top:14px;display:none">
+      <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;cursor:pointer;display:flex;align-items:center;gap:6px" onclick="toggleMemoria()">
+        <span>Memória de Cálculo — como o resultado foi obtido</span>
+        <span id="ci-memoria-icon">▶</span>
+      </div>
+      <div id="ci-memoria" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:12px 14px;font-size:11px;font-family:var(--mono)"></div>
+    </div>
       </div>
     </div>
   </div>
@@ -716,6 +729,9 @@ function goTo(id){
     if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active');
   });
   if(id==='glossario') renderGlossary();
+  if(id==='decisao' && !ciOriginals){
+    ciOriginals = captureCIOriginals();
+  }
 }
 function toggleMobileNav(){
   document.getElementById('mobile-nav').classList.toggle('open');
@@ -867,6 +883,7 @@ function saveState(){
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
   ciScenario = null;
   ciTargetSet = false; // user changed a premise → liberate CI target field
+  ciOriginals = null;   // user changed a premise → reset originals snapshot
 }
 
 function loadState(){
@@ -908,11 +925,12 @@ function applyCIAuto(what, value){
   const el = document.getElementById(fieldId);
   if(!el) return;
   const newVal = parseFloat(value).toFixed(4);
-  if(el.value === newVal) return; // no change — stable, avoid loop
+  if(el.value === newVal) return; // already set — stable
   if(document.activeElement === el) return; // user is typing — don't overwrite
   ciApplying = true;
+  const savedTargetSet = ciTargetSet; // preserve meta% lock
   el.value = newVal;
-  // saveState without resetting ciScenario
+  // save without triggering full saveState (which resets ciTargetSet)
   const data = {};
   INPUT_IDS.forEach(id => {
     const el2 = document.getElementById(id);
@@ -920,7 +938,99 @@ function applyCIAuto(what, value){
   });
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
   recalc();
+  ciTargetSet = savedTargetSet; // restore after recalc
   ciApplying = false;
+}
+
+
+// ── Memória de Cálculo toggle ─────────────────────────────────────────────
+function toggleMemoria(){
+  const el  = document.getElementById('ci-memoria');
+  const ico = document.getElementById('ci-memoria-icon');
+  if(!el) return;
+  const open = el.style.display==='none';
+  el.style.display  = open ? 'block' : 'none';
+  if(ico) ico.textContent = open ? '▼' : '▶';
+}
+
+
+// ── CI Originals snapshot ─────────────────────────────────────────────────
+function captureCIOriginals(){
+  return {
+    pv:     parseFloat(document.getElementById('p-pv').value)     || 0,
+    rebate: parseFloat(document.getElementById('p-rebate').value) || 0,
+    compra: parseFloat(document.getElementById('p-compra').value) || 0,
+  };
+}
+
+function restoreCIOriginal(what){
+  if(!ciOriginals) return;
+  const fieldMap = {pv:'p-pv', rebate:'p-rebate', compra:'p-compra'};
+  const el = document.getElementById(fieldMap[what]);
+  if(!el) return;
+  const orig = ciOriginals[what];
+  if(el.value === orig.toFixed(4)) return; // already at original
+  ciApplying = true;
+  el.value = orig.toFixed(4);
+  const data = {};
+  INPUT_IDS.forEach(id => { const e=document.getElementById(id); if(e) data[id]=e.value; });
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e2){}
+  ciApplying = false;
+}
+
+
+// ── Reset completo às premissas padrão ───────────────────────────────────
+function resetApp(){
+  if(!confirm('Resetar todas as premissas para os valores padrão?\nTodos os dados da sessão serão apagados.')) return;
+
+  // Clear localStorage
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+
+  // Default values
+  const defaults = {
+    'p-cliente':'',
+    'p-compra':'15.5400',
+    'p-icms-e':'12.00',
+    'p-icms-s':'12.00',
+    'p-pv':'5.3900',
+    'p-frete':'2.50',
+    'd-frete':'15',
+    'p-comis':'0.00',
+    'd-comis':'30',
+    'p-rebate':'10.4100',
+    'p-piscofins':'3.65',
+    'p-taxa':'1.50',
+    'd-icmsc':'0',
+    'd-icmsd':'45',
+    'd-compra':'60',
+    'd-venda':'75',
+    'd-rebate':'120',
+    's-passo':'1',
+    's-linhas':'5',
+    'ci-target':'15.00',
+    'ci-taxa':'1.50',
+  };
+
+  INPUT_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if(el && defaults[id] !== undefined) el.value = defaults[id];
+    else if(el) el.value = '';
+  });
+
+  // Reset all CI state
+  ciTargetSet = false;
+  ciOriginals = null;
+  ciScenario  = null;
+  ciApplying  = false;
+  ciWhat      = 'pv';
+  ciIcms      = true;
+
+  // Reset CI selectors visually
+  document.querySelectorAll('#ci-what button').forEach((b,i)=>{b.classList.toggle('on',i===0);});
+  document.querySelectorAll('#ci-icms-seg button').forEach((b,i)=>{b.classList.toggle('on',i===0);});
+
+  recalc();
+  goTo('premissas');
 }
 
 // ── Main recalc ──
@@ -929,7 +1039,7 @@ function recalc(){
   const R=calc();
   // Sync ci-target to current MC Final % when it's not being edited
   const ciTargetEl = document.getElementById('ci-target');
-  if(ciTargetEl && !ciTargetSet && document.activeElement !== ciTargetEl){
+  if(ciTargetEl && !ciTargetSet && !ciApplying && document.activeElement !== ciTargetEl){
     const mcPct = R.pv>0 ? +(R.mcFinal/R.pv*100).toFixed(2) : 15;
     ciTargetEl.value = mcPct.toFixed(2);
   }
@@ -1027,7 +1137,7 @@ function recalc(){
   ];
   document.getElementById('tbl-comp').innerHTML=
     `<tr><th>Indicador</th><th>com ICMS</th><th>sem ICMS</th><th>Diferença</th><th>Observação</th></tr>`+
-    compRows.map(([l,e,c,d,obs],i)=>`<tr class="${[1,3,5].includes(i)?'row-dim':''}"><td>${l}</td><td class="val-pos">${e}</td><td style="color:${c==='—'?'var(--text3)':'var(--blue)'}">${c}</td><td style="color:var(--amber)">${d}</td><td style="color:var(--text3);font-size:10px;font-family:var(--sans)">${obs}</td></tr>`).join('');
+    compRows.map(([l,e,c,d,obs],i)=>`<tr class="${[1,3,5].includes(i)?'row-dim':''}"><td>${l}</td><td class="val-pos">${e}</td><td style="color:${c==='—'?'var(--text3)':'var(--blue)'}">${c}</td><td style="color:var(--amber)">${d}</td><td style="color:var(--text2);font-size:10px;font-family:var(--sans)">${obs}</td></tr>`).join('');
 
   document.getElementById('interp-gerencial').innerHTML=[
     {t:'Por que os modelos diferem?',b:`Crédito ICMS ${fR(icmsC)} (entrada ${(icmsAliqE*100).toFixed(2).replace('.',',')}%) > Débito ${fR(icmsD)} (saída ${(icmsAliqS*100).toFixed(2).replace('.',',')}%). Saldo de ${fR(saldoICMS)} não sai do caixa — compensação contábil futura. O modelo com ICMS captura esse benefício temporal; o sem ICMS ignora por não ser movimentação financeira.`},
@@ -1038,22 +1148,22 @@ function recalc(){
 
   // ── Decisão ──
   document.getElementById('breakeven-detail').innerHTML=`
-    <div style="font-size:12px;color:var(--text3);margin-bottom:10px;font-weight:300">
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;font-weight:300">
       DFCD s/ rebate: <span style="font-family:var(--mono);color:var(--red)">${fR(vplNoReb)}</span><br>
       Fator D${R.dRB}: <span style="font-family:var(--mono);color:var(--text2)">${fN(fat(R.dRB))}</span><br>
       PIS/COFINS: <span style="font-family:var(--mono);color:var(--text2)">${fP(R.piscoP)}</span> s/ rebate
     </div>
     <div style="background:var(--bg3);border-radius:5px;padding:11px;margin-bottom:10px">
-      <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Rebate mínimo bruto</div>
+      <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Rebate mínimo bruto</div>
       <div style="font-family:var(--mono);font-size:18px;font-weight:500;color:var(--accent)">${fR(rebateMin)}</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px">${fP(rebateMin/pv)} do PV</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">${fP(rebateMin/pv)} do PV</div>
     </div>
     <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--border)">
-      <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px">Rebate atual</div><div style="font-family:var(--mono);font-size:14px;color:var(--blue)">${fR(rebate)}</div></div>
-      <div style="color:var(--text3);font-size:18px;align-self:center">→</div>
-      <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px">Gap</div><div style="font-family:var(--mono);font-size:14px;color:${r8(gap)>0?'var(--red)':'var(--green)'}">${r8(gap)>0?'+':''}${fR(gap)}</div></div>
+      <div><div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px">Rebate atual</div><div style="font-family:var(--mono);font-size:14px;color:var(--blue)">${fR(rebate)}</div></div>
+      <div style="color:var(--text2);font-size:18px;align-self:center">→</div>
+      <div><div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px">Gap</div><div style="font-family:var(--mono);font-size:14px;color:${r8(gap)>0?'var(--red)':'var(--green)'}">${r8(gap)>0?'+':''}${fR(gap)}</div></div>
     </div>
-    <div style="font-size:11px;color:var(--text3);margin-top:6px;font-weight:300">
+    <div style="font-size:11px;color:var(--text2);margin-top:6px;font-weight:300">
       ${r8(gap)>0?`Necessário <span style="font-family:var(--mono);color:var(--red)">${fR(gap)}</span> a mais de rebate para zerar VPL caixa.`:
               `Rebate atual supera o mínimo em <span style="font-family:var(--mono);color:var(--green)">${fR(Math.abs(gap))}</span>.`}
     </div>`;
@@ -1061,7 +1171,7 @@ function recalc(){
   const viable=r8(vplN)>=0;
   document.getElementById('decisao-rapida').innerHTML=
     `<div class="alert ${viable?'ok':'err'}"><strong>${viable?'Viável financeiramente.':'Inviável no caixa.'}</strong><br>DFCD com ICMS: ${fP(vplI/pv)} · DFCD sem ICMS: ${fP(vplN/pv)}</div>
-    <div style="font-size:11px;color:var(--text3);line-height:1.7;font-weight:300">
+    <div style="font-size:11px;color:var(--text2);line-height:1.7;font-weight:300">
       ${viable?`A operação gera valor à TMA de ${fP(taxa)} a.m. mesmo desconsiderando o crédito fiscal.`:
                `Requer rebate de ${fR(rebateMin)} para equilibrar o caixa. Gap atual: ${fR(gap)}.`}
     </div>`;
@@ -1248,8 +1358,18 @@ function syncCITargetToMC(){
   const el=document.getElementById('ci-target');
   if(el && R.pv>0) el.value=(Math.round(R.mcFinal/R.pv*10000)/100).toFixed(2);
 }
-function setCIWhat(v,btn){ciWhat=v;ciTargetSet=false;document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
-
+function setCIWhat(v,btn){
+  const prev = ciWhat;
+  ciWhat=v;
+  ciTargetSet=false;
+  document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  // Restore previous variable's original value, then recalc with clean base
+  if(ciOriginals && prev !== v){
+    restoreCIOriginal(prev);
+  }
+  recalc();
+}
 function syncTaxa(src){
   const v=document.getElementById(src).value;
   const other=src==='ci-taxa'?'p-taxa':'ci-taxa';
@@ -1260,6 +1380,132 @@ function syncTaxa(src){
 function setDiagModel(m,btn){diagMdl=m;document.querySelectorAll('#sg-m button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
 function setDiagType(t,btn){diagTyp=t;document.querySelectorAll('#sg-t button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
 
+
+
+// ── Memória de Cálculo ────────────────────────────────────────────────────
+function buildMemoria(what, tgt, pvX, rbX, cpX, vMC, vFC, vDFCD, P){
+  const {pv,rebate,compra,icmsAliqE,icmsAliqS,freteP,comisP,piscoP,taxa,
+         dIC,dFR,dCOM,dID,dCP,dVD,dRB,fat,
+         freteV,comisV,piscoV,icmsC,icmsD,vliq,cmv} = P;
+
+  const pct = v => (v>=0?'+':'')+( v*100).toFixed(4).replace('.',',')+' %';
+  const R$  = v => (v>=0?'':'')+fR(v,4);
+  const f4  = v => v.toFixed(4).replace('.',',');
+  const sep = `<div style="border-top:1px solid var(--border);margin:8px 0"></div>`;
+  const row = (label, formula, result, highlight=false) =>
+    `<div style="display:grid;grid-template-columns:200px 1fr auto;gap:8px;padding:3px 0;${highlight?'color:var(--accent);font-weight:500':'color:var(--text2)'}">
+      <span>${label}</span>
+      <span style="color:var(--text3)">${formula}</span>
+      <span style="text-align:right;min-width:80px">${result}</span>
+    </div>`;
+  const hdr = (t) =>
+    `<div style="color:var(--text2);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;margin:10px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--border)">${t}</div>`;
+
+  let h = `<div style="color:var(--text2);font-size:11px;margin-bottom:8px">
+    <strong style="color:var(--text)">Equação base:</strong>
+    ${what==='pv'?'PV × (coeficientes) = termos fixos → resolve PV':
+      what==='rebate'?'Meta × PV = métrica sem Rebate + Rebate × (1 − PIS/COFINS%) / Fator → resolve Rebate':
+      'Compra × (icmsAliqE/fat(D0) − 1/fat(D60)) + termos fixos = Meta × PV → resolve Compra'}
+  </div>`;
+
+  h += hdr('Parâmetros da simulação');
+  h += row('Meta (% PV)', '', pct(tgt));
+  h += row('Meta × PV', `${pct(tgt)} × ${R$(pv)}`, R$(tgt*pv));
+  h += row('TMA mensal', '', pct(taxa));
+  h += sep;
+
+  if(what==='pv'){
+    h += hdr('Resolução DRE — MC Final = Meta × PV');
+    h += row('CMV (fixo)', `${R$(compra)} × (1 − ${pct(icmsAliqE)})`, R$(cmv));
+    h += row('Rebate líquido (fixo)', `${R$(rebate)} × (1 − ${pct(piscoP)})`, R$(rebate*(1-piscoP)));
+    const numDRE = cmv - rebate + rebate*piscoP;
+    const denDRE = 1 - icmsAliqS - freteP - comisP - tgt;
+    h += row('Numerador', 'CMV − Rebate + PIS/COFINS', R$(numDRE));
+    h += row('Denominador', '1 − ICMS saída − Frete − Comissão − Meta', f4(denDRE));
+    h += row('PV (DRE) = Num ÷ Den', '', R$(vMC.res), true);
+    h += sep;
+
+    h += hdr('Resolução DFC = Meta × PV (sem desconto)');
+    const numFC = compra - rebate + rebate*piscoP;
+    const denFC = 1 - freteP - comisP - tgt;
+    h += row('Numerador', 'Compra − Rebate líq.', R$(numFC));
+    h += row('Denominador', '1 − Frete − Comissão − Meta', f4(denFC));
+    h += row('PV (DFC sem ICMS)', '', R$(vFC.ok?vFC.res:0), true);
+    h += sep;
+
+    h += hdr('Resolução DFCD = Meta × PV (com desconto TMA)');
+    h += row('fat(D0)',  `(1+${pct(taxa)})^(0/30)`,  f4(fat(dIC)));
+    h += row('fat(D15)', `(1+${pct(taxa)})^(15/30)`, f4(fat(dFR)));
+    h += row('fat(D45)', `(1+${pct(taxa)})^(45/30)`, f4(fat(dID)));
+    h += row('fat(D60)', `(1+${pct(taxa)})^(60/30)`, f4(fat(dCP)));
+    h += row('fat(D75)', `(1+${pct(taxa)})^(75/30)`, f4(fat(dVD)));
+    h += row('fat(D120)',`(1+${pct(taxa)})^(120/30)`,f4(fat(dRB)));
+    const A = -freteP/fat(dFR)-comisP/fat(dCOM)-icmsAliqS/fat(dID)+1/fat(dVD)-tgt;
+    const B = compra/fat(dCP)-compra*icmsAliqE/fat(dIC)-rebate*(1-piscoP)/fat(dRB);
+    h += row('A = coef. de PV', '−Frete/f15 −Comis/f30 −ICMS/f45 +1/f75 −Meta', f4(A));
+    h += row('B = termos fixos', 'Compra/f60 −icmsC/f0 −Rebate liq/f120', f4(B));
+    h += row('PV (DFCD) = B ÷ A', '', R$(vDFCD.ok?vDFCD.res:0), true);
+
+  } else if(what==='rebate'){
+    h += hdr('Resolução DRE — MC Final = Meta × PV');
+    const need = tgt*pv - vliq + cmv + freteV + comisV;
+    h += row('Venda Líquida', `${R$(pv)} × (1 − ${pct(icmsAliqS)})`, R$(vliq));
+    h += row('CMV líquido', `${R$(compra)} × (1 − ${pct(icmsAliqE)})`, R$(cmv));
+    h += row('Meta × PV − VL + CMV + Frete + Comis', '', R$(need));
+    h += row('Rebate = numerador ÷ (1 − PIS/COFINS%)', `÷ ${f4(1-piscoP)}`, R$(vMC.res), true);
+    h += sep;
+
+    h += hdr('Resolução DFCD = Meta × PV');
+    const vplNR = icmsC/fat(dIC)+(-freteV)/fat(dFR)+(-comisV)/fat(dCOM)+(-icmsD)/fat(dID)+(-compra)/fat(dCP)+pv/fat(dVD);
+    h += row('fat(D120)', `(1+${pct(taxa)})^(120/30)`, f4(fat(dRB)));
+    h += row('DFCD sem Rebate', 'Σ outros eventos descontados', R$(vplNR));
+    h += row('(Meta×PV − DFCD_sem_Rebate)', '', R$(tgt*pv - vplNR));
+    h += row('× fat(D120)', `× ${f4(fat(dRB))}`, R$((tgt*pv-vplNR)*fat(dRB)));
+    h += row('÷ (1 − PIS/COFINS%)', `÷ ${f4(1-piscoP)}`, '');
+    h += row('Rebate (DFCD)', '', R$(vDFCD.ok?vDFCD.res:0), true);
+
+  } else { // compra
+    h += hdr('Variável Compra aparece em 2 eventos');
+    h += row('D0  ICMS Crédito', `+Compra × ${pct(icmsAliqE)} / fat(${dIC}) = +Compra × ${f4(icmsAliqE/fat(dIC))}`, '');
+    h += row('D60 Pagamento',    `−Compra / fat(${dCP}) = −Compra × ${f4(1/fat(dCP))}`, '');
+    const coef = icmsAliqE/fat(dIC) - 1/fat(dCP);
+    h += row('Coeficiente líquido de Compra', `${f4(icmsAliqE/fat(dIC))} − ${f4(1/fat(dCP))}`, f4(coef));
+    h += sep;
+
+    h += hdr('Resolução DRE — MC Final = Meta × PV');
+    const numDRE2 = vliq - freteV - comisV + rebate - piscoV - tgt*pv;
+    h += row('Venda Líquida', `${R$(pv)} − ICMS saída`, R$(vliq));
+    h += row('VL − Frete − Comis + Rebate − PIS/COFINS − Meta×PV', '', R$(numDRE2));
+    h += row('÷ (1 − icmsAliqE entrada)', `÷ ${f4(1-icmsAliqE)}`, '');
+    h += row('Compra (DRE)', '', R$(vMC.res), true);
+    h += sep;
+
+    h += hdr('Resolução DFCD = Meta × PV (com desconto TMA)');
+    const rest = (-freteV)/fat(dFR)+(-comisV)/fat(dCOM)+(-icmsD)/fat(dID)+pv/fat(dVD)+rebate*(1-piscoP)/fat(dRB);
+    h += row('fat(D0)',  `(1+TMA)^(0/30)`,   f4(fat(dIC)));
+    h += row('fat(D45)', `(1+TMA)^(45/30)`,  f4(fat(dID)));
+    h += row('fat(D60)', `(1+TMA)^(60/30)`,  f4(fat(dCP)));
+    h += row('fat(D75)', `(1+TMA)^(75/30)`,  f4(fat(dVD)));
+    h += row('fat(D120)',`(1+TMA)^(120/30)`, f4(fat(dRB)));
+    h += row('Termos fixos (sem Compra)', '−Frete/f15 −ICMS_D/f45 +PV/f75 +Rebate_liq/f120', R$(rest));
+    h += row('Meta × PV', '', R$(tgt*pv));
+    h += row('Meta×PV − termos fixos', '', R$(tgt*pv - rest));
+    h += row('Coeficiente líquido de Compra', `icmsAliqE/f0 − 1/f60 = ${f4(coef)}`, '');
+    h += row('Compra (DFCD) = (Meta×PV − fixos) ÷ coef', `${R$(tgt*pv-rest)} ÷ ${f4(coef)}`, R$(vDFCD.ok?vDFCD.res:0), true);
+    h += sep;
+
+    h += `<div style="color:var(--text2);font-size:11px;line-height:1.6;margin-top:4px">
+      <strong style="color:var(--amber)">⚠ Por que DFCD ≠ Compra ÷ fat(D60)?</strong><br>
+      A divisão simples por fat(D60) ignora o ICMS Crédito gerado em D0 (entrada do produto).
+      Esse crédito reduz o custo líquido da compra no fluxo descontado.<br>
+      Compra ÷ fat(D60) = ${R$(compra/fat(dCP))} &nbsp;|&nbsp;
+      Correto (com ICMS D0): ${R$(vDFCD.ok?vDFCD.res:0)} &nbsp;|&nbsp;
+      Diferença: ${R$(vDFCD.ok?(vDFCD.res - compra/fat(dCP)):0)}
+    </div>`;
+  }
+
+  return h;
+}
 
 // ── Cálculo Inverso ──────────────────────────────────
 function renderCI(R){
@@ -1407,12 +1653,21 @@ function renderCI(R){
     const pC=pct===null?'':r8(pct)>=0?'var(--green)':'var(--red)';
     return `<div class="ci-row ${cls}"><span class="ci-label">${label}</span><span class="ci-val" style="color:${vC}">${vStr}</span><span class="ci-pct" style="color:${pC}">${pStr}</span></div>`;
   };
-  const ciRowDFCD = (label, day, factorVal, val, pvRef, cls='') => {
-    const vStr=val===null?'—':fR(val,4);
-    const pStr=(val!==null&&pvRef>0)?fP(val/pvRef):'';
-    const vC=val===null?'var(--text3)':r8(val)>=0?'var(--green)':'var(--red)';
-    const pC=(val!==null&&pvRef>0)?(r8(val/pvRef)>=0?'var(--green)':'var(--red)'):'var(--text3)';
-    return `<div class="ci-row ${cls}"><span class="ci-day">D${day}</span><span class="ci-label">${label}</span><span class="ci-factor">${fN(factorVal,4)}</span><span class="ci-val" style="color:${vC}">${vStr}</span><span class="ci-pct" style="color:${pC}">${pStr}</span></div>`;
+    const ciRowDFCD = (label, day, factorVal, rawVal, val, pvRef, cls='') => {
+    const rStr = rawVal===null||rawVal===undefined ? '—' : fR(rawVal,4);
+    const vStr = val===null ? '—' : fR(val,4);
+    const pStr = (val!==null && pvRef>0) ? fP(val/pvRef) : '';
+    const rC = rawVal===null||rawVal===undefined ? 'var(--text2)' : r8(rawVal)>=0 ? 'var(--green)' : 'var(--red)';
+    const vC = val===null ? 'var(--text2)' : r8(val)>=0 ? 'var(--green)' : 'var(--red)';
+    const pC = (val!==null && pvRef>0) ? (r8(val/pvRef)>=0?'var(--green)':'var(--red)') : 'var(--text3)';
+    return `<div class="ci-row ${cls}">
+      <span class="ci-day" style="color:var(--text2)">D${day}</span>
+      <span class="ci-label">${label}</span>
+      <span class="ci-val" style="min-width:72px;color:${rC}">${rStr}</span>
+      <span class="ci-factor" style="color:var(--text2)">${fN(factorVal,4)}</span>
+      <span class="ci-val" style="color:${vC}">${vStr}</span>
+      <span class="ci-pct" style="color:${pC}">${pStr}</span>
+    </div>`;
   };
 
   const isTarget = (lbl) =>
@@ -1432,19 +1687,26 @@ function renderCI(R){
     ['(-) PIS/COFINS sobre Rebate', -piscovX, -piscoP, 'ci-sub'],
     ['MC Final', mcFinalX, mcFinalX/pvX, 'ci-total'],
   ];
-  let dreHtml='<div style="font-size:10px;color:var(--text3);display:flex;justify-content:flex-end;gap:8px;margin-bottom:4px"><span style="min-width:72px;text-align:right">R$</span><span style="min-width:52px;text-align:right">% PV</span></div>';
+  let dreHtml='<div style="font-size:10px;color:var(--text2);display:flex;justify-content:flex-end;gap:8px;margin-bottom:4px"><span style="min-width:72px;text-align:right">R$</span><span style="min-width:52px;text-align:right">% PV</span></div>';
   dreLines.forEach(([l,v,p,c])=>{ dreHtml+=ciRow(l,v,p,c); });
 
   // ── DFC block builder ──────────────────────────────────────────────────
   const buildDFC = (fc_arr, v_res) => {
     const pvRef = v_res.pv2;
     const ud = [...new Set(days_ev)];
-    let h='<div style="font-size:10px;color:var(--text3);display:flex;justify-content:flex-end;gap:8px;margin-bottom:4px"><span style="min-width:30px"></span><span style="min-width:72px;text-align:right">R$</span><span style="min-width:52px;text-align:right">% PV</span></div>';
+    let h='<div style="font-size:10px;color:var(--text2);display:flex;justify-content:flex-end;gap:8px;margin-bottom:4px"><span style="min-width:30px"></span><span style="min-width:72px;text-align:right">R$</span><span style="min-width:52px;text-align:right">% PV</span></div>';
     ud.forEach(d=>{
       const evs=days_ev.map((dd,i)=>dd===d?{lbl:lbls_ev[i],val:fc_arr[i]}:null).filter(Boolean).filter(e=>e.val!==0);
       evs.forEach(e=>{
         const tgt2=isTarget(e.lbl);
-        h+=`<div class="ci-row ${tgt2?'ci-target':''}"><span class="ci-day" style="color:var(--text3)">D${d}</span><span class="ci-label">${e.lbl}</span><span class="ci-val" style="color:${r8(e.val)>=0?'var(--green)':'var(--red)'}">${fR(e.val,4)}</span><span class="ci-pct" style="color:${pvRef>0?(r8(e.val/pvRef)>=0?'var(--green)':'var(--red)'):'var(--text3)'}">${pvRef>0?fP(e.val/pvRef):''}</span></div>`;
+        const vC=r8(e.val)>=0?'var(--green)':'var(--red)';
+        const pC=pvRef>0?(r8(e.val/pvRef)>=0?'var(--green)':'var(--red)'):'var(--text3)';
+        h+=`<div class="ci-row ${tgt2?'ci-target':''}">
+          <span class="ci-day" style="color:var(--text2)">D${d}</span>
+          <span class="ci-label">${e.lbl}</span>
+          <span class="ci-val" style="color:${vC}">${fR(e.val,4)}</span>
+          <span class="ci-pct" style="color:${pC}">${pvRef>0?fP(e.val/pvRef):''}</span>
+        </div>`;
       });
     });
     const tot=fc_arr.reduce((a,b)=>a+b,0);
@@ -1456,13 +1718,21 @@ function renderCI(R){
   const buildDFCD = (disc_arr, fc_arr, v_res) => {
     const pvRef = v_res.pv2;
     const ud = [...new Set(days_ev)];
-    let h='<div style="font-size:10px;color:var(--text3);display:flex;gap:4px;justify-content:flex-end;margin-bottom:4px"><span style="min-width:30px"></span><span style="min-width:44px;text-align:right">Fator</span><span style="min-width:72px;text-align:right">VP (R$)</span><span style="min-width:52px;text-align:right">% PV</span></div>';
+    // Show resolved variable value prominently
+    const resolvedLabel = ciWhat==='pv'?'Preço de Venda resolvido':ciWhat==='rebate'?'Rebate resolvido':'Compra resolvida';
+    const resolvedVal   = ciWhat==='pv'?v_res.pv2:ciWhat==='rebate'?v_res.rb2:v_res.cp2;
+    let h=`<div style="background:rgba(200,232,122,0.06);border:1px solid var(--accent2);border-radius:4px;padding:5px 8px;margin-bottom:6px;display:flex;justify-content:space-between;font-size:11px">
+      <span style="color:var(--text2)">${resolvedLabel}</span>
+      <span style="font-family:var(--mono);color:var(--accent);font-weight:500">${fR(resolvedVal,4)}</span>
+      <span style="color:var(--text2)">→ VP na tabela = ${resolvedLabel.includes('Compra')||resolvedLabel.includes('Rebate')||resolvedLabel.includes('Venda')?'valor ÷ fator':'valor ÷ fator'}</span>
+    </div>`;
+    h+='<div style="font-size:10px;color:var(--text2);display:flex;gap:4px;justify-content:flex-end;margin-bottom:4px"><span style="min-width:30px"></span><span style="min-width:72px;text-align:right">DFC (R$)</span><span style="min-width:44px;text-align:right">Fator</span><span style="min-width:72px;text-align:right">VP (R$)</span><span style="min-width:52px;text-align:right">% PV</span></div>';
     ud.forEach(d=>{
       const evs=days_ev.map((dd,i)=>dd===d?{lbl:lbls_ev[i],val:disc_arr[i],raw:fc_arr[i]}:null).filter(Boolean).filter(e=>e.raw!==0);
       const dayFactor=fat(d);
       evs.forEach(e=>{
         const tgt2=isTarget(e.lbl);
-        h+=ciRowDFCD(e.lbl,d,dayFactor,e.val,pvRef,tgt2?'ci-target':'');
+        h+=ciRowDFCD(e.lbl,d,dayFactor,e.raw,e.val,pvRef,tgt2?'ci-target':'');
       });
     });
     const tot=disc_arr.reduce((a,b)=>a+b,0);
@@ -1473,18 +1743,21 @@ function renderCI(R){
   // ── Render based on ciIcms selector ──────────────────────────────────
   const vFC   = ciIcms ? vFCsi  : vFCno;
   const vDFCD = ciIcms ? vDsi   : vDno;
-  const fc_arr   = ciIcms ? fc_si  : fc_no;
-  const disc_arr = ciIcms ? disc_si : disc_no;
+  const fc_arr = ciIcms ? fc_si : fc_no;
+
+  // DFCD uses its OWN resolved values — not the MC scenario
+  const fc_dfcd_own = mkFlow(vDFCD, ciIcms);
+  const disc_dfcd_own = fc_dfcd_own.map((v,i) => v/fat(days_ev[i]));
 
   document.getElementById('ci-dre').innerHTML  = dreHtml;
   document.getElementById('ci-dfc').innerHTML  = buildDFC(fc_arr, vFC);
-  document.getElementById('ci-dfcd').innerHTML = buildDFCD(disc_arr, fc_arr, vDFCD);
+  document.getElementById('ci-dfcd').innerHTML = buildDFCD(disc_dfcd_own, fc_dfcd_own, vDFCD);
 
   // Update DFCD header TMA label
   const tmaEl = document.getElementById('ci-dfcd-tma');
   if(tmaEl) tmaEl.textContent = `| TMA ${fP(taxa)}`;
   const dfcTitleEl = document.getElementById('ci-dfc-title');
-  if(dfcTitleEl) dfcTitleEl.textContent = `DFC — ${ciIcms?'com ICMS':'sem ICMS'}`;
+  if(dfcTitleEl) dfcTitleEl.textContent = `DFC — Fluxo Nominal ${ciIcms?'com ICMS':'sem ICMS'}`;
   const dfcdTitleEl = document.getElementById('ci-dfcd-title');
   if(dfcdTitleEl) dfcdTitleEl.textContent = `DFCD — DFC Descontado ${ciIcms?'com ICMS':'sem ICMS'}`;
 
@@ -1513,18 +1786,28 @@ function renderCI(R){
   // Auto-apply DRE result to the corresponding premise field
   if(vMC.ok && !ciApplying) applyCIAuto(ciWhat, vMC.res);
 
+  // ── Memória de Cálculo ────────────────────────────────────────────────
+  const mWrap = document.getElementById('ci-memoria-wrap');
+  const mEl   = document.getElementById('ci-memoria');
+  if(mWrap && mEl){
+    mWrap.style.display = 'block';
+    const mRows = buildMemoria(ciWhat, tgt, pvX, rbX, cpX, vMC, vFC, vDFCD,
+                               {pv,rebate,compra,icmsAliqE,icmsAliqS,freteP,comisP,piscoP,taxa,
+                                dIC,dFR,dCOM,dID,dCP,dVD,dRB,fat,
+                                freteV,comisV,piscoV,icmsC,icmsD,vliq,cmv});
+    mEl.innerHTML = mRows;
+  }
+
   document.getElementById('ci-explanation').innerHTML=
     `<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
       <strong style="color:var(--text);font-size:11px;text-transform:uppercase;letter-spacing:0.5px">${whatLabels[ciWhat]} · Meta ${fP(tgt)} do PV · ${scenLabel}</strong>
-      <span style="color:var(--text3);font-size:11px">
+      <span style="color:var(--text2);font-size:11px">
         DRE: <span style="font-family:var(--mono);color:${vMC.ok?'var(--green)':'var(--red)'}">${vMC.ok?fR(vMC.res,4):'—'}</span>${fmt_gap(vMC.gap)}
         &nbsp;|&nbsp; DFC: <span style="font-family:var(--mono);color:${vFC.ok?'var(--green)':'var(--red)'}">${vFC.ok?fR(vFC.res,4):'—'}</span>${fmt_gap(vFC.gap)}
         &nbsp;|&nbsp; DFCD: <span style="font-family:var(--mono);color:${vDFCD.ok?'var(--green)':'var(--red)'}">${vDFCD.ok?fR(vDFCD.res,4):'—'}</span>${fmt_gap(vDFCD.gap)}
       </span>
     </div>`;
 }
-
-
 
 // ── Diagram ──
 function setCIIcms(v,btn){ciIcms=(v==='icms');document.querySelectorAll('#ci-icms-seg button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
@@ -1533,8 +1816,18 @@ function syncCITargetToMC(){
   const el=document.getElementById('ci-target');
   if(el && R.pv>0) el.value=(Math.round(R.mcFinal/R.pv*10000)/100).toFixed(2);
 }
-function setCIWhat(v,btn){ciWhat=v;ciTargetSet=false;document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
-
+function setCIWhat(v,btn){
+  const prev = ciWhat;
+  ciWhat=v;
+  ciTargetSet=false;
+  document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  // Restore previous variable's original value, then recalc with clean base
+  if(ciOriginals && prev !== v){
+    restoreCIOriginal(prev);
+  }
+  recalc();
+}
 function syncTaxa(src){
   const v=document.getElementById(src).value;
   const other=src==='ci-taxa'?'p-taxa':'ci-taxa';
@@ -1660,7 +1953,7 @@ function renderGlossary(){
     `<div style="padding:10px 0;border-bottom:1px solid var(--border)">
       <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
         <span style="font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent)">${sigla}</span>
-        ${term ? `<span style="font-size:11px;color:var(--text3)">— ${term}</span>` : ''}
+        ${term ? `<span style="font-size:11px;color:var(--text2)">— ${term}</span>` : ''}
       </div>
       <div style="font-size:12px;color:var(--text2);line-height:1.65;font-weight:300">${def}</div>
     </div>`;
@@ -1772,6 +2065,7 @@ try{
 loadState();   // restore last session
 formatPctInputs();
 recalc();
+ciOriginals = captureCIOriginals();
 syncCITargetToMC();
 renderGlossary();
 </script>
