@@ -569,7 +569,16 @@ tr.row-event td:first-child {
 
   <!-- ══ CÁLCULO INVERSO ══ -->
   <div class="card" style="margin-bottom:12px">
-    <div class="card-title">Cálculo Inverso — Precificação por meta</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="card-title" style="margin-bottom:0">Cálculo Inverso — Precificação por meta</div>
+      <button onclick="restoreOriginals()"
+        style="background:none;border:1px solid var(--border2);border-radius:5px;padding:4px 12px;font-size:11px;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s"
+        onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent)'"
+        onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'"
+        title="Restaurar PV, Rebate e Compra para os valores salvos em ↺ Atualizar Premissas">
+        ↩ Restaurar Premissas
+      </button>
+    </div>
 
     <!-- Selectors row -->
     <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:flex-end">
@@ -1000,6 +1009,29 @@ function applyCIResult(what, value){
   const data = {};
   INPUT_IDS.forEach(id => { const e2=document.getElementById(id); if(e2) data[id]=e2.value; });
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+  recalc();
+}
+
+
+// ── Restaurar Premissas — volta ao snapshot ciOriginals ──────────────────
+function restoreOriginals(){
+  if(!ciOriginals){
+    alert('Nenhuma premissa salva. Use ↺ Atualizar Premissas na aba Premissas primeiro.');
+    return;
+  }
+  const fieldMap = {pv:'p-pv', rebate:'p-rebate', compra:'p-compra'};
+  Object.entries(fieldMap).forEach(([key,id])=>{
+    const el=document.getElementById(id);
+    if(el && ciOriginals[key]!==undefined) el.value=ciOriginals[key].toFixed(4);
+  });
+  ciTargetSet = false;
+  ciScenario  = null;
+  ciWhat      = 'pv';
+  document.querySelectorAll('#ci-what button').forEach((b,i)=>b.classList.toggle('on',i===0));
+  // Save restored state to localStorage
+  const data={};
+  INPUT_IDS.forEach(id=>{const e=document.getElementById(id);if(e)data[id]=e.value;});
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));}catch(e){}
   recalc();
 }
 
