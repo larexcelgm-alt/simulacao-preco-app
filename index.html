@@ -172,17 +172,6 @@ svg.diagram{width:100%;display:block;overflow:visible}
 .dl-dot{width:8px;height:8px;border-radius:2px}
 .dl-dash{width:18px;height:0;border-top:1.5px dashed var(--text3)}
 
-/* ── Sensitivity ── */
-.sensitivity-bar{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:4px;margin-bottom:4px;font-size:12px}
-.sensitivity-bar.viable{background:var(--green-bg)}
-.sensitivity-bar.inviable{background:var(--red-bg)}
-.sensitivity-bar.current{border:1px solid var(--amber);background:var(--amber-bg)}
-.sb-label{font-family:var(--mono);min-width:84px;font-size:11px}
-.sb-track{flex:1;height:4px;background:var(--border2);border-radius:2px;position:relative}
-.sb-fill{height:100%;border-radius:2px;transition:.3s}
-.sb-vpl{font-family:var(--mono);font-size:11px;min-width:96px;text-align:right}
-.sb-status{font-size:10px;min-width:80px;text-align:right}
-
 /* ── Executive cards ── */
 .exec-card{background:var(--bg3);border-radius:6px;padding:14px;margin-bottom:8px;border-left:3px solid}
 .exec-card.green{border-color:var(--green)}.exec-card.red{border-color:var(--red)}.exec-card.amber{border-color:var(--amber)}
@@ -206,6 +195,7 @@ svg.diagram{width:100%;display:block;overflow:visible}
 @media(max-width:768px){
   .app{grid-template-columns:1fr}
   .sidebar{display:none}
+  .mobile-top{display:flex!important}
   .topbar{display:flex}
   .main{padding-top:0}
   .page{padding:16px}
@@ -286,91 +276,99 @@ tr.row-event td:first-child {
 .ci-pct{font-family:var(--mono);font-size:10px;text-align:right;min-width:52px;color:var(--text2)}
 .ci-factor{font-family:var(--mono);font-size:10px;color:var(--text2);min-width:44px;text-align:right}
 .ci-day{font-size:10px;color:var(--text2);min-width:30px}
+
+/* ── Memória de Cálculo ── */
+.mem-section{font-size:9px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin:10px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--border)}
+.mem-row{display:flex;align-items:baseline;gap:8px;padding:2px 0;font-size:11px;font-family:var(--mono)}
+.mem-lbl{color:var(--text2);min-width:180px;flex-shrink:0}
+.mem-mid{color:var(--text3);flex:1;font-size:10px}
+.mem-val{color:var(--text);text-align:right;min-width:80px}
+.mem-highlight .mem-lbl{color:var(--accent2);font-weight:600}
+.mem-highlight .mem-val{color:var(--accent);font-weight:700}
 </style>
 </head>
 <body>
-
 <!-- Mobile top bar -->
-<div class="topbar">
-  <div class="topbar-title">SIMULA PREÇO APP</div>
+<div class="mobile-top" style="display:none;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20">
+  <div class="logo-name" style="font-family:var(--display);font-size:15px;font-weight:700;color:var(--blue-light)">Simula Preço</div>
   <div style="display:flex;gap:8px;align-items:center">
-    <button class="theme-toggle" style="position:static;width:32px;height:32px;font-size:14px;box-shadow:none" id="theme-toggle-mob" onclick="toggleTheme()">🌙</button>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
     <button class="hamburger" onclick="toggleMobileNav()">☰ Menu</button>
   </div>
 </div>
-
 <!-- Mobile nav overlay -->
-<div class="mobile-nav" id="mobile-nav">
-  <button class="mobile-nav-close" onclick="toggleMobileNav()">✕ Fechar</button>
-  <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding:0 4px">Modelo</div>
-  <div class="nav-item active" onclick="goTo('premissas');toggleMobileNav()">Premissas</div>
-  <div class="nav-item" onclick="goTo('fluxo-icms');toggleMobileNav()">DFC com ICMS</div>
-  <div class="nav-item" onclick="goTo('fluxo-no');toggleMobileNav()">DFC sem ICMS</div>
-  <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin:12px 0 8px;padding:0 4px">Análise</div>
-  <div class="nav-item" onclick="goTo('comparativo');toggleMobileNav()">Comparativo</div>
-  <div class="nav-item" onclick="goTo('decisao');toggleMobileNav()">Análise de Decisão</div>
-  <div class="nav-item" onclick="goTo('diagrama');toggleMobileNav()">Diagrama FC</div>
-  <div class="nav-item" onclick="goTo('glossario');toggleMobileNav()">Glossário</div>
+<div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()">
+  <div class="mobile-nav-panel" onclick="event.stopPropagation()">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <div class="logo-name" style="font-family:var(--display);font-size:15px;font-weight:700;color:var(--blue-light)">Simula Preço</div>
+      <button onclick="closeMobileNav()" style="background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <nav style="padding:8px 0">
+      <div class="nav-section">Demonstrativos</div>
+      <div class="nav-item" onclick="goTo('premissas');closeMobileNav()">Premissas</div>
+      <div class="nav-item" onclick="goTo('fluxo-icms');closeMobileNav()">DFC com ICMS</div>
+      <div class="nav-item" onclick="goTo('fluxo-no');closeMobileNav()">DFC sem ICMS</div>
+      <div class="nav-item" onclick="goTo('comparativo');closeMobileNav()">Comparativo</div>
+      <div class="nav-section" style="margin-top:6px">Análise</div>
+      <div class="nav-item" onclick="goTo('decisao');closeMobileNav()">Análise de Decisão</div>
+      <div class="nav-section" style="margin-top:6px">Referência</div>
+      <div class="nav-item" onclick="goTo('glossario');closeMobileNav()">Glossário</div>
+    </nav>
+  </div>
 </div>
-
 <div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-name">Simula Preço</div>
+      <div class="logo-sub">Andorinha Med · Precificação B2B</div>
+    </div>
+    <div class="client-tag">
+      <div class="client-dot"></div>
+      <div class="client-name" id="client-display">Andorinha Med</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Demonstrativos</div>
+      <div class="nav-item active" onclick="goTo('premissas')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+        Premissas
+      </div>
+      <div class="nav-item" onclick="goTo('fluxo-icms')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12l3-5 3 3 2-4 4 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        DFC com ICMS
+      </div>
+      <div class="nav-item" onclick="goTo('fluxo-no')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12l3-5 3 3 2-4 4 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        DFC sem ICMS
+      </div>
+      <div class="nav-item" onclick="goTo('comparativo')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M9 4l5 4-5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Comparativo
+      </div>
+      <div class="nav-section" style="margin-top:6px">Análise</div>
+      <div class="nav-item" onclick="goTo('decisao')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.6 3.3 3.6.5-2.6 2.5.6 3.6L8 10.3l-3.2 1.6.6-3.6L2.8 5.8l3.6-.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        Análise de Decisão
+      </div>
+      <div class="nav-section" style="margin-top:6px">Referência</div>
+      <div class="nav-item" onclick="goTo('glossario')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 2h8l2 2v10H3V2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><line x1="6" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="6" y1="9" x2="11" y2="9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Glossário
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div id="sb-taxa" class="sb-stat"></div>
+      <div id="sb-pv" class="sb-stat"></div>
+      <div id="sb-rebate" class="sb-stat"></div>
+    </div>
+    <div style="padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">🌙</button>
+      <span style="font-size:9px;color:var(--text3)">v3.0</span>
+    </div>
+  </aside>
+  <!-- Main content -->
+  <main class="main">
 
-<!-- ── Sidebar ── -->
-<nav class="sidebar">
-  <div class="logo">
-    <div class="logo-name">SIMULA PREÇO APP</div>
-    <div class="logo-sub">Andorinha Med · Análise Financeira</div>
-  </div>
-  <div class="client-tag" id="client-tag">
-    <div class="client-dot"></div>
-    <div class="client-name" id="client-display">—</div>
-  </div>
-  <div class="nav">
-    <div class="nav-section">Modelo</div>
-    <div class="nav-item active" onclick="goTo('premissas')">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-      Premissas
-    </div>
-    <div class="nav-item" onclick="goTo('fluxo-icms')">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M9 4l5 4-5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      DFC com ICMS
-    </div>
-    <div class="nav-item" onclick="goTo('fluxo-no')">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M9 4l5 4-5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="2" y1="4" x2="8" y2="13" stroke="currentColor" stroke-width="1" opacity="0.35"/></svg>
-      DFC sem ICMS
-    </div>
-    <div class="nav-section" style="margin-top:6px">Análise</div>
-    <div class="nav-item" onclick="goTo('comparativo')">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="5" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="9" y="4" width="5" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
-      Comparativo
-    </div>
-    <div class="nav-item" onclick="goTo('decisao')">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.6 3.3 3.6.5-2.6 2.6.6 3.6L8 10.4l-3.2 1.6.6-3.6L2.8 5.8l3.6-.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
-      Análise de Decisão
-    </div>
-    <div class="nav-item" onclick="goTo('diagrama')">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12l3-5 3 3 2-4 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Diagrama FC
-    </div>
-    <div class="nav-section" style="margin-top:6px">Referência</div>
-    <div class="nav-item" onclick="goTo('glossario')">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 2h8l2 2v10H3V2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><line x1="6" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="6" y1="9" x2="11" y2="9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-      Glossário
-    </div>
-  </div>
-  <div class="sidebar-footer">
-    <div class="sf-row" id="sb-taxa">i = 1,50% a.m.</div>
-    <div class="sf-row" id="sb-pv">PV = R$ 5,39</div>
-    <div class="sf-row" id="sb-rebate">Rebate = R$ 10,41</div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-      <span style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px">Tema</span>
-      <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema claro/escuro">🌙</button>
-    </div>
-  </div>
-</nav>
-
-<!-- ── Pages ── -->
-<main class="main">
 
 <!-- ══ PREMISSAS ══ -->
 <div class="page active" id="page-premissas">
@@ -410,11 +408,11 @@ tr.row-event td:first-child {
           </div>
           <div class="input-group">
             <div class="input-label">PIS/COFINS Compra <span class="input-hint">crédito D0 — Lucro Real</span></div>
-            <div class="input-row"><input type="number" id="p-piscofs-c" value="9.25" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
+            <div class="input-row"><input type="number" id="p-piscofs-c" value="0.00" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
           </div>
           <div class="input-group">
             <div class="input-label">PIS/COFINS Venda <span class="input-hint">débito — Lucro Real</span></div>
-            <div class="input-row"><input type="number" id="p-piscofs-v" value="9.25" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
+            <div class="input-row"><input type="number" id="p-piscofs-v" value="0.00" step="0.01" oninput="recalc()" onblur="formatPctInputs()"><span class="input-suffix">%</span></div>
           </div>
         </div>
         <div class="input-section">
@@ -563,27 +561,11 @@ tr.row-event td:first-child {
 <div class="page" id="page-decisao">
   <div class="page-header">
     <div class="page-title">Análise de Decisão</div>
-    <div class="page-subtitle">Ponto de equilíbrio, sensibilidade ao rebate e resumo executivo</div>
+    <div class="page-subtitle">Resumo executivo e precificação por meta</div>
   </div>
   <div class="grid2" style="margin-bottom:12px">
-    <div class="card"><div class="card-title">Ponto de equilíbrio — rebate mínimo (DFCD = 0)</div><div id="breakeven-detail"></div></div>
-    <div class="card"><div class="card-title">Decisão rápida</div><div id="decisao-rapida"></div></div>
-  </div>
-  <div class="card" style="margin-bottom:12px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-      <div class="card-title" style="margin:0">Sensibilidade DFCD × Rebate</div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <span style="font-size:11px;color:var(--text2)">Passo</span>
-        <input type="number" id="s-passo" value="0.25" step="0.05" style="width:66px;font-size:12px;padding:4px 8px" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()">
-        <span style="font-size:11px;color:var(--text2)">Linhas ±</span>
-        <input type="number" id="s-linhas" value="5" step="1" min="2" max="8" style="width:50px;font-size:12px;padding:4px 8px" oninput="ciTargetSet=false;ciOriginals=captureCIOriginals();recalc()">
-      </div>
-    </div>
-    <div id="sensitivity-bars"></div>
-  </div>
-  <div class="card"><div class="card-title">Resumo executivo</div><div id="exec-summary"></div></div>
-
-  <!-- ══ CÁLCULO INVERSO ══ -->
+     </div>
+    <!-- ══ CÁLCULO INVERSO ══ -->
   <div class="card" style="margin-bottom:12px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <div class="card-title" style="margin-bottom:0">Cálculo Inverso — Precificação por meta</div>
@@ -637,8 +619,8 @@ tr.row-event td:first-child {
       </div>
     </div>
 
-    <!-- Explanation bar — resultado obtido em primeiro plano -->
-    <div id="ci-explanation" style="font-size:12px;color:var(--text2);line-height:1.6;padding:8px 12px;background:var(--bg3);border-radius:5px;border-left:2px solid var(--accent2);margin-bottom:14px"></div>
+    <!-- Resumo Executivo — acima dos blocos -->
+    <div id="exec-summary" style="margin-bottom:10px"></div>
 
     <!-- Three blocks: DRE | DFC | DFCD -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px" id="ci-three-blocks">
@@ -646,10 +628,6 @@ tr.row-event td:first-child {
         <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--accent2)">DRE — Cenário Calculado (MC Final)</div>
         <div id="ci-dre"></div>
       </div>
-
-    
-
-    <!-- Memória de Cálculo — em último plano -->
       <div>
         <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border2)">DFC — Fluxo Nominal (mesmo cenário DRE)</div>
         <div id="ci-dfc"></div>
@@ -657,6 +635,29 @@ tr.row-event td:first-child {
       <div>
         <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--blue)"><span id="ci-dfcd-title">DFCD — DFC Descontado (TMA)</span> <span id="ci-dfcd-tma" style="color:var(--blue);font-weight:400"></span></div>
         <div id="ci-dfcd"></div>
+      </div>
+    </div>
+
+
+    <!-- Resumo Executivo cards — abaixo dos blocos -->
+    <div id="ci-exec-cards" style="margin-top:14px"></div>
+
+    <!-- Diagrama FC — CI -->
+    <div id="ci-diag-wrap" style="margin-top:16px">
+      <!-- Title row -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Diagrama de Fluxo de Caixa</div>
+        <div id="ci-diag-seg" style="display:flex;gap:4px">
+          <button id="ci-diag-nom" onclick="setCIDiagTyp('nom')" style="font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid var(--border2);background:var(--accent2);color:var(--bg);cursor:pointer">Nominal</button>
+          <button id="ci-diag-disc" onclick="setCIDiagTyp('disc')" style="font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid var(--border2);background:none;color:var(--text2);cursor:pointer">Descontado</button>
+        </div>
+      </div>
+      <!-- Scenario header -->
+      <div id="ci-diag-header" style="margin-bottom:8px"></div>
+      <!-- KPIs -->
+      <div id="ci-diag-kpis" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
+      <svg id="ci-diag-svg" viewBox="0 0 900 520" style="width:100%;height:auto;display:block"></svg>
+    </div>
 
     <!-- Memória de Cálculo — em último plano -->
     <div id="ci-memoria-wrap" style="margin-top:14px;display:none">
@@ -665,40 +666,6 @@ tr.row-event td:first-child {
         <span id="ci-memoria-icon">▶</span>
       </div>
       <div id="ci-memoria" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:12px 14px;font-size:11px;font-family:var(--mono)"></div>
-    </div>
-      </div>
-    </div>
-  </div>
-
-
-</div>
-
-<!-- ══ DIAGRAMA ══ -->
-<div class="page" id="page-diagrama">
-  <div class="page-header">
-    <div class="page-title">Diagrama de Fluxo de Caixa</div>
-    <div class="page-subtitle">↑ entrada · ↓ saída · altura proporcional ao valor · cinza = valor no outro modo (DFC/DFCD)</div>
-  </div>
-  <div style="display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
-    <div class="seg" id="sg-m">
-      <button class="on" onclick="setDiagModel('icms',this)">com ICMS</button>
-      <button onclick="setDiagModel('no',this)">sem ICMS</button>
-    </div>
-    <div class="seg" id="sg-t">
-      <button class="on" onclick="setDiagType('nom',this)">Nominal</button>
-      <button onclick="setDiagType('disc',this)">Descontado</button>
-    </div>
-  </div>
-  <div class="diagram-wrap" style="margin-bottom:14px">
-    <svg id="diag-svg" class="diagram" viewBox="0 0 900 420" role="img" aria-label="Diagrama de fluxo de caixa"></svg>
-    <div class="diagram-legend">
-      <div class="dl-item"><div class="dl-dot" style="background:var(--green)"></div>Entrada</div>
-      <div class="dl-item"><div class="dl-dot" style="background:var(--red)"></div>Saída</div>
-      <div class="dl-item"><div class="dl-dash"></div>Saldo acumulado</div>
-      <div class="dl-item" style="margin-left:auto;font-style:italic;font-size:10px">Cinza = valor no outro modo</div>
-    </div>
-    <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
-      <div class="grid4" id="kpis-diag"></div>
     </div>
   </div>
 </div>
@@ -742,13 +709,16 @@ tr.row-event td:first-child {
     </div>
   </div>
 </div>
-</main>
+
+  </main>
+</div>
+
 </div>
 
 
 <script>
 // ── State ──
-let diagMdl='icms', diagTyp='nom', ciWhat='pv', ciIcms=true, ciScenario=null, ciTargetSet=false, ciOriginals=null;
+let ciDiagTyp='nom', ciWhat='pv', ciIcms=true, ciScenario=null, ciTargetSet=false, ciOriginals=null;
 
 // ── Nav ──
 function goTo(id){
@@ -763,6 +733,7 @@ function goTo(id){
     ciOriginals = captureCIOriginals();
   }
 }
+function closeMobileNav(){ const el=document.getElementById('mobile-nav'); if(el) el.classList.remove('open'); }
 function toggleMobileNav(){
   document.getElementById('mobile-nav').classList.toggle('open');
 }
@@ -868,20 +839,6 @@ const kpiH=(l,v,isPct=false)=>{
 // ── Table helpers ──
 
 // Unique days preserving order
-function getUD(days){ const s=new Set(); return days.filter(d=>s.has(d)?false:s.add(d)).sort((a,b)=>a-b); }
-
-// For each unique day: last cumulative value after all events on that day
-function mapCum(cums,days,ud){ return ud.map(d=>{let v=null;days.forEach((dd,i)=>{if(dd===d)v=cums[i]});return v!==null?v:0}); }
-
-// For each unique day: sum of FC values on that day
-function mapFC(fcVals,days,ud){ return ud.map(d=>days.reduce((s,dd,i)=>dd===d?s+fcVals[i]:s,0)); }
-
-// For each unique day: sum of discounted values on that day
-function mapVPL(discVals,days,ud){ return ud.map(d=>days.reduce((s,dd,i)=>dd===d?s+discVals[i]:s,0)); }
-
-function dayHdr(ud){
-  return `<tr><th>Evento</th>${ud.map(d=>`<th>D${d}</th>`).join('')}<th>Total</th></tr>`;
-}
 function eventRow(lbl,val,eventDay,ud,isNA=false){
   const cells=ud.map(d=>{
     if(isNA) return `<td class="val-na">N/A</td>`;
@@ -1044,6 +1001,104 @@ function restoreOriginals(){
   recalc();
 }
 
+
+// ── Update Resumo Executivo with CI scenario ─────────────────────────────
+function renderExecSummaryCI(pvX, rbX, cpX, taxa, dCP,
+                              icmsAliqE, icmsAliqS, piscofsCp, piscofsVp,
+                              piscoP, freteP, comisP,
+                              dIC, dFR, dCOM, dID, dVD, dPiscofsV, dRB, fat,
+                              ciIcms, ciWhat, tgt,
+                              vMC_res, vFC_res, vFC_ok,
+                              vDFCD_res, vDFCD_ok) {
+
+  const lbl = ciWhat==='pv' ? 'Preço de Venda'
+            : ciWhat==='rebate' ? 'Rebate'
+            : 'Preço de Compra';
+
+  const ic=cpX*icmsAliqE, id=pvX*icmsAliqS;
+  const pfc=cpX*piscofsCp, pfv=pvX*piscofsVp;
+  const vliq=pvX-id-pfv, freteV=pvX*freteP, piscoV=rbX*piscoP;
+
+  const dreRes  = vMC_res!==null ? fR(vMC_res,4) : '—';
+  const dfcScen = ciIcms ? 'com ICMS' : 'sem ICMS';
+  const dfcRes  = vFC_res!==null ? fR(vFC_res,4) : '—';
+  const dfcdRes = vDFCD_res!==null ? fR(vDFCD_res,4) : '—';
+  const diffDRE = (vDFCD_res!==null && vMC_res!==null) ? fR(r8(vDFCD_res-vMC_res),4) : '—';
+
+  const varLbl = ciWhat==='pv' ? 'Preço de Venda' : ciWhat==='rebate' ? 'Rebate' : 'Preço de Compra';
+  const diffLbl = (res, dre) => {
+    if(res===null||dre===null) return '';
+    const d=r8(res-dre);
+    return d===0 ? `igual ao ${varLbl} do DRE.`
+      : `${fR(Math.abs(d),4)} ${d>0?'acima':'abaixo'} do ${varLbl} do DRE.`;
+  };
+
+  const hi  = (v) => `<span style="color:var(--green);font-family:var(--mono);font-weight:600">${v}</span>`;
+  const hiD = (v) => `<span style="color:var(--accent);font-family:var(--mono);font-weight:600">${v}</span>`;
+
+  const diffLblHi = (res, dre) => {
+    if(res===null||dre===null) return '';
+    const d=r8(res-dre);
+    return d===0 ? `igual ao ${varLbl} do DRE.`
+      : `${hiD(fR(Math.abs(d),4))} ${d>0?'acima':'abaixo'} do ${varLbl} do DRE.`;
+  };
+
+  const dreNote = vMC_res!==null
+    ? (ciWhat==='pv'     ? `Para atingir ${fP(tgt)}, o Preço de Venda necessário é ${hi(dreRes)}.`
+       : ciWhat==='rebate' ? `Para atingir ${fP(tgt)}, o Rebate necessário é ${hi(dreRes)}.`
+       :                     `Para atingir ${fP(tgt)}, o Preço de Compra máximo é ${hi(dreRes)}.`)
+    : 'Sem solução para esta configuração.';
+
+  const dfcNote = vFC_ok
+    ? (ciWhat==='pv'     ? `Para atingir ${fP(tgt)}, o Preço de Venda necessário é ${hi(dfcRes)}: ${diffLblHi(vFC_res,vMC_res)}`
+       : ciWhat==='rebate' ? `Para atingir ${fP(tgt)}, o Rebate necessário é ${hi(dfcRes)}: ${diffLblHi(vFC_res,vMC_res)}`
+       :                     `Para atingir ${fP(tgt)}, o Preço de Compra máximo é ${hi(dfcRes)}: ${diffLblHi(vFC_res,vMC_res)}`)
+    : `Sem solução DFC ${dfcScen}.`;
+
+  const dfcdNote = vDFCD_ok
+    ? (ciWhat==='pv'     ? `Descontando à TMA de ${fP(taxa)} a.m., o Preço de Venda necessário é ${hi(dfcdRes)}: ${diffLblHi(vDFCD_res,vMC_res)}`
+       : ciWhat==='rebate' ? `Descontando à TMA de ${fP(taxa)} a.m., o Rebate necessário é ${hi(dfcdRes)}: ${diffLblHi(vDFCD_res,vMC_res)}`
+       :                     `Descontando à TMA de ${fP(taxa)} a.m., o Preço de Compra máximo é ${hi(dfcdRes)}: ${diffLblHi(vDFCD_res,vMC_res)}`)
+    : `Sem solução DFCD ${dfcScen}.`;
+
+  const hdrLine = `<div style="font-size:11px;padding:8px 10px;background:var(--bg3);border-left:2px solid var(--accent2);border-radius:4px;margin-bottom:10px">
+    <div style="font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">${lbl} · Meta ${fP(tgt)} do PV · ${dfcScen}</div>
+    <div style="color:var(--text2)">
+      DRE: <span style="font-family:var(--mono);color:${vMC_res!==null?'var(--green)':'var(--red)'}">${dreRes}</span>
+      &nbsp;|&nbsp; DFC: <span style="font-family:var(--mono);color:${vFC_ok?'var(--green)':'var(--red)'}">${dfcRes}</span>
+      &nbsp;|&nbsp; DFCD: <span style="font-family:var(--mono);color:${vDFCD_ok?'var(--green)':'var(--red)'}">${dfcdRes}</span>
+    </div>
+  </div>`;
+
+  // Context footer: the OTHER premise values (not the resolved variable)
+  const ctxFooter = (() => {
+    const dim = (label, val) =>
+      `<span style="color:var(--text);font-size:12px;font-weight:500">${label}: </span><span style="font-family:var(--mono);color:var(--accent);font-size:13px;font-weight:700">${val}</span>`;
+    if(ciWhat==='pv')
+      return `${dim('Rebate', fR(rbX,4))} &nbsp;&nbsp;|&nbsp;&nbsp; ${dim('Preço de Compra', fR(cpX,4))}`;
+    if(ciWhat==='rebate')
+      return `${dim('Preço de Venda', fR(pvX,4))} &nbsp;&nbsp;|&nbsp;&nbsp; ${dim('Preço de Compra', fR(cpX,4))}`;
+    return `${dim('Preço de Venda', fR(pvX,4))} &nbsp;&nbsp;|&nbsp;&nbsp; ${dim('Rebate', fR(rbX,4))}`;
+  })();
+  const footer = `<div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--border2)">${ctxFooter}</div>`;
+
+  // Also show header above diagram
+  const diagHdr = document.getElementById('ci-diag-header');
+  if(diagHdr) diagHdr.innerHTML = hdrLine;
+
+  document.getElementById('exec-summary').innerHTML = hdrLine;
+
+  const cardsEl = document.getElementById('ci-exec-cards');
+  if(cardsEl) cardsEl.innerHTML = [
+    {c:'green',                  t:`DRE — MC Final · ${lbl} = ${dreRes}`,      b: dreNote},
+    {c:vFC_ok?'green':'red',     t:`DFC ${dfcScen} · ${lbl} = ${dfcRes}`,      b: dfcNote},
+    {c:vDFCD_ok?'green':'amber', t:`DFCD ${dfcScen} · ${lbl} = ${dfcdRes}`,    b: dfcdNote},
+  ].map(({c,t,b})=>`<div class="exec-card ${c}"><div class="exec-title">${t}</div><div class="exec-body">${b}${footer}</div></div>`).join('');
+}
+
+
+
+
 // ── Main recalc ──
 function recalc(){
   saveState();
@@ -1066,7 +1121,7 @@ function recalc(){
 
   // Client display
   const cname=gs('p-cliente')||'—';
-  document.getElementById('client-display').textContent=cname;
+  const cdEl=document.getElementById('client-display'); if(cdEl) cdEl.textContent=cname;
 
   // Sidebar footer
   document.getElementById('sb-taxa').textContent=`TMA = ${(taxa*100).toFixed(2).replace('.',',')}% a.m.`;
@@ -1161,63 +1216,7 @@ function recalc(){
     {t:'Risco principal',b:`FC sem rebate (MC2): ${fP(mc2/pv)}. Rebate de ${fR(rebate)} = ${fP(rebate/pv)} do PV — dependência estrutural. Crédito ICMS de ${fR(saldoICMS)} só tem valor se houver débitos futuros. PIS/COFINS ${fP(R.piscoP)} incide sobre o rebate bruto.`},
   ].map(({t,b})=>`<div style="padding:11px 0;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:500;color:var(--text);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px">${t}</div><div style="font-size:12px;color:var(--text2);line-height:1.7;font-weight:300">${b}</div></div>`).join('');
 
-  // ── Decisão ──
-  document.getElementById('breakeven-detail').innerHTML=`
-    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;font-weight:300">
-      DFCD s/ rebate: <span style="font-family:var(--mono);color:var(--red)">${fR(vplNoReb)}</span><br>
-      Fator D${R.dRB}: <span style="font-family:var(--mono);color:var(--text2)">${fN(fat(R.dRB))}</span><br>
-      PIS/COFINS: <span style="font-family:var(--mono);color:var(--text2)">${fP(R.piscoP)}</span> s/ rebate
-    </div>
-    <div style="background:var(--bg3);border-radius:5px;padding:11px;margin-bottom:10px">
-      <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Rebate mínimo bruto</div>
-      <div style="font-family:var(--mono);font-size:18px;font-weight:500;color:var(--accent)">${fR(rebateMin)}</div>
-      <div style="font-size:11px;color:var(--text2);margin-top:2px">${fP(rebateMin/pv)} do PV</div>
-    </div>
-    <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--border)">
-      <div><div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px">Rebate atual</div><div style="font-family:var(--mono);font-size:14px;color:var(--blue)">${fR(rebate)}</div></div>
-      <div style="color:var(--text2);font-size:18px;align-self:center">→</div>
-      <div><div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px">Gap</div><div style="font-family:var(--mono);font-size:14px;color:${r8(gap)>0?'var(--red)':'var(--green)'}">${r8(gap)>0?'+':''}${fR(gap)}</div></div>
-    </div>
-    <div style="font-size:11px;color:var(--text2);margin-top:6px;font-weight:300">
-      ${r8(gap)>0?`Necessário <span style="font-family:var(--mono);color:var(--red)">${fR(gap)}</span> a mais de rebate para zerar VPL caixa.`:
-              `Rebate atual supera o mínimo em <span style="font-family:var(--mono);color:var(--green)">${fR(Math.abs(gap))}</span>.`}
-    </div>`;
 
-  const viable=r8(vplN)>=0;
-  document.getElementById('decisao-rapida').innerHTML=
-    `<div class="alert ${viable?'ok':'err'}"><strong>${viable?'Viável financeiramente.':'Inviável no caixa.'}</strong><br>DFCD com ICMS: ${fP(vplI/pv)} · DFCD sem ICMS: ${fP(vplN/pv)}</div>
-    <div style="font-size:11px;color:var(--text2);line-height:1.7;font-weight:300">
-      ${viable?`A operação gera valor à TMA de ${fP(taxa)} a.m. mesmo desconsiderando o crédito fiscal.`:
-               `Requer rebate de ${fR(rebateMin)} para equilibrar o caixa. Gap atual: ${fR(gap)}.`}
-    </div>`;
-
-  const nL=parseInt(document.getElementById('s-linhas').value)||5;
-  const passo=parseFloat(document.getElementById('s-passo').value)||0.25;
-  let bars='';
-  for(let i=0;i<=nL*2;i++){
-    const rb=rebate+(i-nL)*passo;
-    if(rb<=0)continue;
-    const piscoLocal=rb*R.piscoP;
-    const vpl=vplNoReb+(rb-piscoLocal)/fat(R.dRB);
-    const isCur=Math.abs(rb-rebate)<0.001;
-    const viable2=r8(vpl)>=0;
-    const pct=Math.min(Math.abs(vpl)/Math.max(Math.abs(vplNoReb),0.01)*25,100);
-    bars+=`<div class="sensitivity-bar ${isCur?'current':viable2?'viable':'inviable'}">
-      <div class="sb-label" style="color:${isCur?'var(--amber)':viable2?'var(--green)':'var(--red)'}">${fR(rb,2)}</div>
-      <div class="sb-track"><div class="sb-fill" style="width:${pct}%;background:${viable2?'var(--green-dim)':'var(--red-dim)'}"></div></div>
-      <div class="sb-vpl ${clsK(vpl)}">${fR(vpl,4)}</div>
-      <div class="sb-status" style="color:${isCur?'var(--amber)':viable2?'var(--green)':'var(--red)'}">
-        ${isCur?'← atual':viable2?'viável':'inviável'}
-      </div>
-    </div>`;
-  }
-  document.getElementById('sensitivity-bars').innerHTML=bars;
-
-  document.getElementById('exec-summary').innerHTML=[
-    {c:'green',t:'ACEITAR — visão com ICMS',b:`DFCD com ICMS ${fP(vplI/pv)} positivo à TMA de ${fP(taxa)} a.m. DFC Final de ${fP(mcFinal/pv)} do PV. Crédito líquido ICMS de ${fR(saldoICMS)} permanece na empresa sem custo financeiro.`},
-    {c:'red',  t:'REJEITAR — visão sem ICMS',b:`DFCD sem ICMS ${fP(vplN/pv)} a ${fP(taxa)} a.m. Desembolso de ${fR(rebate)} no D${R.dCP} contra recebimentos tardios. PIS/COFINS de ${fR(piscoV)} reduz o rebate líquido para ${fR(rebate-piscoV)}.`},
-    {c:'amber',t:'CONDIÇÃO DE VIABILIDADE',b:`Rebate mínimo bruto: ${fR(rebateMin)} (${fP(rebateMin/pv)} PV). Rebate atual: ${fR(rebate)}. A operação ${r8(gap)>0?'AINDA NÃO É':'JÁ É'} viável no caixa com o rebate contratado.`},
-  ].map(({c,t,b})=>`<div class="exec-card ${c}"><div class="exec-title">${t}</div><div class="exec-body">${b}</div></div>`).join('');
 
   // ── Sync ci-taxa display with p-taxa (without triggering syncTaxa loop) ──
   const ciTaxaEl = document.getElementById('ci-taxa');
@@ -1226,9 +1225,6 @@ function recalc(){
 
   // ── Cálculo Inverso ──
   renderCI(R);
-
-  // ── Diagram ──
-  renderDiagram(R);
 }
 
 // ── renderFluxosCI — DFC pages always reflect premissas (CI uses Apply button) ──
@@ -1269,135 +1265,6 @@ function syncTaxa(src){
   recalc();
 
 }
-function setDiagModel(m,btn){diagMdl=m;document.querySelectorAll('#sg-m button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
-function setDiagType(t,btn){diagTyp=t;document.querySelectorAll('#sg-t button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
-
-
-
-// ── Memória de Cálculo ────────────────────────────────────────────────────
-function buildMemoria(what, tgt, pvX, rbX, cpX, vMC, vMC, vDFCD, P){
-  const {pv,rebate,compra,icmsAliqE,icmsAliqS,freteP,comisP,piscoP,taxa,
-         dIC,dFR,dCOM,dID,dCP,dVD,dRB,fat,
-         freteV,comisV,piscoV,icmsC,icmsD,vliq,cmv} = P;
-
-  const pct = v => (v>=0?'+':'')+( v*100).toFixed(4).replace('.',',')+' %';
-  const R$  = v => (v>=0?'':'')+fR(v,4);
-  const f4  = v => v.toFixed(4).replace('.',',');
-  const sep = `<div style="border-top:1px solid var(--border);margin:8px 0"></div>`;
-  const row = (label, formula, result, highlight=false) =>
-    `<div style="display:grid;grid-template-columns:200px 1fr auto;gap:8px;padding:3px 0;${highlight?'color:var(--accent);font-weight:500':'color:var(--text2)'}">
-      <span>${label}</span>
-      <span style="color:var(--text3)">${formula}</span>
-      <span style="text-align:right;min-width:80px">${result}</span>
-    </div>`;
-  const hdr = (t) =>
-    `<div style="color:var(--text2);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;margin:10px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--border)">${t}</div>`;
-
-  let h = `<div style="color:var(--text2);font-size:11px;margin-bottom:8px">
-    <strong style="color:var(--text)">Equação base:</strong>
-    ${what==='pv'?'PV × (coeficientes) = termos fixos → resolve PV':
-      what==='rebate'?'Meta × PV = métrica sem Rebate + Rebate × (1 − PIS/COFINS%) / Fator → resolve Rebate':
-      'Compra × (icmsAliqE/fat(D0) − 1/fat(D60)) + termos fixos = Meta × PV → resolve Compra'}
-  </div>`;
-
-  h += hdr('Parâmetros da simulação');
-  h += row('Meta (% PV)', '', pct(tgt));
-  h += row('Meta × PV', `${pct(tgt)} × ${R$(pv)}`, R$(tgt*pv));
-  h += row('TMA mensal', '', pct(taxa));
-  h += sep;
-
-  if(what==='pv'){
-    h += hdr('Resolução DRE — MC Final = Meta × PV');
-    h += row('CMV (fixo)', `${R$(compra)} × (1 − ${pct(icmsAliqE)})`, R$(cmv));
-    h += row('Rebate líquido (fixo)', `${R$(rebate)} × (1 − ${pct(piscoP)})`, R$(rebate*(1-piscoP)));
-    const numDRE = cmv - rebate + rebate*piscoP;
-    const denDRE = 1 - icmsAliqS - freteP - comisP - tgt;
-    h += row('Numerador', 'CMV − Rebate + PIS/COFINS', R$(numDRE));
-    h += row('Denominador', '1 − ICMS saída − Frete − Comissão − Meta', f4(denDRE));
-    h += row('PV (DRE) = Num ÷ Den', '', R$(vMC.res), true);
-    h += sep;
-
-    h += hdr('Resolução DFC = Meta × PV (sem desconto)');
-    const numFC = compra - rebate + rebate*piscoP;
-    const denFC = 1 - freteP - comisP - tgt;
-    h += row('Numerador', 'Compra − Rebate líq.', R$(numFC));
-    h += row('Denominador', '1 − Frete − Comissão − Meta', f4(denFC));
-    h += row('PV (DFC sem ICMS)', '', R$(vMC.ok?vMC.res:0), true);
-    h += sep;
-
-    h += hdr('Resolução DFCD = Meta × PV (com desconto TMA)');
-    h += row('fat(D0)',  `(1+${pct(taxa)})^(0/30)`,  f4(fat(dIC)));
-    h += row('fat(D15)', `(1+${pct(taxa)})^(15/30)`, f4(fat(dFR)));
-    h += row('fat(D45)', `(1+${pct(taxa)})^(45/30)`, f4(fat(dID)));
-    h += row('fat(D60)', `(1+${pct(taxa)})^(60/30)`, f4(fat(dCP)));
-    h += row('fat(D75)', `(1+${pct(taxa)})^(75/30)`, f4(fat(dVD)));
-    h += row('fat(D120)',`(1+${pct(taxa)})^(120/30)`,f4(fat(dRB)));
-    const A = -freteP/fat(dFR)-comisP/fat(dCOM)-icmsAliqS/fat(dID)+1/fat(dVD)-tgt;
-    const B = compra/fat(dCP)-compra*icmsAliqE/fat(dIC)-rebate*(1-piscoP)/fat(dRB);
-    h += row('A = coef. de PV', '−Frete/f15 −Comis/f30 −ICMS/f45 +1/f75 −Meta', f4(A));
-    h += row('B = termos fixos', 'Compra/f60 −icmsC/f0 −Rebate liq/f120', f4(B));
-    h += row('PV (DFCD) = B ÷ A', '', R$(vDFCD.ok?vDFCD.res:0), true);
-
-  } else if(what==='rebate'){
-    h += hdr('Resolução DRE — MC Final = Meta × PV');
-    const need = tgt*pv - vliq + cmv + freteV + comisV;
-    h += row('Venda Líquida', `${R$(pv)} × (1 − ${pct(icmsAliqS)})`, R$(vliq));
-    h += row('CMV líquido', `${R$(compra)} × (1 − ${pct(icmsAliqE)})`, R$(cmv));
-    h += row('Meta × PV − VL + CMV + Frete + Comis', '', R$(need));
-    h += row('Rebate = numerador ÷ (1 − PIS/COFINS%)', `÷ ${f4(1-piscoP)}`, R$(vMC.res), true);
-    h += sep;
-
-    h += hdr('Resolução DFCD = Meta × PV');
-    const vplNR = icmsC/fat(dIC)+(-freteV)/fat(dFR)+(-comisV)/fat(dCOM)+(-icmsD)/fat(dID)+(-compra)/fat(dCP)+pv/fat(dVD);
-    h += row('fat(D120)', `(1+${pct(taxa)})^(120/30)`, f4(fat(dRB)));
-    h += row('DFCD sem Rebate', 'Σ outros eventos descontados', R$(vplNR));
-    h += row('(Meta×PV − DFCD_sem_Rebate)', '', R$(tgt*pv - vplNR));
-    h += row('× fat(D120)', `× ${f4(fat(dRB))}`, R$((tgt*pv-vplNR)*fat(dRB)));
-    h += row('÷ (1 − PIS/COFINS%)', `÷ ${f4(1-piscoP)}`, '');
-    h += row('Rebate (DFCD)', '', R$(vDFCD.ok?vDFCD.res:0), true);
-
-  } else { // compra
-    h += hdr('Variável Compra aparece em 2 eventos');
-    h += row('D0  ICMS Crédito', `+Compra × ${pct(icmsAliqE)} / fat(${dIC}) = +Compra × ${f4(icmsAliqE/fat(dIC))}`, '');
-    h += row('D60 Pagamento',    `−Compra / fat(${dCP}) = −Compra × ${f4(1/fat(dCP))}`, '');
-    const coef = icmsAliqE/fat(dIC) - 1/fat(dCP);
-    h += row('Coeficiente líquido de Compra', `${f4(icmsAliqE/fat(dIC))} − ${f4(1/fat(dCP))}`, f4(coef));
-    h += sep;
-
-    h += hdr('Resolução DRE — MC Final = Meta × PV');
-    const numDRE2 = vliq - freteV - comisV + rebate - piscoV - tgt*pv;
-    h += row('Venda Líquida', `${R$(pv)} − ICMS saída`, R$(vliq));
-    h += row('VL − Frete − Comis + Rebate − PIS/COFINS − Meta×PV', '', R$(numDRE2));
-    h += row('÷ (1 − icmsAliqE entrada)', `÷ ${f4(1-icmsAliqE)}`, '');
-    h += row('Compra (DRE)', '', R$(vMC.res), true);
-    h += sep;
-
-    h += hdr('Resolução DFCD = Meta × PV (com desconto TMA)');
-    const rest = (-freteV)/fat(dFR)+(-comisV)/fat(dCOM)+(-icmsD)/fat(dID)+pv/fat(dVD)+rebate*(1-piscoP)/fat(dRB);
-    h += row('fat(D0)',  `(1+TMA)^(0/30)`,   f4(fat(dIC)));
-    h += row('fat(D45)', `(1+TMA)^(45/30)`,  f4(fat(dID)));
-    h += row('fat(D60)', `(1+TMA)^(60/30)`,  f4(fat(dCP)));
-    h += row('fat(D75)', `(1+TMA)^(75/30)`,  f4(fat(dVD)));
-    h += row('fat(D120)',`(1+TMA)^(120/30)`, f4(fat(dRB)));
-    h += row('Termos fixos (sem Compra)', '−Frete/f15 −ICMS_D/f45 +PV/f75 +Rebate_liq/f120', R$(rest));
-    h += row('Meta × PV', '', R$(tgt*pv));
-    h += row('Meta×PV − termos fixos', '', R$(tgt*pv - rest));
-    h += row('Coeficiente líquido de Compra', `icmsAliqE/f0 − 1/f60 = ${f4(coef)}`, '');
-    h += row('Compra (DFCD) = (Meta×PV − fixos) ÷ coef', `${R$(tgt*pv-rest)} ÷ ${f4(coef)}`, R$(vDFCD.ok?vDFCD.res:0), true);
-    h += sep;
-
-    h += `<div style="color:var(--text2);font-size:11px;line-height:1.6;margin-top:4px">
-      <strong style="color:var(--amber)">⚠ Por que DFCD ≠ Compra ÷ fat(D60)?</strong><br>
-      A divisão simples por fat(D60) ignora o ICMS Crédito gerado em D0 (entrada do produto).
-      Esse crédito reduz o custo líquido da compra no fluxo descontado.<br>
-      Compra ÷ fat(D60) = ${R$(compra/fat(dCP))} &nbsp;|&nbsp;
-      Correto (com ICMS D0): ${R$(vDFCD.ok?vDFCD.res:0)} &nbsp;|&nbsp;
-      Diferença: ${R$(vDFCD.ok?(vDFCD.res - compra/fat(dCP)):0)}
-    </div>`;
-  }
-
-  return h;
-}
 
 // ── Cálculo Inverso ──────────────────────────────────
 function renderCI(R){
@@ -1420,8 +1287,8 @@ function renderCI(R){
         return den!==0?num/den:null;
       }
       if(base==='fc_no'){
-        // DFC sem ICMS: -fr-co-compra+pv+rb-rb*pisco = tgt*pv
-        const num=compra-rebate+rebate*piscoP, den=1-freteP-comisP-tgt;
+        const num=compra*(1-piscofsCp)-rebate*(1-piscoP);
+        const den=1-freteP-comisP-piscofsVp-tgt;
         return den!==0?num/den:null;
       }
       if(base==='fc_si'){
@@ -1455,8 +1322,8 @@ function renderCI(R){
       if(base==='fc_no') return (tgt*pv + freteV + comisV - piscofsC + piscofsV + compra - pv)/(1-piscoP);
       if(base==='fc_si') return (tgt*pv + freteV + comisV - icmsC + icmsD - piscofsC + piscofsV + compra - pv)/(1-piscoP);
       if(base==='dfcd_no'){
-        const vplNR = (-freteV)/fat(dFR)+(-comisV)/fat(dCOM)+(-compra)/fat(dCP)+pv/fat(dVD);
-        return (tgt*pv - vplNR)*fat(dRB)/(1-piscoP);
+        const vplNR_no=piscofsC/fat(dIC)-freteV/fat(dFR)-comisV/fat(dCOM)-compra/fat(dCP)+pv*(1-piscofsVp)/fat(dVD);
+        return (tgt*pv-vplNR_no)*fat(dRB)/(1-piscoP);
       }
       if(base==='dfcd_si'){
         const vplNR=(icmsC+piscofsC)/fat(dIC)-freteV/fat(dFR)-comisV/fat(dCOM)-icmsD/fat(dID)-compra/fat(dCP)+pv*(1-piscofsVp)/fat(dVD);
@@ -1656,17 +1523,19 @@ function renderCI(R){
   // DRE and DFC always use MC resolution — they must show identical totals
   // ciIcms toggle only controls ICMS event visibility in DFC (not the total)
   const vDFCD  = ciIcms ? vDsi : vDno;
-  // mc_v object for mkFlow — uses resolved pvX/rbX/cpX from MC resolution
-  const mc_vals = {pv2:pvX, rb2:rbX, cp2:cpX};
-  const fc_mc  = mkFlow(mc_vals, true);      // full flow with ICMS (total = MC Final)
-  const fc_arr = mkFlow(mc_vals, ciIcms);    // ICMS shown/hidden per toggle
+
+  // DFC: com ICMS uses MC resolution (DFC_si = DRE identity)
+  //      sem ICMS uses fc_no resolution (own equation, achieves meta% without ICMS)
+  const vFC    = ciIcms ? {pv2:pvX, rb2:rbX, cp2:cpX, ok:vMC.ok, gap:vMC.gap, res:vMC.res} : vFCno;
+  const mc_vals = {pv2:pvX, rb2:rbX, cp2:cpX}; // MC resolution — for DRE
+  const fc_arr  = mkFlow(vFC, ciIcms);           // DFC uses its own resolution
 
   // DFCD uses its OWN resolved values
   const fc_dfcd_own   = mkFlow(vDFCD, ciIcms);
   const disc_dfcd_own = fc_dfcd_own.map((v,i) => v/fat(days_ev[i]));
 
   document.getElementById('ci-dre').innerHTML  = dreHtml;
-  document.getElementById('ci-dfc').innerHTML  = buildDFC(fc_arr, mc_vals);
+  document.getElementById('ci-dfc').innerHTML  = buildDFC(fc_arr, vFC);
   document.getElementById('ci-dfcd').innerHTML = buildDFCD(disc_dfcd_own, fc_dfcd_own, vDFCD);
 
   // Update DFCD header TMA label
@@ -1699,136 +1568,291 @@ function renderCI(R){
     mEl.innerHTML = mRows;
   }
 
-  document.getElementById('ci-explanation').innerHTML=
-    `<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <strong style="color:var(--text);font-size:11px;text-transform:uppercase;letter-spacing:0.5px">${whatLabels[ciWhat]} · Meta ${fP(tgt)} do PV · ${scenLabel}</strong>
-      <span style="color:var(--text2);font-size:11px">
-        DRE: <span style="font-family:var(--mono);color:${vMC.ok?'var(--green)':'var(--red)'}">${vMC.ok?fR(vMC.res,4):'—'}</span>${fmt_gap(vMC.gap)}
-        &nbsp;|&nbsp; DFC: <span style="font-family:var(--mono);color:${vMC.ok?'var(--green)':'var(--red)'}">${vMC.ok?fR(vMC.res,4):'—'}</span>${fmt_gap(vMC.gap)}
-        &nbsp;|&nbsp; DFCD: <span style="font-family:var(--mono);color:${vDFCD.ok?'var(--green)':'var(--red)'}">${vDFCD.ok?fR(vDFCD.res,4):'—'}</span>${fmt_gap(vDFCD.gap)}
-      </span>
-    </div>`;
+  
+  // Diagrama FC com valores CI
+  if(vMC.ok){
+    // Compute DFC/DFCD totals from each block's own resolved values
+    const _fcNom = mkFlow(vFC,   ciIcms);  // DFC uses vFC (com ICMS=MC, sem ICMS=vFCno)
+    const _fcD   = mkFlow(vDFCD, ciIcms);  // DFCD uses vDFCD
+    const _dfcTotal  = _fcNom.reduce((a,b)=>a+b,0);
+    const _dfcdTotal = _fcD.map((v,i)=>v/fat(days_ev[i])).reduce((a,b)=>a+b,0);
+    // Pass vFC values for nominal diagram, vDFCD for discounted
+    renderDiagramCI(vFC.pv2, vFC.rb2, vFC.cp2, taxa,
+                    icmsAliqE, icmsAliqS, piscofsCp, piscofsVp, piscoP,
+                    freteP, comisP,
+                    dIC, dFR, dCOM, dID, dCP, dVD, dPiscofsV, dRB, fat,
+                    ciIcms, ciWhat, tgt,
+                    _dfcTotal, _dfcdTotal, vDFCD.pv2,
+                    vDFCD.pv2, vDFCD.rb2, vDFCD.cp2);
+  }
+
+  // Update Resumo Executivo with CI scenario
+  if(vMC.ok){
+    renderExecSummaryCI(pvX, rbX, cpX, taxa, dCP,
+                        icmsAliqE, icmsAliqS, piscofsCp, piscofsVp,
+                        piscoP, freteP, comisP,
+                        dIC, dFR, dCOM, dID, dVD, dPiscofsV, dRB, fat,
+                        ciIcms, ciWhat, tgt,
+                        vMC.res, vFC.res, vFC.ok,
+                        vDFCD.res, vDFCD.ok);
+  }
 }
 
 // ── Diagram ──
-function setCIIcms(v,btn){ciIcms=(v==='icms');document.querySelectorAll('#ci-icms-seg button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');recalc();}
-function syncCITargetToMC(){
-  const R=calc();
-  const el=document.getElementById('ci-target');
-  if(el && R.pv>0) el.value=(Math.round(R.mcFinal/R.pv*10000)/100).toFixed(2);
-}
-function setCIWhat(v,btn){
-  const prev = ciWhat;
-  ciWhat=v;
-  // Lock meta% at current value — whether typed by user or auto-synced
-  // This prevents recalc() from re-syncing meta to a different MC Final
-  ciTargetSet = true;
-  document.querySelectorAll('#ci-what button').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  // Restore previous variable's original value, then recalc with clean base
-  if(ciOriginals && prev !== v){
-    restoreCIOriginal(prev);
-  }
+
+
+
+
+
+
+
+
+
+// ── Diagrama CI toggle ────────────────────────────────────────────────────
+function setCIDiagTyp(v){
+  ciDiagTyp = v;
+  document.getElementById('ci-diag-nom').style.background  = v==='nom' ? 'var(--accent2)' : 'none';
+  document.getElementById('ci-diag-nom').style.color       = v==='nom' ? 'var(--bg)'      : 'var(--text2)';
+  document.getElementById('ci-diag-disc').style.background = v==='disc'? 'var(--accent2)' : 'none';
+  document.getElementById('ci-diag-disc').style.color      = v==='disc'? 'var(--bg)'      : 'var(--text2)';
   recalc();
 }
-function syncTaxa(src){
-  const v=document.getElementById(src).value;
-  const other=src==='ci-taxa'?'p-taxa':'ci-taxa';
-  document.getElementById(other).value=v;
-  recalc();
-
-}
-function setDiagModel(m,btn){diagMdl=m;document.querySelectorAll('#sg-m button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
-function setDiagType(t,btn){diagTyp=t;document.querySelectorAll('#sg-t button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderDiagram(calc());}
 
 
+// ── Diagrama FC — CI ─────────────────────────────────────────────────────
+function renderDiagramCI(pvX, rbX, cpX, taxa,
+                          icmsAliqE, icmsAliqS, piscofsCp, piscofsVp, piscoP,
+                          freteP, comisP,
+                          dIC, dFR, dCOM, dID, dCP, dVD, dPiscofsV, dRB, fat,
+                          ciIcms, ciWhat, tgt,
+                          dfcTotal, dfcdTotal, pvDFCDref,
+                          pvDisc, rbDisc, cpDisc) {
 
-function renderDiagram(R){
-  const{pv,days,fcICMS,fcNO,discICMS,discNO,fcFI,fcFN,vplI,vplN,fat}=R;
-  const raw  =diagMdl==='icms'?fcICMS:fcNO;
-  const disc =diagMdl==='icms'?discICMS:discNO;
-  const vals =diagTyp==='nom'?raw:disc;
-  const alt  =diagTyp==='nom'?disc:raw;
-  const fcF  =diagMdl==='icms'?fcFI:fcFN;
-  const vplF =diagMdl==='icms'?vplI:vplN;
+  // Nominal flows — MC resolution (pvX/rbX/cpX)
+  const ic  = cpX*icmsAliqE,  id  = pvX*icmsAliqS;
+  const pfc = cpX*piscofsCp,  pfv = pvX*piscofsVp;
+  const fr  = pvX*freteP,     co  = pvX*comisP,   pi = rbX*piscoP;
+  const days = [dIC, dIC, dFR, dCOM, dID, dPiscofsV, dCP, dVD, dRB, dRB];
+  const fcSI = [ic,  pfc, -fr, -co, -id, -pfv, -cpX, pvX, rbX, -pi];
+  const fcNO = [0,   pfc, -fr, -co,  0,  -pfv, -cpX, pvX, rbX, -pi];
+  const raw  = ciIcms ? fcSI : fcNO;
+  const disc = raw.map((v,i) => v/fat(days[i]));
 
-  document.getElementById('kpis-diag').innerHTML=
-    kpiH('DFC Final',fcF)+kpiH('DFC (% PV)',fcF/pv,true)+kpiH('DFCD Final',vplF)+kpiH('DFCD (% PV)',vplF/pv,true);
-
-  // X positions: unique days proportional to timeline, same-day events offset ±18px
-  const ud=getUD(days);
-  const maxDay=Math.max(...ud);
-  const X0=65, X1=830;
-  const udXS=ud.map(d=>X0+(d/maxDay)*(X1-X0));
-  const getDayX=d=>udXS[ud.indexOf(d)];
-  // count events per day for offset
-  const dayCnt={}, daySeq={};
-  days.forEach((d,i)=>{dayCnt[d]=(dayCnt[d]||0)+1;});
-  const dayPos={};
-  days.forEach((d,i)=>{dayPos[d]=(dayPos[d]||0); daySeq[i]=dayPos[d]; dayPos[d]++;});
-  const getX=i=>{
-    const d=days[i], base=getDayX(d), cnt=dayCnt[d];
-    if(cnt===1) return base;
-    return base+(daySeq[i]-(cnt-1)/2)*22;
+  // Helper to build flows for any pv/rb/cp combo
+  const buildFlow = (pv2, rb2, cp2, withIcms) => {
+    const _ic=cp2*icmsAliqE,_id=pv2*icmsAliqS,_pfc=cp2*piscofsCp,_pfv=pv2*piscofsVp;
+    const _fr=pv2*freteP,_co=pv2*comisP,_pi=rb2*piscoP;
+    const f=[_ic,_pfc,-_fr,-_co,-_id,-_pfv,-cp2,pv2,rb2,-_pi];
+    if(!withIcms){f[0]=0;f[4]=0;}
+    return f;
   };
 
-  const TLY=195, SC=9.5, MH=28;
+  const fcF  = raw.reduce((a,b)=>a+b,0);
+  const vplF = disc.reduce((a,b)=>a+b,0);
+
+  // Bars always show nominal values; cumulative line switches
+  // Nominal: DFC bars; Descontado: DFCD nominal bars, VP cumulative
+  const rawDisc = buildFlow(pvDisc||pvX, rbDisc||rbX, cpDisc||cpX, ciIcms);
+  const barVals = ciDiagTyp==='disc' ? rawDisc : raw;
+  const cumVals = ciDiagTyp==='disc' ? disc : raw;
+
+  // ── Auto-scale ────────────────────────────────────────────────────────
+  const allAbs = barVals.map(Math.abs).filter(v=>v>0);
+  const maxVal = Math.max(...allAbs, 0.0001);
+  let scale = 1, suffix = '';
+  if(maxVal >= 1e6)      { scale = 1e6; suffix = ' MM'; }
+  else if(maxVal >= 1e3) { scale = 1e3; suffix = ' mil'; }
+  const fmt = v => {
+    const s = (v/scale).toFixed(4).replace('.',',');
+    return `R$\u00a0${s}${suffix}`;
+  };
+
+  const DLBLS = ['ICMS Crédito','PIS/COFINS Crédito','Frete','Comissão',
+                  'ICMS Débito','PIS/COFINS Débito','Compra','Venda',
+                  'Rebate bruto','PIS/COFINS Rebate'];
+
+  const ud = getUD(days);
+  const maxDay = Math.max(...ud);
+  const X0 = 65, X1 = 820;
+  const udXS = ud.map(d => X0 + (d/maxDay)*(X1-X0));
+  const getDayX = d => udXS[ud.indexOf(d)];
+  const dayCnt={}, dayPos={}, daySeq={};
+  days.forEach(d => { dayCnt[d] = (dayCnt[d]||0)+1; });
+  days.forEach((d,i) => { dayPos[d]=dayPos[d]||0; daySeq[i]=dayPos[d]; dayPos[d]++; });
+  const getX = i => {
+    const d=days[i], base=getDayX(d), cnt=dayCnt[d];
+    return cnt===1 ? base : base+(daySeq[i]-(cnt-1)/2)*22;
+  };
+
+  const TLY=200, SC=7, MH=28;
   const GRN='#7BC47A', RED='#E07070', GRAY='#5A5C54';
-  const DLBLS=['ICMS Crédito','Frete','Comissão','ICMS Débito','Compra','Venda','Rebate bruto','PIS/COFINS'];
 
-  let s='';
-  s+=`<rect x="40" y="20" width="850" height="${TLY-20}" rx="0" fill="rgba(200,232,122,0.015)"/>`;
-  s+=`<line x1="40" y1="${TLY}" x2="870" y2="${TLY}" stroke="#3A3D35" stroke-width="0.75"/>`;
-  s+=`<text x="32" y="${TLY+4}" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="10" fill="#5A5C54">0</text>`;
+  let s = '';
+  s+=`<rect x="40" y="18" width="840" height="${TLY-18}" rx="0" fill="rgba(200,232,122,0.015)"/>`;
+  s+=`<line x1="40" y1="${TLY}" x2="860" y2="${TLY}" stroke="#3A3D35" stroke-width="0.75"/>`;
+  s+=`<text x="32" y="${TLY+4}" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="12" fill="#9A9C94">0</text>`;
 
-  // Draw unique-day axis ticks first
-  ud.forEach(d=>{
-    const x=getDayX(d);
+  ud.forEach(d => {
+    const x = getDayX(d);
     s+=`<line x1="${x}" y1="${TLY-4}" x2="${x}" y2="${TLY+4}" stroke="#4A4D43" stroke-width="0.75"/>`;
-    s+=`<text x="${x}" y="${TLY+17}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="500" fill="#9A9890">D${d}</text>`;
+    s+=`<text x="${x}" y="${TLY+17}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="12" font-weight="600" fill="#C0C0B8">D${d}</text>`;
   });
 
   let cumPts=[], cum=0;
-  vals.forEach((v,i)=>{
-    const x=getX(i);
-    if(v===0){ cum+=0; return; }
-    cum+=v; cumPts.push({x:getDayX(days[i]),v:cum});
-    const pos=v>0;
-    const h=Math.max(Math.abs(v)*SC,MH);
-    const col=pos?GRN:RED;
-    const y2=pos?TLY-h:TLY+h;
+  barVals.forEach((v,i) => {
+    const x = getX(i);
+    if(v===0){ return; }
+    cum += cumVals[i]; cumPts.push({x: getDayX(days[i]), v: cum});
+    const pos = v > 0;
+    const h = Math.max(Math.abs(v/scale)*SC, MH);
+    const col = pos ? GRN : RED;
+    const y2 = pos ? TLY-h : TLY+h;
     s+=`<line x1="${x}" y1="${TLY}" x2="${x}" y2="${y2+(pos?3:-3)}" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>`;
     if(pos) s+=`<polygon points="${x-4},${y2+10} ${x+4},${y2+10} ${x},${y2+1}" fill="${col}"/>`;
     else     s+=`<polygon points="${x-4},${y2-10} ${x+4},${y2-10} ${x},${y2-1}" fill="${col}"/>`;
-    const vStr=fR(v,4), altStr=fR(alt[i],4), lbl=DLBLS[i];
+    const vStr = fmt(v), lbl = DLBLS[i];
     if(pos){
-      s+=`<text x="${x}" y="${y2-18}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="500" fill="${col}">${vStr}</text>`;
-      s+=`<text x="${x}" y="${y2-6}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" fill="#9A9890">${lbl}</text>`;
-      s+=`<text x="${x}" y="${y2+4}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="${GRAY}">${altStr}</text>`;
+      s+=`<text x="${x}" y="${y2-22}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="${col}">${vStr}</text>`;
+      s+=`<text x="${x}" y="${y2-8}"  text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="12" fill="#D8D8D0">${lbl}</text>`;
     } else {
-      s+=`<text x="${x}" y="${y2+13}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="500" fill="${col}">${vStr}</text>`;
-      s+=`<text x="${x}" y="${y2+24}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" fill="#9A9890">${lbl}</text>`;
-      s+=`<text x="${x}" y="${y2+34}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="${GRAY}">${altStr}</text>`;
+      s+=`<text x="${x}" y="${y2+16}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="${col}">${vStr}</text>`;
+      s+=`<text x="${x}" y="${y2+30}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="12" fill="#D8D8D0">${lbl}</text>`;
     }
   });
 
-  if(cumPts.length>1){
-    const csc=3.5, cy=p=>TLY-p.v*csc;
+  if(cumPts.length > 1){
+    const csc=3.2, cy=p=>TLY-p.v/scale*csc;
     let dp=`M ${cumPts[0].x} ${cy(cumPts[0])}`;
-    cumPts.slice(1).forEach(p=>{dp+=` L ${p.x} ${cy(p)}`});
+    cumPts.slice(1).forEach(p=>{ dp+=` L ${p.x} ${cy(p)}`; });
     s+=`<path d="${dp}" fill="none" stroke="#3A3D35" stroke-width="1.2" stroke-dasharray="5 4"/>`;
     const last=cumPts[cumPts.length-1];
-    const lc=r8(last.v)>=0?GRN:RED;
+    const lc = r8(last.v)>=0 ? GRN : RED;
     s+=`<circle cx="${last.x}" cy="${cy(last)}" r="4" fill="${lc}"/>`;
     s+=`<circle cx="${last.x}" cy="${cy(last)}" r="1.8" fill="#0E0F0D"/>`;
-    s+=`<text x="${last.x+12}" y="${cy(last)-2}" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="500" fill="${lc}">Saldo</text>`;
-    s+=`<text x="${last.x+12}" y="${cy(last)+9}" font-family="IBM Plex Mono,monospace" font-size="9" fill="${lc}">${fR(last.v,4)}</text>`;
+    s+=`<text x="${last.x+12}" y="${cy(last)-2}"  font-family="IBM Plex Sans,sans-serif" font-size="12" font-weight="700" fill="${lc}">Saldo</text>`;
+    s+=`<text x="${last.x+12}" y="${cy(last)+12}" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="600" fill="${lc}">${fmt(last.v)}</text>`;
   }
 
-  document.getElementById('diag-svg').innerHTML=s;
-  // KPIs below diagram
-  document.getElementById('kpis-diag').innerHTML=
-    kpiH('DFC Final',fcF)+kpiH('DFC (% PV)',fcF/pv,true)+kpiH('DFCD Final',vplF)+kpiH('DFCD (% PV)',vplF/pv,true);
+  const _lbl  = ciWhat==='pv'?'Preço de Venda':ciWhat==='rebate'?'Rebate':'Preço de Compra';
+  const _scen = ciIcms ? 'com ICMS' : 'sem ICMS';
+  const typLbl = ciDiagTyp==='disc' ? 'Descontado (VP)' : 'Nominal';
+  s+=`<text x="450" y="14" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="11" fill="#B0B0A8">Fluxo ${typLbl} · ${_scen} · Meta ${(tgt*100).toFixed(2).replace('.',',')}%</text>`;
+
+  const svgEl = document.getElementById('ci-diag-svg');
+  if(svgEl) svgEl.innerHTML = s;
+
+  // Build header locally
+  const _hdr = `<div style="font-size:11px;padding:8px 10px;background:var(--bg3);border-left:2px solid var(--accent2);border-radius:4px">
+    <div style="font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">${_lbl} · Meta ${(tgt*100).toFixed(2).replace('.',',')}% do PV · ${_scen}</div>
+  </div>`;
+  const hdrEl = document.getElementById('ci-diag-header');
+  if(hdrEl) hdrEl.innerHTML = _hdr;
+
+  // KPIs
+  const kpiDFC  = dfcTotal  !== undefined ? dfcTotal  : fcF;
+  const kpiDFCD = dfcdTotal !== undefined ? dfcdTotal : vplF;
+  const kpisEl  = document.getElementById('ci-diag-kpis');
+  if(kpisEl) kpisEl.innerHTML =
+    kpiH('DFC Final', kpiDFC) +
+    kpiH('DFC (% PV)', kpiDFC/pvX, true) +
+    kpiH('DFCD Final', kpiDFCD) +
+    kpiH('DFCD (% PV)', kpiDFCD/(pvDFCDref||pvX), true);
+}
+
+
+// ── getUD: unique sorted days ─────────────────────────────────────────────
+function getUD(days){
+  return [...new Set(days)].sort((a,b)=>a-b);
+}
+
+
+function dayHdr(ud){
+  return `<tr><th>Evento</th><th>R$</th>${ud.map(d=>`<th>D${d}</th>`).join('')}<th>% PV</th></tr>`;
+}
+
+
+// ── Memória de Cálculo ────────────────────────────────────────────────────
+function buildMemoria(ciWhat, tgt, pvX, rbX, cpX, vMC, vFC_r, vDFCD,
+                      R){
+  const {pv,rebate,compra,icmsAliqE,icmsAliqS,freteP,comisP,piscoP,
+         piscofsCp,piscofsVp,taxa,
+         dIC,dFR,dCOM,dID,dCP,dVD,dRB,fat,
+         freteV,comisV,piscoV,icmsC,icmsD,vliq,cmv} = R;
+
+  const fP2 = v => (v>=0?'+':'')+((v)*100).toFixed(4)+' %';
+  const fR2 = v => (v>=0?'':'')+fR(v,4);
+  const row = (lbl,mid,val,cls='') =>
+    `<div class="mem-row${cls?' mem-'+cls:''}"><span class="mem-lbl">${lbl}</span>`+
+    `<span class="mem-mid">${mid}</span><span class="mem-val">${val}</span></div>`;
+
+  // ── PARÂMETROS ─────────────────────────────────────────────────────────
+  let h = `<div class="mem-section">Parâmetros da Simulação</div>`;
+  h += row('Meta (% PV)','',fP2(tgt));
+  h += row('Meta × PV',`${fP2(tgt)} × ${fR2(pvX)}`, fR2(tgt*pvX));
+  h += row('TMA mensal','',fP2(taxa));
+
+  // ── RESOLUÇÃO DRE ────────────────────────────────────────────────────
+  h += `<div class="mem-section">Resolução DRE — MC Final = Meta × PV</div>`;
+  const cmvFix  = compra*(1-icmsAliqE-piscofsCp);
+  const rbLiq   = rebate*(1-piscoP);
+  const numDRE  = cmvFix - rbLiq + (vliq - pvX + cmv - cmvFix + piscoV - (rebate-rbLiq));
+  // Simpler: PV*(1-icmsS-piscofsV-frete-comis-tgt) = compra*(1-icmsE-piscofsC) - rebate*(1-piscoP)
+  const denDRE  = 1 - icmsAliqS - piscofsVp - freteP - comisP - tgt;
+  const numDRE2 = compra*(1-icmsAliqE-piscofsCp) - rebate*(1-piscoP);
+  h += row(`CMV (fixo)`, `${fR2(compra)} × (1 − ${fP2(icmsAliqE+piscofsCp)})`, fR2(cmvFix));
+  h += row(`Rebate líquido (fixo)`, `${fR2(rebate)} × (1 − ${fP2(piscoP)})`, fR2(rbLiq));
+  h += row('Numerador','CMV − Rebate + PIS/COFINS', fR2(numDRE2));
+  h += row('Denominador','1 − ICMS saída − Frete − Comissão − Meta', fR(denDRE,4));
+  h += row('PV (DRE) = Num ÷ Den','', fR2(vMC.pv2||pvX), 'highlight');
+
+  // ── RESOLUÇÃO DFC (sem ICMS) ─────────────────────────────────────────
+  h += `<div class="mem-section">Resolução DFC = Meta × PV (Sem Desconto)</div>`;
+  const numDFC = compra*(1-piscofsCp) - rebate*(1-piscoP);
+  const denDFC = 1 - freteP - comisP - piscofsVp - tgt;
+  h += row('Numerador','Compra − Rebate liq.', fR2(numDFC));
+  h += row('Denominador','1 − Frete − Comissão − Meta', fR(denDFC,4));
+  h += row('PV (DFC sem ICMS) = Num ÷ Den','', fR2(vFC_r.pv2||pvX), 'highlight');
+
+  // ── RESOLUÇÃO DFCD ───────────────────────────────────────────────────
+  h += `<div class="mem-section">Resolução DFCD = Meta × PV (Com Desconto TMA)</div>`;
+  const uniqDays = [...new Set([dIC,dFR,dCOM,dID,dCP,dVD,dRB])].sort((a,b)=>a-b);
+  uniqDays.forEach(d => {
+    h += row(`fat(D${d})`, `(1++${fP2(taxa)})^(${d}/30)`, fR(fat(d),4));
+  });
+  // A = coef of PV (sum of VP coefficients affecting PV)
+  const A = -freteP/fat(dFR) - comisP/fat(dCOM) - icmsAliqS/fat(dID) + (1-piscofsVp)/fat(dVD) - tgt;
+  // B = fixed terms VP
+  const B = compra/fat(dCP) - compra*icmsAliqE/fat(dIC) - rebate*(1-piscoP)/fat(dRB);
+  h += row('A = coef. de PV','−Frete/f'+dFR+' −Comis/f'+dCOM+' −ICMS/f'+dID+' +1/f'+dVD+' −Meta', fR(A,4));
+  h += row('B = termos fixos','Compra/f'+dCP+' −icmsC/f'+dIC+' −Rebate liq./f'+dRB, fR2(B));
+  h += row('PV (DFCD) = B ÷ A','', fR2(vDFCD.pv2||pvX), 'highlight');
+
+  return h;
+}
+
+
+// ── Table mapping helpers ─────────────────────────────────────────────────
+function mapFC(fc, days, ud){
+  // Sum events for each unique day
+  const m = {};
+  ud.forEach(d => m[d] = 0);
+  fc.forEach((v,i) => { if(days[i]!==undefined) m[days[i]] = (m[days[i]]||0) + v; });
+  return ud.map(d => m[d]||0);
+}
+
+function mapCum(cum, days, ud){
+  // Pick the last cumulative value for each unique day
+  const m = {};
+  cum.forEach((v,i) => { if(days[i]!==undefined) m[days[i]] = v; });
+  return ud.map(d => m[d]!==undefined ? m[d] : null);
+}
+
+function mapVPL(disc, days, ud){
+  // Sum discounted events for each unique day
+  const m = {};
+  ud.forEach(d => m[d] = 0);
+  disc.forEach((v,i) => { if(days[i]!==undefined) m[days[i]] = (m[days[i]]||0) + v; });
+  return ud.map(d => m[d]||0);
 }
 
 // ── Theme ──────────────────────────────────────────
